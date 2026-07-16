@@ -1,0 +1,72 @@
+name: Xquik API
+description: >-
+  Independent, third-party X (Twitter) data and automation platform offering 40+ tools for search, extraction, write
+  actions, monitoring, webhooks, and trends. Provides a REST API with OpenAPI 3.1 contract, hosted MCP servers,
+  llms.txt, and published agent skills. Not affiliated with X Corp.
+url: https://xquik-api.apievangelist.com/apis.yml
+created: '2026-07-16'
+modified: '2026-07-16'
+specificationVersion: '0.21'
+tags:
+  - social media data
+  - X / Twitter
+  - social listening & monitoring
+  - data extraction / scraping
+  - automation
+  - webhooks
+  - MCP / agent tools
+  - developer API
+apis:
+  - name: Xquik REST API
+    description: >-
+      REST API for X (Twitter) data and automation with OpenAPI 3.1 contract covering 93 paths across API Keys, Account,
+      Articles, Communities, Composition, Draws, Events, Extractions, Lists, Media, Monitors, Subscribe, Support,
+      Trends, Tweets, Users, Webhooks, X Accounts, and X Write.
+    humanURL: https://docs.xquik.com
+    baseURL: https://xquik.com/api/v1
+    tags:
+      - social media data
+      - X / Twitter
+      - social listening & monitoring
+      - data extraction / scraping
+      - automation
+      - webhooks
+      - MCP / agent tools
+      - developer API
+    properties:
+      - type: OpenAPI
+        url: https://xquik.com/openapi.json
+      - type: Documentation
+        url: https://docs.xquik.com
+      - type: LLMSTxt
+        url: https://docs.xquik.com/llms.txt
+      - type: AgentSkills
+        url: https://skills.sh/xquik-dev/x-twitter-scraper/x-twitter-scraper
+      - type: MCP
+        url: https://xquik.com/mcp
+  - name: Xquik Docs MCP Server
+    description: Read-only documentation search MCP server for the Xquik platform.
+    humanURL: https://docs.xquik.com
+    baseURL: https://docs.xquik.com/mcp
+    tags:
+      - social media data
+      - X / Twitter
+      - social listening & monitoring
+      - data extraction / scraping
+      - automation
+      - webhooks
+      - MCP / agent tools
+      - developer API
+    properties:
+      - type: MCP
+        url: https://docs.xquik.com/mcp
+      - type: Documentation
+        url: https://docs.xquik.com
+maintainers:
+  - FN: Xquik API
+    url: https://xquik.com/en
+generated:
+  by: apis.io/add
+  model: claude-opus-4-8
+  confidence: 97
+  at: '2026-07-16T15:52:44.843Z'
