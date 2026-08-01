@@ -1,0 +1,143 @@
+rules:
+  xquik-openapi-version:
+    description: Use OpenAPI 3.1.
+    given: '$'
+    severity: error
+    then:
+      field: openapi
+      function: pattern
+      functionOptions:
+        match: '^3\.1\.'
+  xquik-info-title:
+    description: Provide the API title.
+    given: '$.info'
+    severity: error
+    then:
+      field: title
+      function: truthy
+  xquik-info-description:
+    description: Describe the API.
+    given: '$.info'
+    severity: error
+    then:
+      field: description
+      function: truthy
+  xquik-info-version:
+    description: Provide the API version.
+    given: '$.info'
+    severity: error
+    then:
+      field: version
+      function: truthy
+  xquik-info-contact:
+    description: Provide maintainer contact details.
+    given: '$.info'
+    severity: error
+    then:
+      field: contact
+      function: truthy
+  xquik-contact-name:
+    description: Name the API maintainer.
+    given: '$.info.contact'
+    severity: warn
+    then:
+      field: name
+      function: truthy
+  xquik-contact-url:
+    description: Link the API maintainer.
+    given: '$.info.contact'
+    severity: warn
+    then:
+      field: url
+      function: truthy
+  xquik-contact-email:
+    description: Publish the support email.
+    given: '$.info.contact'
+    severity: warn
+    then:
+      field: email
+      function: truthy
+  xquik-servers:
+    description: Declare a production server.
+    given: '$'
+    severity: error
+    then:
+      field: servers
+      function: truthy
+  xquik-server-url:
+    description: Give each server a URL.
+    given: '$.servers[*]'
+    severity: error
+    then:
+      field: url
+      function: truthy
+  xquik-tags:
+    description: Define shared operation tags.
+    given: '$'
+    severity: info
+    then:
+      field: tags
+      function: truthy
+  xquik-paths:
+    description: Publish API paths.
+    given: '$'
+    severity: error
+    then:
+      field: paths
+      function: truthy
+  xquik-operation-summary:
+    description: Summarize every operation.
+    given: '$.paths[*][get,post,put,patch,delete]'
+    severity: error
+    then:
+      field: summary
+      function: truthy
+  xquik-operation-id:
+    description: Identify every operation.
+    given: '$.paths[*][get,post,put,patch,delete]'
+    severity: error
+    then:
+      field: operationId
+      function: truthy
+  xquik-operation-tags:
+    description: Group every operation.
+    given: '$.paths[*][get,post,put,patch,delete]'
+    severity: error
+    then:
+      field: tags
+      function: truthy
+  xquik-operation-responses:
+    description: Document operation responses.
+    given: '$.paths[*][get,post,put,patch,delete]'
+    severity: error
+    then:
+      field: responses
+      function: truthy
+  xquik-components:
+    description: Publish reusable components.
+    given: '$'
+    severity: info
+    then:
+      field: components
+      function: truthy
+  xquik-component-schemas:
+    description: Publish reusable schemas.
+    given: '$.components'
+    severity: error
+    then:
+      field: schemas
+      function: truthy
+  xquik-security-schemes:
+    description: Declare authentication schemes.
+    given: '$.components'
+    severity: error
+    then:
+      field: securitySchemes
+      function: truthy
+  xquik-security:
+    description: Apply authentication requirements.
+    given: '$'
+    severity: error
+    then:
+      field: security
+      function: truthy

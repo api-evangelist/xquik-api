@@ -1,0 +1,32 @@
+generated: '2026-08-01'
+method: declared
+source: https://xquik.com/apis.yml
+publisher: Xquik
+standards:
+  - id: openapi-3.1
+    conforms: true
+    evidence: https://xquik.com/openapi.json
+  - id: oauth-2.1
+    conforms: true
+    evidence: https://xquik.com/.well-known/oauth-authorization-server
+  - id: rfc9728-oauth-protected-resource
+    conforms: true
+    evidence: https://xquik.com/.well-known/oauth-protected-resource/mcp
+  - id: rfc9727-api-catalog
+    conforms: true
+    evidence: https://xquik.com/.well-known/api-catalog
+  - id: rfc9116-security-txt
+    conforms: true
+    evidence: https://xquik.com/.well-known/security.txt
+  - id: mcp
+    conforms: true
+    evidence: https://xquik.com/.well-known/mcp.json
+  - id: agent-skills-discovery-0.2
+    conforms: true
+    evidence: https://xquik.com/.well-known/agent-skills/index.json
+  - id: a2a-agent-card-1.0
+    conforms: true
+    evidence: https://xquik.com/.well-known/agent-card.json
+  - id: rfc9457-problem-details
+    conforms: false
+    evidence: Xquik uses its documented error envelope.

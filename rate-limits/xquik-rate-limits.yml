@@ -1,0 +1,37 @@
+specification: API Commons Rate Limits
+specificationVersion: '0.1'
+schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main/schema/api-commons.yml#/$defs/RateLimits
+provider: Xquik
+providerId: xquik
+created: '2026-08-01'
+modified: '2026-08-01'
+reconciled: true
+tags:
+  - rate limiting
+  - REST
+description: Public request limits for Xquik REST operations.
+sources:
+  - https://docs.xquik.com/guides/rate-limits
+headers:
+  retryAfter: Retry-After
+responseCodes:
+  throttled: 429
+limits:
+  - name: Read operations
+    scope: account
+    metric: requests_per_second
+    limit: 300
+    timeFrame: second
+  - name: Write operations
+    scope: account
+    metric: requests_per_minute
+    limit: 120
+    timeFrame: minute
+  - name: Delete operations
+    scope: account
+    metric: requests_per_minute
+    limit: 60
+    timeFrame: minute
+policies:
+  - name: Backoff
+    description: Wait for Retry-After before retrying a throttled request.

@@ -1,0 +1,34 @@
+generated: '2026-08-01'
+method: declared
+publisher: Xquik
+source: https://xquik.com/.well-known/agent-card.json
+description: >-
+  Xquik's provider-authored A2A Agent Card. The saved document matches the
+  provider route and the A2A 1.0.0 AgentCard structure.
+discovery:
+  path: /.well-known/agent-card.json
+  canonical: true
+  host: xquik.com
+conformance:
+  spec: A2A 1.0.0
+  grade: conformant
+  protocol_version: 1.0.0
+  preferred_transport: JSONRPC
+  deviations: []
+card:
+  name: Xquik MCP
+  description: >-
+    Use Xquik through MCP for public X data, connected-account actions,
+    monitoring, webhooks, exports, and account workflows.
+  url: https://xquik.com/mcp
+  version: 2.6.0
+  documentation_url: https://docs.xquik.com/mcp/overview
+  skills: 3
+  file: xquik-agent-card.json
+x-evidence:
+  declared: '2026-08-01'
+  url: https://xquik.com/.well-known/agent-card.json
+  expected_content_type: application/json
+  status: 200
+  verified: '2026-08-01'
+  note: Provider-authored route is live and returns the saved A2A 1.0.0 Agent Card.

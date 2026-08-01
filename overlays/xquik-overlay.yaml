@@ -1,0 +1,13 @@
+overlay: 1.0.0
+info:
+  title: Xquik API Governance Metadata
+  version: 1.0.0
+extends: https://xquik.com/openapi.json
+actions:
+  - target: $.info
+    update:
+      x-xquik-governance:
+        rules: https://xquik.com/openapi-rules.yml
+        vocabulary: https://xquik.com/api-vocabulary.yml
+        catalog: https://xquik.com/apis.yml
+        maintainer: support@xquik.com

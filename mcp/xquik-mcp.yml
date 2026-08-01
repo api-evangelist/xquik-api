@@ -1,0 +1,23 @@
+generated: '2026-08-01'
+method: declared
+publisher: Xquik
+status: published
+source: https://xquik.com/.well-known/mcp.json
+description: >-
+  Xquik operates an official remote MCP server. It supports OAuth 2.1 and
+  client-specific API-key access.
+server:
+  name: xquik
+  transport: http
+  protocol: mcp
+  url: https://xquik.com/mcp
+  manifest: https://xquik.com/.well-known/mcp.json
+  auth: oauth2
+  protected_resource: https://xquik.com/.well-known/oauth-protected-resource/mcp
+  authorization_server: https://xquik.com/.well-known/oauth-authorization-server
+documentation: https://docs.xquik.com/mcp/overview
+tools:
+  - name: explore
+    description: Find the smallest relevant Xquik API operation.
+  - name: xquik
+    description: Run authenticated Xquik API operations.

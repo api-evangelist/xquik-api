@@ -1,0 +1,1621 @@
+generated: 2026-08-01
+method: declared
+publisher: Xquik
+source: https://xquik.com/openapi.json
+description: Provider-declared x-agentic-access contract for Xquik REST operations.
+summary:
+  operations: 127
+  by_action_class:
+    connected: 71
+    acting: 56
+  by_consequence:
+    read: 71
+    write: 56
+  human_in_the_loop_required: 56
+operations:
+  - path: /api/v1/account
+    method: get
+    operationId: getAccount
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/account
+    method: patch
+    operationId: updateAccount
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/account/x-identity
+    method: put
+    operationId: setXIdentity
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/api-keys
+    method: get
+    operationId: listApiKeys
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/api-keys
+    method: post
+    operationId: createApiKey
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/api-keys/{id}
+    method: delete
+    operationId: revokeApiKey
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/subscribe
+    method: post
+    operationId: subscribe
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/compose
+    method: post
+    operationId: compose
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/drafts
+    method: get
+    operationId: listDrafts
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/drafts
+    method: post
+    operationId: createDraft
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/drafts/{id}
+    method: get
+    operationId: getDraft
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/drafts/{id}
+    method: delete
+    operationId: deleteDraft
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/styles
+    method: get
+    operationId: listStyles
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/styles
+    method: post
+    operationId: analyzeStyle
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/styles/compare
+    method: get
+    operationId: compareStyles
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/styles/{id}
+    method: get
+    operationId: getStyle
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/styles/{id}
+    method: put
+    operationId: saveStyle
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/styles/{id}
+    method: delete
+    operationId: deleteStyle
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/styles/{id}/performance
+    method: get
+    operationId: getStylePerformance
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/radar
+    method: get
+    operationId: getRadar
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/monitors
+    method: get
+    operationId: listMonitors
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/monitors
+    method: post
+    operationId: createMonitor
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/monitors/keywords
+    method: get
+    operationId: listKeywordMonitors
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/monitors/keywords
+    method: post
+    operationId: createKeywordMonitor
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/monitors/keywords/{id}
+    method: get
+    operationId: getKeywordMonitor
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/monitors/keywords/{id}
+    method: patch
+    operationId: updateKeywordMonitor
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/monitors/keywords/{id}
+    method: delete
+    operationId: deleteKeywordMonitor
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/monitors/{id}
+    method: get
+    operationId: getMonitor
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/monitors/{id}
+    method: patch
+    operationId: updateMonitor
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/monitors/{id}
+    method: delete
+    operationId: deleteMonitor
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/events
+    method: get
+    operationId: listEvents
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/events/{id}
+    method: get
+    operationId: getEvent
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/extractions
+    method: get
+    operationId: listExtractions
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/extractions
+    method: post
+    operationId: createExtraction
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/extractions/estimate
+    method: post
+    operationId: estimateExtraction
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/extractions/{id}
+    method: get
+    operationId: getExtraction
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/extractions/{id}/export
+    method: get
+    operationId: exportExtraction
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/draws
+    method: get
+    operationId: listDraws
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/draws
+    method: post
+    operationId: createDraw
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/draws/{id}
+    method: get
+    operationId: getDraw
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/draws/{id}/export
+    method: get
+    operationId: exportDraw
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/webhooks
+    method: get
+    operationId: listWebhooks
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/webhooks
+    method: post
+    operationId: createWebhook
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/webhooks/{id}
+    method: patch
+    operationId: updateWebhook
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/webhooks/{id}
+    method: delete
+    operationId: deleteWebhook
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/webhooks/{id}/deliveries
+    method: get
+    operationId: listWebhookDeliveries
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/webhooks/{id}/test
+    method: post
+    operationId: testWebhook
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/webhooks/{id}/resume
+    method: post
+    operationId: resumeWebhook
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/x/tweets
+    method: get
+    operationId: getBatchTweets
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/tweets
+    method: post
+    operationId: createTweet
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/x/write-actions/{id}
+    method: get
+    operationId: getWriteActionStatus
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/trends
+    method: get
+    operationId: getXTrends
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/tweets/search
+    method: get
+    operationId: searchTweets
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/articles/{tweetId}
+    method: get
+    operationId: getArticle
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/tweets/{id}
+    method: get
+    operationId: lookupTweet
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/tweets/{id}
+    method: delete
+    operationId: deleteTweet
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/x/tweets/{id}/like
+    method: post
+    operationId: likeTweet
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/x/tweets/{id}/like
+    method: delete
+    operationId: unlikeTweet
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/x/tweets/{id}/retweet
+    method: post
+    operationId: retweet
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/x/tweets/{id}/retweet
+    method: delete
+    operationId: unretweet
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/x/users/batch
+    method: get
+    operationId: getBatchUsers
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/users/search
+    method: get
+    operationId: searchUsers
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/users/{id}
+    method: get
+    operationId: getUser
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/users/{id}/follow
+    method: post
+    operationId: followUser
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/x/users/{id}/follow
+    method: delete
+    operationId: unfollowUser
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/x/users/{id}/remove-follower
+    method: post
+    operationId: removeFollower
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/x/followers/check
+    method: get
+    operationId: checkFollow
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/dm/{userId}
+    method: post
+    operationId: sendDm
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/x/media
+    method: post
+    operationId: uploadMedia
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/x/media/download
+    method: post
+    operationId: downloadMedia
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/x/profile
+    method: patch
+    operationId: updateProfile
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/x/profile/avatar
+    method: patch
+    operationId: updateAvatar
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/x/profile/banner
+    method: patch
+    operationId: updateBanner
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/x/communities
+    method: post
+    operationId: createCommunity
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/x/communities/{id}
+    method: delete
+    operationId: deleteCommunity
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/x/communities/{id}/join
+    method: post
+    operationId: joinCommunity
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/x/communities/{id}/join
+    method: delete
+    operationId: leaveCommunity
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/x/accounts
+    method: get
+    operationId: listXAccounts
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/accounts
+    method: post
+    operationId: connectXAccount
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/x/account-connection-attempts/{id}
+    method: get
+    operationId: getXAccountConnectionAttempt
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/account-connection-challenges/{id}/submit
+    method: post
+    operationId: submitXAccountConnectionChallenge
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/x/accounts/{id}
+    method: get
+    operationId: getXAccount
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/accounts/{id}
+    method: delete
+    operationId: disconnectXAccount
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/x/accounts/{id}/reauth
+    method: post
+    operationId: reauthXAccount
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/x/accounts/bulk-retry
+    method: post
+    operationId: bulkRetryXAccounts
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/trends
+    method: get
+    operationId: getTrends
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/support/attachments/{id}
+    method: get
+    operationId: downloadSupportAttachment
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/support/tickets
+    method: get
+    operationId: listTickets
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/support/tickets
+    method: post
+    operationId: createTicket
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/support/tickets/{id}
+    method: get
+    operationId: getTicket
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/support/tickets/{id}
+    method: patch
+    operationId: updateTicketStatus
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/support/tickets/{id}/messages
+    method: post
+    operationId: addTicketMessage
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/guest-wallets
+    method: post
+    operationId: createGuestWallet
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/guest-wallets/topups
+    method: post
+    operationId: topUpGuestWallet
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/guest-wallets/status
+    method: get
+    operationId: getGuestWalletStatus
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/credits
+    method: get
+    operationId: getCredits
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/credits/topup
+    method: post
+    operationId: topUpCredits
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/credits/topup/status
+    method: get
+    operationId: getCreditTopupStatus
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/credits/quick-topup
+    method: post
+    operationId: quickTopUpCredits
+    x-agentic-access:
+      action-class: acting
+      consequence: write
+      subject: required
+      audience: https://xquik.com
+      token:
+        max-ttl: 900
+        purpose-required: true
+      escalation:
+        human-in-the-loop: required
+        triggers:
+          - external-side-effect
+      audit: required
+  - path: /api/v1/x/tweets/{id}/favoriters
+    method: get
+    operationId: getTweetFavoriters
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/users/{id}/tweets
+    method: get
+    operationId: getUserTweets
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/users/{id}/replies
+    method: get
+    operationId: getUserReplies
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/users/{id}/likes
+    method: get
+    operationId: getUserLikes
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/users/{id}/media
+    method: get
+    operationId: getUserMedia
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/users/{id}/followers-you-know
+    method: get
+    operationId: getFollowersYouKnow
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/bookmarks
+    method: get
+    operationId: getBookmarks
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/bookmarks/folders
+    method: get
+    operationId: getBookmarkFolders
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/notifications
+    method: get
+    operationId: getNotifications
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/timeline
+    method: get
+    operationId: getTimeline
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/dm/{userId}/history
+    method: get
+    operationId: getDmHistory
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/communities/{id}/info
+    method: get
+    operationId: getCommunityInfo
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/communities/{id}/members
+    method: get
+    operationId: getCommunityMembers
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/communities/{id}/moderators
+    method: get
+    operationId: getCommunityModerators
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/communities/{id}/tweets
+    method: get
+    operationId: getCommunityTweets
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/communities/search
+    method: get
+    operationId: searchCommunities
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/communities/tweets
+    method: get
+    operationId: getAllCommunityTweets
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/lists/{id}/followers
+    method: get
+    operationId: getListFollowers
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/lists/{id}/members
+    method: get
+    operationId: getListMembers
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/lists/{id}/tweets
+    method: get
+    operationId: getListTweets
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/tweets/{id}/quotes
+    method: get
+    operationId: getTweetQuotes
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/tweets/{id}/replies
+    method: get
+    operationId: getTweetReplies
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/tweets/{id}/retweeters
+    method: get
+    operationId: getTweetRetweeters
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/tweets/{id}/thread
+    method: get
+    operationId: getTweetThread
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/users/{id}/followers
+    method: get
+    operationId: getUserFollowers
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/users/{id}/following
+    method: get
+    operationId: getUserFollowing
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/users/{id}/mentions
+    method: get
+    operationId: getUserMentions
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
+  - path: /api/v1/x/users/{id}/verified-followers
+    method: get
+    operationId: getUserVerifiedFollowers
+    x-agentic-access:
+      action-class: connected
+      consequence: read
+      subject: optional
+      token:
+        max-ttl: 3600
+      audit: none
