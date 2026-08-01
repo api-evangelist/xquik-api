@@ -32,6 +32,8 @@ apis:
       - automation
     properties:
       - type: OpenAPI
+        url: openapi/xquik-rest-api-openapi.yml
+      - type: OpenAPISource
         url: https://xquik.com/openapi.json
       - type: Documentation
         url: https://docs.xquik.com
@@ -165,7 +167,7 @@ common:
   - type: LLMsTxt
     url: llms/xquik-llms.txt
   - type: AgentCard
-    url: a2a/xquik-a2a.yml
+    url: a2a/xquik-api-a2a.yml
   - type: AgenticAccess
     url: agentic-access/xquik-agentic-access.yml
   - type: SpectralRules
