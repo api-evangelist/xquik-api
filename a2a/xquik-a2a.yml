@@ -29,4 +29,6 @@ x-evidence:
   declared: '2026-08-01'
   url: https://xquik.com/.well-known/agent-card.json
   expected_content_type: application/json
-  note: Provider-authored route deployment is pending at contribution time.
+  status: 200
+  verified: '2026-08-01'
+  note: Provider-authored route is live and returns the saved A2A 1.0.0 Agent Card.

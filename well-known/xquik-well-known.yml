@@ -30,5 +30,5 @@ hosts:
         status: 200
         type: application/json
       - path: /.well-known/agent-card.json
-        status: pending
+        status: 200
         type: application/json
