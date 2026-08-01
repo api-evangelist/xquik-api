@@ -1,0 +1,76 @@
+specification: API Commons Plans
+specificationVersion: '0.1'
+schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main/schema/api-commons.yml#/$defs/Plans
+provider: Xquik
+providerId: xquik
+created: '2026-08-01'
+modified: '2026-08-01'
+reconciled: true
+tags:
+  - social media data
+  - automation
+  - usage-based billing
+description: Public Xquik plans and prepaid credit pricing.
+sources:
+  - https://xquik.com/en#pricing
+plans:
+  - id: xquik-pay-as-you-go
+    name: Pay As You Go
+    type: usage-based
+    description: Buy prepaid credits without a subscription.
+    entries:
+      - label: Minimum purchase
+        name: minimum_purchase
+        type: metered
+        metric: credits
+        limit: 66666
+        timeFrame: usage
+        geo: global
+        unit: 66666
+        price: '10.00'
+        userMultiplied: false
+  - id: xquik-starter
+    name: Starter
+    type: subscription
+    description: Monthly credits for smaller production workloads.
+    entries:
+      - label: Monthly credits
+        name: included_credits
+        type: subscription
+        metric: credits
+        limit: 140000
+        timeFrame: month
+        geo: global
+        unit: 140000
+        price: '20.00'
+        userMultiplied: false
+  - id: xquik-pro
+    name: Pro
+    type: subscription
+    description: Monthly credits for growing production workloads.
+    entries:
+      - label: Monthly credits
+        name: included_credits
+        type: subscription
+        metric: credits
+        limit: 770000
+        timeFrame: month
+        geo: global
+        unit: 770000
+        price: '99.00'
+        userMultiplied: false
+  - id: xquik-business
+    name: Business
+    type: subscription
+    description: Monthly credits for larger production workloads.
+    entries:
+      - label: Monthly credits
+        name: included_credits
+        type: subscription
+        metric: credits
+        limit: 1670000
+        timeFrame: month
+        geo: global
+        unit: 1670000
+        price: '199.00'
+        userMultiplied: false

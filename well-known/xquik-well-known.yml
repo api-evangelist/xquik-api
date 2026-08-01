@@ -1,0 +1,34 @@
+generated: '2026-08-01'
+method: declared
+publisher: Xquik
+description: Provider-authored discovery surface for Xquik's public API and MCP server.
+hosts:
+  - host: https://xquik.com
+    documents:
+      - path: /.well-known/api-catalog
+        status: 200
+        type: application/linkset+json
+      - path: /.well-known/mcp.json
+        status: 200
+        type: application/json
+      - path: /.well-known/agent-index.json
+        status: 200
+        type: application/json
+      - path: /.well-known/agent-skills/index.json
+        status: 200
+        type: application/json
+      - path: /.well-known/oauth-authorization-server
+        status: 200
+        type: application/json
+      - path: /.well-known/oauth-protected-resource/mcp
+        status: 200
+        type: application/json
+      - path: /.well-known/security.txt
+        status: 200
+        type: text/plain
+      - path: /.well-known/http-message-signatures-directory
+        status: 200
+        type: application/json
+      - path: /.well-known/agent-card.json
+        status: pending
+        type: application/json

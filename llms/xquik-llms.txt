@@ -1,0 +1,32 @@
+# Xquik
+
+> Xquik is an independent third-party service. Not affiliated with X Corp. "Twitter" and "X" are trademarks of X Corp.
+
+Xquik supports public X data, connected-account actions, monitoring, exports, webhooks, and agents.
+
+## Primary Links
+
+- Documentation: https://docs.xquik.com
+- API reference: https://docs.xquik.com/api-reference/overview
+- OpenAPI 3.1 schema: https://xquik.com/openapi.json
+- API catalog: https://xquik.com/.well-known/api-catalog
+- APIs.json index: https://xquik.com/apis.yml
+- MCP endpoint: https://xquik.com/mcp
+- MCP manifest: https://xquik.com/.well-known/mcp.json
+- MCP authentication: https://xquik.com/auth.md
+- Agent index: https://xquik.com/.well-known/agent-index.json
+- A2A agent card: https://xquik.com/.well-known/agent-card.json
+- Agent Skills: https://xquik.com/.well-known/agent-skills/index.json
+- Pricing: https://xquik.com/en#pricing
+- SDKs and CLI: https://github.com/Xquik-dev
+
+## Access
+
+- Dashboard login uses magic links.
+- API keys are user-managed and revocable.
+- OAuth 2.1 supports third-party clients.
+- MCP clients should use OAuth 2.1 discovery.
+
+## Contact
+
+- Support: mailto:support@xquik.com

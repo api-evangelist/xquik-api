@@ -1,0 +1,63 @@
+specification: FinOps Framework
+specificationVersion: '1.0'
+schema: https://www.finops.org/framework/
+provider: Xquik
+providerId: xquik
+created: '2026-08-01'
+modified: '2026-08-01'
+reconciled: true
+tags:
+  - FinOps
+  - cost management
+  - usage-based billing
+description: Public cost allocation guidance for Xquik credits.
+sources:
+  - https://xquik.com/en#pricing
+  - https://docs.xquik.com/llms.txt
+alignedWith:
+  framework: FinOps Foundation Framework
+  frameworkUrl: https://www.finops.org/framework/
+publisherName: Xquik
+serviceCategory: Social Media Data
+billingModel:
+  pricingCategory: Prepaid Credits and Subscription
+  billingFrequency: Monthly or On Demand
+  billingCurrency: USD
+  chargeCategories:
+    - Usage
+    - Purchase
+    - Credit
+focusColumns:
+  ServiceName: Xquik
+  ServiceCategory: Social Media Data
+  ProviderName: Xquik
+  PublisherName: Xquik
+  BillingCurrency: USD
+meters:
+  - name: delivered_results
+    unit: credit
+    aggregation: sum
+    dimensions:
+      - operation
+      - account
+  - name: active_monitor_time
+    unit: hour
+    aggregation: sum
+    dimensions:
+      - monitor
+      - account
+  - name: write_actions
+    unit: credit
+    aggregation: sum
+    dimensions:
+      - action
+      - account
+principles:
+  - name: Visibility
+    description: Read current credits from the account endpoint.
+  - name: Allocation
+    description: Allocate usage through API keys and operation records.
+  - name: Optimization
+    description: Estimate extractions before creating them.
+  - name: Accountability
+    description: Reconcile usage records against credit deductions.

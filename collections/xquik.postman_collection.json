@@ -1,0 +1,64 @@
+{
+  "info": {
+    "_postman_id": "e7474705-5569-4b9f-9a01-cb55405fe7d7",
+    "name": "Xquik REST API",
+    "description": "Safe starter requests for Xquik public X data. Not affiliated with X Corp.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      { "key": "key", "value": "x-api-key", "type": "string" },
+      { "key": "value", "value": "{{xquik_api_key}}", "type": "string" },
+      { "key": "in", "value": "header", "type": "string" }
+    ]
+  },
+  "variable": [
+    { "key": "base_url", "value": "https://xquik.com/api/v1" },
+    { "key": "xquik_api_key", "value": "" },
+    { "key": "tweet_id", "value": "1893456789012345678" },
+    { "key": "username", "value": "x" }
+  ],
+  "item": [
+    {
+      "name": "Get Tweet",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/x/tweets/{{tweet_id}}",
+        "description": "Retrieve one public post by numeric ID."
+      }
+    },
+    {
+      "name": "Search Tweets",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/x/tweets/search?q=from%3A{{username}}&limit=10",
+        "description": "Search recent public posts."
+      }
+    },
+    {
+      "name": "Get User",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/x/users/{{username}}",
+        "description": "Retrieve one public profile."
+      }
+    },
+    {
+      "name": "Get User Tweets",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/x/users/{{username}}/tweets?limit=10",
+        "description": "Retrieve one public profile timeline."
+      }
+    },
+    {
+      "name": "Get Trends",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/trends?woeid=1&count=10",
+        "description": "Retrieve worldwide trends."
+      }
+    }
+  ]
+}

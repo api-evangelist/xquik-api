@@ -1,0 +1,71 @@
+name: Xquik API Vocabulary
+description: Shared terms for Xquik API contracts and documentation.
+version: '1.0.0'
+created: '2026-08-01'
+modified: '2026-08-01'
+tags:
+  - social media data
+  - automation
+  - webhooks
+  - agents
+terms:
+  - term: API Key
+    definition: Secret credential granting scoped Xquik API access.
+    category: Authentication
+  - term: OAuth Access Token
+    definition: Scoped bearer token issued through Xquik OAuth 2.1.
+    category: Authentication
+  - term: Guest Wallet
+    definition: Accountless prepaid credential for eligible read operations.
+    category: Billing
+  - term: Credit
+    definition: Public billing unit consumed by metered operations.
+    category: Billing
+  - term: Monitor
+    definition: Recurring account or keyword observation configuration.
+    category: Monitoring
+  - term: Event
+    definition: Stored occurrence produced by an active monitor.
+    category: Monitoring
+  - term: Webhook
+    definition: HTTPS destination receiving signed Xquik events.
+    category: Integration
+  - term: Delivery
+    definition: One recorded attempt to send a webhook event.
+    category: Integration
+  - term: Extraction
+    definition: Tracked job collecting a bounded public dataset.
+    category: Data
+  - term: Draw
+    definition: Auditable selection of giveaway winners and backups.
+    category: Automation
+  - term: Connected X Account
+    definition: Customer-authorized account used for supported write actions.
+    category: Authentication
+  - term: Write Action
+    definition: Durable record tracking one connected-account mutation.
+    category: Automation
+  - term: Idempotency Key
+    definition: Unique request key preventing supported duplicate mutations.
+    category: Reliability
+  - term: Cursor
+    definition: Opaque checkpoint used to request the next result page.
+    category: Pagination
+  - term: MCP Server
+    definition: Hosted agent interface exposing Xquik tools through MCP.
+    category: Agents
+  - term: Agent Skill
+    definition: Packaged instructions for safe Xquik agent workflows.
+    category: Agents
+  - term: MPP
+    definition: Payment challenge protocol supported by fixed-price reads.
+    category: Billing
+  - term: Public Read
+    definition: Operation retrieving public X data without writing.
+    category: Data
+  - term: Retry-After
+    definition: Response header stating when throttled work may resume.
+    category: Reliability
+  - term: Normalized Contract
+    definition: Opt-in v1 response format with stable structured fields.
+    category: Contract
