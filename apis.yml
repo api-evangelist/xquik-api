@@ -4,7 +4,7 @@ description: >-
   provides public data reads, connected-account write actions, monitoring,
   signed webhooks, exports, hosted MCP servers, OAuth 2.1, API keys, 8 SDKs, a
   CLI, Agent Skills, and an OpenAPI 3.1 contract. Not affiliated with X Corp.
-url: https://raw.githubusercontent.com/api-evangelist/xquik-api/refs/heads/main/apis.yml
+url: https://xquik.com/apis.yml
 image: https://xquik.com/logo-square.png
 created: '2026-04-14'
 modified: '2026-08-01'
