@@ -1,0 +1,114 @@
+asyncapi: 3.1.0
+id: https://xquik.com/asyncapi.yaml
+info:
+  title: Xquik Monitor Webhooks
+  version: 1.0.0
+  description: >-
+    Xquik sends signed monitor events to customer-managed HTTPS webhook
+    endpoints. Xquik is not affiliated with or endorsed by X Corp.
+  contact:
+    name: Xquik Support
+    url: https://docs.xquik.com/webhooks/overview
+    email: support@xquik.com
+defaultContentType: application/json
+servers:
+  subscriber:
+    host: '{subscriberHost}'
+    pathname: /
+    protocol: https
+    description: HTTPS endpoint registered by the Xquik customer.
+    variables:
+      subscriberHost:
+        description: Customer-managed public webhook host.
+    security:
+      - $ref: '#/components/securitySchemes/xquikWebhookSignature'
+    bindings:
+      http: {}
+channels:
+  monitorEvents:
+    address: '{callbackPath}'
+    description: Signed monitor events sent to the registered webhook endpoint.
+    parameters:
+      callbackPath:
+        description: Customer-managed webhook path.
+    messages:
+      monitorEvent:
+        $ref: '#/components/messages/monitorEvent'
+operations:
+  sendMonitorEvent:
+    action: send
+    summary: Send a signed monitor event.
+    description: >-
+      Sends one versioned monitor event to a registered HTTPS endpoint.
+      Receivers verify the HMAC headers before processing the payload.
+    channel:
+      $ref: '#/channels/monitorEvents'
+    messages:
+      - $ref: '#/channels/monitorEvents/messages/monitorEvent'
+    bindings:
+      http:
+        method: POST
+        bindingVersion: 0.3.0
+components:
+  securitySchemes:
+    xquikWebhookSignature:
+      type: httpApiKey
+      in: header
+      name: X-Xquik-Signature
+      description: >-
+        HMAC-SHA256 signature computed over the timestamp, nonce, and raw
+        request body with the endpoint secret.
+  messages:
+    monitorEvent:
+      name: monitorEvent
+      title: Xquik Monitor Event
+      summary: A signed event created by an account or keyword monitor.
+      contentType: application/json
+      headers:
+        type: object
+        additionalProperties: false
+        required:
+          - X-Xquik-Nonce
+          - X-Xquik-Signature
+          - X-Xquik-Timestamp
+        properties:
+          X-Xquik-Nonce:
+            type: string
+            pattern: '^[0-9a-f]{32}$'
+            description: Unique request nonce encoded as lowercase hexadecimal.
+          X-Xquik-Signature:
+            type: string
+            pattern: '^sha256=[0-9a-f]{64}$'
+            description: >-
+              HMAC-SHA256 of timestamp, nonce, and the raw body using the
+              endpoint secret.
+          X-Xquik-Timestamp:
+            type: string
+            pattern: '^[0-9]+$'
+            description: Unix epoch time in milliseconds.
+      payload:
+        $ref: ../json-schema/webhook-event.schema.json
+      correlationId:
+        description: Stable identifier for this webhook delivery.
+        location: $message.payload#/deliveryId
+      bindings:
+        http:
+          bindingVersion: 0.3.0
+      examples:
+        - name: New post
+          summary: A new post matched an account monitor.
+          headers:
+            X-Xquik-Nonce: 0123456789abcdef0123456789abcdef
+            X-Xquik-Signature: >-
+              sha256=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+            X-Xquik-Timestamp: '1785628800000'
+          payload:
+            data:
+              id: '1950000000000000000'
+              text: Example post text
+            deliveryId: '42'
+            eventType: tweet.new
+            occurredAt: '2026-08-02T00:00:00.000Z'
+            schemaVersion: 1
+            streamEventId: '91'
+            username: example
