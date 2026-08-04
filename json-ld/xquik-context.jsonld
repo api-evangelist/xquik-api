@@ -1,0 +1,43 @@
+{
+  "@context": {
+    "@version": 1.1,
+    "@vocab": "https://xquik.com/xquik-context.jsonld#",
+    "schema": "https://schema.org/",
+    "xquik": "https://xquik.com/xquik-context.jsonld#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "Extraction": "xquik:Extraction",
+    "Monitor": "xquik:Monitor",
+    "Tweet": "schema:SocialMediaPosting",
+    "WebhookDelivery": "xquik:WebhookDelivery",
+    "WebhookEndpoint": "xquik:WebhookEndpoint",
+    "WebhookEvent": "xquik:WebhookEvent",
+    "XProfile": "schema:Person",
+    "createdAt": {
+      "@id": "schema:dateCreated",
+      "@type": "xsd:dateTime"
+    },
+    "data": "xquik:data",
+    "deliveryId": "xquik:deliveryId",
+    "deliveryStatus": "xquik:deliveryStatus",
+    "eventType": "xquik:eventType",
+    "eventTypes": {
+      "@container": "@set",
+      "@id": "xquik:eventType"
+    },
+    "id": "@id",
+    "isActive": "xquik:isActive",
+    "occurredAt": {
+      "@id": "schema:startDate",
+      "@type": "xsd:dateTime"
+    },
+    "query": "schema:query",
+    "schemaVersion": "schema:version",
+    "streamEventId": "xquik:streamEventId",
+    "text": "schema:text",
+    "url": {
+      "@id": "schema:url",
+      "@type": "@id"
+    },
+    "username": "schema:alternateName"
+  }
+}

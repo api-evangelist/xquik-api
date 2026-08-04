@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xquik.com/schemas/webhook-endpoint.schema.json",
+  "title": "Xquik Webhook Endpoint",
+  "description": "A customer endpoint registered to receive signed Xquik events.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "consecutiveFailures",
+    "createdAt",
+    "deliveryStatus",
+    "eventTypes",
+    "failureHardCap",
+    "id",
+    "isActive",
+    "url"
+  ],
+  "properties": {
+    "consecutiveFailures": { "type": "integer", "minimum": 0 },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "deliveryStatus": {
+      "type": "string",
+      "enum": ["active", "paused", "needs_attention"]
+    },
+    "eventTypes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "$ref": "./webhook-event.schema.json#/properties/eventType" }
+    },
+    "failureHardCap": { "type": "integer", "minimum": 1 },
+    "id": { "type": "string", "pattern": "^[0-9]+$" },
+    "isActive": { "type": "boolean" },
+    "url": { "type": "string", "format": "uri", "pattern": "^https://" }
+  }
+}
