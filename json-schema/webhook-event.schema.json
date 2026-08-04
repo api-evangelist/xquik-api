@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://xquik.com/schemas/webhook-event.schema.json",
+  "title": "Xquik Webhook Event",
+  "description": "A signed account or keyword monitor event delivered by Xquik.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "data",
+    "deliveryId",
+    "eventType",
+    "occurredAt",
+    "schemaVersion",
+    "streamEventId"
+  ],
+  "properties": {
+    "data": {
+      "description": "Event-specific JSON data captured by the monitor."
+    },
+    "deliveryId": {
+      "type": "string",
+      "pattern": "^[0-9]+$",
+      "description": "Stable identifier for this webhook delivery."
+    },
+    "eventType": {
+      "type": "string",
+      "description": "Monitor event type that triggered the delivery.",
+      "enum": [
+        "tweet.new",
+        "tweet.reply",
+        "tweet.retweet",
+        "tweet.quote",
+        "tweet.media",
+        "tweet.link",
+        "tweet.poll",
+        "tweet.mention",
+        "tweet.hashtag",
+        "tweet.longform",
+        "profile.avatar.changed",
+        "profile.banner.changed",
+        "profile.name.changed",
+        "profile.username.changed",
+        "profile.bio.changed",
+        "profile.location.changed",
+        "profile.url.changed",
+        "profile.verified.changed",
+        "profile.protected.changed",
+        "profile.pinned_tweet.changed",
+        "profile.unavailable.changed"
+      ]
+    },
+    "occurredAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Time the monitored event occurred."
+    },
+    "query": {
+      "type": "string",
+      "description": "Keyword query that produced the event, when applicable."
+    },
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1,
+      "description": "Webhook payload schema version."
+    },
+    "streamEventId": {
+      "type": "string",
+      "pattern": "^[0-9]+$",
+      "description": "Stable identifier for the underlying monitor event."
+    },
+    "username": {
+      "type": "string",
+      "description": "Monitored X username, when applicable."
+    }
+  }
+}
