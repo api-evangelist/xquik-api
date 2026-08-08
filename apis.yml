@@ -1,64 +1,200 @@
-name: Xquik API
-description: >-
-  A third-party X (Twitter) data and automation platform positioned as an X/Twitter API alternative. It covers
-  authentication, public reads, automated writes, and webhooks across tweets, profiles, followers, replies, monitors,
-  and media, with 23 extraction tools, HMAC-signed webhooks, and MCP support. Not affiliated with X Corp.
-url: https://xquik-api.apievangelist.com/apis.yml
-created: '2026-08-01'
-modified: '2026-08-01'
+name: Xquik
+description: Xquik is an independent third-party X data and automation platform. It provides public data
+  reads, connected-account write actions, monitoring, signed webhooks, exports, hosted MCP servers, OAuth
+  2.1, API keys, 8 SDKs, a CLI, Agent Skills, and an OpenAPI 3.1 contract. Not affiliated with X Corp.
+url: https://xquik.com/apis.yml
+image: https://xquik.com/logo-square.png
+created: '2026-04-14'
+modified: '2026-08-07'
 specificationVersion: '0.21'
 tags:
-  - X/Twitter data
-  - social media data
-  - social listening
-  - data extraction
-  - marketing automation
-  - webhooks
-  - developer API
-  - MCP
-  - agent-native
-  - AI agent tooling
+- social media data
+- X / Twitter
+- social listening
+- data extraction
+- automation
+- webhooks
+- MCP
+- developer API
 apis:
-  - name: Xquik REST API
-    description: >-
-      REST API for searching public X data, exporting tweets/replies/followers/timelines/lists/media, posting tweets,
-      and monitoring accounts in real time. OpenAPI 3.1 with RFC 9727 discovery, pay-per-use reads, and OAuth 2.1 /
-      API-key auth.
-    humanURL: https://docs.xquik.com
-    baseURL: https://xquik.com/api/v1
-    tags:
-      - X/Twitter data
-      - social media data
-      - social listening
-      - data extraction
-      - marketing automation
-      - webhooks
-      - developer API
-      - MCP
-      - agent-native
-      - AI agent tooling
-    properties:
-      - type: OpenAPI
-        url: https://xquik.com/openapi.json
-      - type: OpenAPI
-        url: https://xquik.com/openapi.yaml
-      - type: OpenAPI
-        url: https://docs.xquik.com/openapi.yaml
-      - type: Documentation
-        url: https://docs.xquik.com
-      - type: LLMSTxt
-        url: https://xquik.com/llms.txt
-      - type: LLMSTxt
-        url: https://docs.xquik.com/llms.txt
-      - type: MCP
-        url: https://xquik.com/mcp
-      - type: MCP
-        url: https://docs.xquik.com/mcp
-      - type: AgentSkills
-        url: https://xquik.com/.well-known/agent-skills/index.json
+- name: Xquik REST API
+  description: OpenAPI 3.1 REST API for public X data, connected-account write actions, monitoring, signed
+    webhooks, exports, account management, and billing.
+  humanURL: https://docs.xquik.com/api-reference/overview
+  baseURL: https://xquik.com/api/v1
+  tags:
+  - REST
+  - OpenAPI
+  - webhooks
+  - automation
+  properties:
+  - type: OpenAPI
+    url: openapi/xquik-rest-api-openapi.yml
+  - type: OpenAPISource
+    url: https://xquik.com/openapi.json
+  - type: Documentation
+    url: https://docs.xquik.com
+  - type: APIReference
+    url: https://docs.xquik.com/api-reference/overview
+  - type: Authentication
+    url: https://docs.xquik.com/api-reference/authentication
+  - type: OpenAPI
+    url: https://xquik.com/openapi.yaml
+  - type: OpenAPI
+    url: https://docs.xquik.com/openapi.yaml
+- name: Xquik API MCP Server
+  description: Hosted MCP server for the Xquik API with OAuth 2.1 and API-key access.
+  humanURL: https://docs.xquik.com/mcp/overview
+  baseURL: https://xquik.com/mcp
+  tags:
+  - MCP
+  - agents
+  - automation
+  properties:
+  - type: MCPServer
+    url: mcp/xquik-mcp.yml
+  - type: Authentication
+    url: https://xquik.com/auth.md
+- name: Xquik Docs MCP Server
+  description: Read-only hosted MCP server for searching Xquik documentation.
+  humanURL: https://docs.xquik.com/mcp/overview
+  baseURL: https://docs.xquik.com/mcp
+  tags:
+  - MCP
+  - documentation
+  - agents
+  properties:
+  - type: MCPServer
+    url: https://docs.xquik.com/mcp
+  - type: Documentation
+    url: https://docs.xquik.com
+common:
+- type: Website
+  url: https://xquik.com/en
+- type: APIsJSON
+  url: https://xquik.com/apis.yml
+- type: DeveloperPortal
+  url: https://docs.xquik.com
+- type: Documentation
+  url: https://docs.xquik.com
+- type: APIReference
+  url: https://docs.xquik.com/api-reference/overview
+- type: GettingStarted
+  url: https://docs.xquik.com/x-api-quickstart
+- type: Authentication
+  url: https://docs.xquik.com/api-reference/authentication
+- type: Idempotency
+  url: https://docs.xquik.com/api-reference/x-write/create-tweet
+- type: SDK
+  name: TypeScript SDK
+  url: https://github.com/Xquik-dev/x-twitter-scraper-typescript
+- type: SDK
+  name: Python SDK
+  url: https://github.com/Xquik-dev/x-twitter-scraper-python
+- type: SDK
+  name: Go SDK
+  url: https://github.com/Xquik-dev/x-twitter-scraper-go
+- type: SDK
+  name: Ruby SDK
+  url: https://github.com/Xquik-dev/x-twitter-scraper-ruby
+- type: SDK
+  name: Java SDK
+  url: https://github.com/Xquik-dev/x-twitter-scraper-java
+- type: SDK
+  name: Kotlin SDK
+  url: https://github.com/Xquik-dev/x-twitter-scraper-kotlin
+- type: SDK
+  name: C# SDK
+  url: https://github.com/Xquik-dev/x-twitter-scraper-csharp
+- type: SDK
+  name: PHP SDK
+  url: https://github.com/Xquik-dev/x-twitter-scraper-php
+- type: CLI
+  url: https://github.com/Xquik-dev/x-twitter-scraper-cli
+- type: Sandbox
+  url: https://docs.xquik.com/mcp/tools
+- type: Postman
+  url: collections/xquik.postman_collection.json
+- type: MCPServer
+  url: mcp/xquik-mcp.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: Support
+  url: mailto:support@xquik.com
+- type: Blog
+  url: blogs/xquik-developer-updates.md
+- type: Plans
+  url: plans/xquik-plans.yml
+- type: Pricing
+  url: https://xquik.com/en#pricing
+- type: SignUp
+  url: https://dashboard.xquik.com/en/signup
+- type: Login
+  url: https://dashboard.xquik.com/en/login
+- type: TermsOfService
+  url: https://xquik.com/en/terms
+- type: PrivacyPolicy
+  url: https://xquik.com/en/privacy
+- type: FinOps
+  url: finops/xquik-finops.yml
+- type: Compliance
+  url: security/xquik-compliance.md
+- type: TrustCenter
+  url: security/xquik-trust-center.md
+- type: ChangeLog
+  url: https://docs.xquik.com/changelog
+- type: RateLimits
+  url: rate-limits/xquik-rate-limits.yml
+- type: Deprecation
+  url: lifecycle/xquik-deprecation-policy.md
+- type: Security
+  url: https://docs.xquik.com/security
+- type: Webhooks
+  url: https://docs.xquik.com/webhooks/overview
+- type: GitHubOrganization
+  url: https://github.com/Xquik-dev
+- type: RoadMap
+  url: roadmap/xquik-roadmap.md
+- type: ErrorCatalog
+  url: https://docs.xquik.com/guides/error-handling
+- type: WellKnown
+  url: well-known/xquik-well-known.yml
+- type: SecurityTxt
+  url: https://xquik.com/.well-known/security.txt
+- type: HTTPMessageSignatures
+  url: https://xquik.com/.well-known/http-message-signatures-directory
+- type: LLMsTxt
+  url: llms/xquik-llms.txt
+- type: AgentCard
+  url: a2a/xquik-api-a2a.yml
+- type: AgenticAccess
+  url: agentic-access/xquik-agentic-access.yml
+- type: SpectralRules
+  url: rules/xquik-rules.yml
+- type: Vocabulary
+  url: vocabulary/xquik-vocabulary.yml
+- type: Overlay
+  url: overlays/xquik-overlay.yaml
+- type: Conformance
+  url: conformance/xquik-conformance.yml
+- type: AsyncAPI
+  url: asyncapi/xquik-asyncapi.yaml
+- type: JSONLDContext
+  url: json-ld/xquik-context.jsonld
+- type: JSONSchema
+  url: json-schema/xquik-webhook-event.schema.json
+- type: JSONSchema
+  url: json-schema/xquik-webhook-endpoint.schema.json
 maintainers:
-  - FN: Xquik API
-    url: https://xquik.com
+- FN: Xquik
+  email: support@xquik.com
+  url: https://xquik.com/en
+x-provenance:
+  summary: Xquik authored these artifacts and publishes their live counterparts on xquik.com, docs.xquik.com,
+    and the Xquik-dev GitHub organization.
+  provider_published: true
+  method: declared
+  validated_against_live_endpoint: true
 generated:
   by: apis.io/add
   model: claude-opus-4-8
