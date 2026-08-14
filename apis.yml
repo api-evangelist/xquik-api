@@ -5,7 +5,7 @@ description: Xquik is an independent third-party X data and automation platform.
 url: https://xquik.com/apis.yml
 image: https://xquik.com/logo-square.png
 created: '2026-04-14'
-modified: '2026-08-07'
+modified: '2026-08-13'
 specificationVersion: '0.21'
 tags:
 - social media data
@@ -53,6 +53,10 @@ apis:
   properties:
   - type: MCPServer
     url: mcp/xquik-mcp.yml
+  - type: ToolCrosswalk
+    url: mcp/xquik-tool-crosswalk.yml
+  - type: OAuthScopes
+    url: scopes/xquik-scopes.yml
   - type: Authentication
     url: https://xquik.com/auth.md
 - name: Xquik Docs MCP Server
@@ -66,9 +70,17 @@ apis:
   properties:
   - type: MCPServer
     url: https://docs.xquik.com/mcp
+  - type: MCPServer
+    url: mcp/xquik-docs-mcp.yml
   - type: Documentation
     url: https://docs.xquik.com
 common:
+- type: VulnerabilityDisclosure
+  url: security/xquik-api-vulnerability-disclosure.yml
+- type: DomainSecurity
+  url: security/xquik-api-domain-security.yml
+- type: Authentication
+  url: authentication/xquik-api-authentication.yml
 - type: Website
   url: https://xquik.com/en
 - type: APIsJSON
@@ -185,6 +197,30 @@ common:
   url: json-schema/xquik-webhook-event.schema.json
 - type: JSONSchema
   url: json-schema/xquik-webhook-endpoint.schema.json
+- type: Packages
+  url: packages/xquik-packages.yml
+- type: SDKs
+  url: packages/xquik-packages.yml
+- type: Conventions
+  url: conventions/xquik-conventions.yml
+- type: Idempotency
+  url: conventions/xquik-conventions.yml
+- type: ErrorCatalog
+  url: errors/xquik-error-codes.yml
+- type: DataModel
+  url: data-model/xquik-data-model.yml
+- type: ChangeLog
+  url: changelog/xquik-changelog.yml
+- type: CLI
+  url: cli/xquik-cli.yml
+- type: Sandbox
+  url: sandbox/xquik-sandbox.yml
+- type: OAuthScopes
+  url: scopes/xquik-scopes.yml
+- type: Lifecycle
+  url: lifecycle/xquik-lifecycle.yml
+- type: SecurityTxt
+  url: well-known/xquik-security.txt
 maintainers:
 - FN: Xquik
   email: support@xquik.com
@@ -200,3 +236,8 @@ generated:
   model: claude-opus-4-8
   confidence: 97
   at: '2026-08-01T21:10:37.167Z'
+x-enrichment:
+  date: '2026-08-13'
+  status: enriched
+  artifacts_added: 28
+  pass: local-v1
