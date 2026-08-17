@@ -5,7 +5,7 @@ description: Xquik is an independent third-party X data and automation platform.
 url: https://xquik.com/apis.yml
 image: https://xquik.com/logo-square.png
 created: '2026-04-14'
-modified: '2026-08-13'
+modified: '2026-08-14'
 specificationVersion: '0.21'
 tags:
 - social media data
@@ -32,6 +32,17 @@ apis:
     url: openapi/xquik-rest-api-openapi.yml
   - type: OpenAPISource
     url: https://xquik.com/openapi.json
+  - type: AsyncAPI
+    url: asyncapi/xquik-monitor-webhooks.yml
+  - type: JSONSchema
+    name: Webhook Event
+    url: json-schema/webhook-event.schema.json
+  - type: JSONSchema
+    name: Webhook Endpoint
+    url: json-schema/webhook-endpoint.schema.json
+  - type: JSONLDContext
+    name: Xquik API Context
+    url: json-ld/xquik-context.jsonld
   - type: Documentation
     url: https://docs.xquik.com
   - type: APIReference
@@ -95,6 +106,8 @@ common:
   url: https://docs.xquik.com/x-api-quickstart
 - type: Authentication
   url: https://docs.xquik.com/api-reference/authentication
+- type: OAuthScopes
+  url: https://xquik.com/.well-known/oauth-authorization-server
 - type: Idempotency
   url: https://docs.xquik.com/api-reference/x-write/create-tweet
 - type: SDK
@@ -123,6 +136,8 @@ common:
   url: https://github.com/Xquik-dev/x-twitter-scraper-php
 - type: CLI
   url: https://github.com/Xquik-dev/x-twitter-scraper-cli
+- type: TerraformProvider
+  url: https://github.com/Xquik-dev/terraform-provider-x-twitter-scraper
 - type: Sandbox
   url: https://docs.xquik.com/mcp/tools
 - type: Postman
@@ -155,12 +170,16 @@ common:
   url: security/xquik-trust-center.md
 - type: ChangeLog
   url: https://docs.xquik.com/changelog
+- type: StatusPage
+  url: https://xquik.com/status.json
 - type: RateLimits
   url: rate-limits/xquik-rate-limits.yml
 - type: Deprecation
   url: lifecycle/xquik-deprecation-policy.md
 - type: Security
   url: https://docs.xquik.com/security
+- type: VulnerabilityDisclosure
+  url: https://xquik.com/vulnerability-disclosure.md
 - type: Webhooks
   url: https://docs.xquik.com/webhooks/overview
 - type: GitHubOrganization
@@ -190,13 +209,13 @@ common:
 - type: Conformance
   url: conformance/xquik-conformance.yml
 - type: AsyncAPI
-  url: asyncapi/xquik-asyncapi.yaml
+  url: asyncapi/xquik-monitor-webhooks.yml
 - type: JSONLDContext
   url: json-ld/xquik-context.jsonld
 - type: JSONSchema
-  url: json-schema/xquik-webhook-event.schema.json
+  url: json-schema/webhook-event.schema.json
 - type: JSONSchema
-  url: json-schema/xquik-webhook-endpoint.schema.json
+  url: json-schema/webhook-endpoint.schema.json
 - type: Packages
   url: packages/xquik-packages.yml
 - type: SDKs
