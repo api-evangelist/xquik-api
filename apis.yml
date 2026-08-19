@@ -6,7 +6,7 @@ url: https://xquik.com/apis.yml
 image: https://xquik.com/logo-square.png
 created: '2026-04-14'
 modified: '2026-08-13'
-specificationVersion: '0.21'
+specificationVersion: '0.23'
 tags:
 - social media data
 - X / Twitter
