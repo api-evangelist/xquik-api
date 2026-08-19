@@ -1,0 +1,61 @@
+generated: '2026-08-13'
+method: searched
+source: https://docs.xquik.com/sdks/cli
+repository: https://github.com/Xquik-dev/x-twitter-scraper-cli
+description: >-
+  First-party Go CLI generated alongside the SDKs from the published OpenAPI contract. It
+  mirrors REST resources as `namespace:resource action` commands and maps REST query
+  parameters to flags one-for-one.
+binary: x-twitter-scraper
+package: packages/xquik-packages.yml
+install:
+- method: go install
+  command: go install github.com/Xquik-dev/x-twitter-scraper-cli/cmd/x-twitter-scraper@latest
+  note: Requires $(go env GOPATH)/bin on PATH.
+version: v0.13.0
+released: '2026-08-12'
+authentication:
+- kind: api-key
+  env: X_TWITTER_SCRAPER_API_KEY
+  flag: --api-key
+  format: xq_ + 64 hex
+- kind: oauth-bearer
+  env: X_TWITTER_SCRAPER_BEARER_TOKEN
+command_surface:
+  form: '<binary> <namespace>:<resource> <action> [flags]'
+  help: '--help works at every level'
+  groups:
+  - namespace: x:tweets
+    actions: [search, retrieve, get-replies, create]
+    backing_operations: [searchTweets, lookupTweet, getTweetReplies, createTweet]
+  - namespace: x:users
+    actions: [retrieve-followers, retrieve-search]
+    backing_operations: [getUserFollowers, searchUsers]
+  - namespace: x:media
+    actions: [upload]
+    backing_operations: [uploadMedia]
+  - namespace: x:dm
+    actions: [send]
+    backing_operations: [sendDm]
+output:
+  formats: [json, yaml]
+  flags:
+  - --format json|yaml
+  - --format-error json
+  - --transform (GJSON syntax, extract one field)
+  errors: written to stderr, non-zero exit on failure
+  pagination: paginated commands include pagination fields in JSON output; pass cursor params on the next call
+documented_workflows:
+- Search tweets to JSON Lines, CSV or XLSX
+- Follower export to CSV, JSON or XLSX
+- Tweet replies to CSV, JSON or XLSX
+- Post media tweets, replies and DM attachments
+note: >-
+  The command list above is what the CLI guide documents by name. The generated binary
+  covers more of the catalog; only verified command names are recorded here rather than
+  inferring one command per operation.
+x-evidence:
+  fetched: '2026-08-13'
+  url: https://docs.xquik.com/sdks/cli
+  http_status: 200
+  read_via: docs MCP query_docs_filesystem_xquik (cat /sdks/cli.mdx)

@@ -1,10 +1,14 @@
-generated: '2026-08-01'
-method: declared
+generated: '2026-08-13'
+method: probed
 publisher: Xquik
 source: https://xquik.com/.well-known/agent-card.json
 description: >-
-  Xquik's provider-authored A2A Agent Card. The saved document matches the
-  provider route and the A2A 1.0.0 AgentCard structure.
+  Xquik serves an A2A Agent Card from its own host at the canonical RFC 8615 path. This
+  round replaced the 2026-08-01 provider-declared manifest with an observed probe: the card
+  below was fetched live on 2026-08-13 and saved verbatim. The live card has since changed
+  from the one first submitted — its OAuth scopes are now the single `mcp:tools` scope that
+  the OAuth authorization-server metadata and the MCP 401 challenge both advertise, instead
+  of the earlier read/write pair.
 discovery:
   path: /.well-known/agent-card.json
   canonical: true
@@ -14,21 +18,50 @@ conformance:
   grade: conformant
   protocol_version: 1.0.0
   preferred_transport: JSONRPC
+  checks:
+    capabilities_is_object: true
+    protocol_version_present: true
+    skills_is_array: true
+    default_input_modes_present: true
+    default_output_modes_present: true
+    preferred_transport_present: true
   deviations: []
+  note: >-
+    `capabilities` is present as an empty object — structurally conformant, and it honestly
+    declares no streaming or push-notification support rather than overstating capability.
 card:
   name: Xquik MCP
   description: >-
-    Use Xquik through MCP for public X data, connected-account actions,
-    monitoring, webhooks, exports, and account workflows.
+    Use Xquik through MCP for public X data, connected-account actions, monitoring,
+    webhooks, exports, and account workflows.
   url: https://xquik.com/mcp
   version: 2.6.0
   documentation_url: https://docs.xquik.com/mcp/overview
+  provider: Xquik
   skills: 3
+  skill_ids: [read-public-x-data, run-x-data-workflows, manage-connected-account-actions]
+  security: oauth2 authorizationCode + PKCE, scope mcp:tools
   file: xquik-agent-card.json
-x-evidence:
-  declared: '2026-08-01'
-  url: https://xquik.com/.well-known/agent-card.json
-  expected_content_type: application/json
+additional_cards:
+- host: docs.xquik.com
+  path: /.well-known/agent-card.json
   status: 200
-  verified: '2026-08-01'
-  note: Provider-authored route is live and returns the saved A2A 1.0.0 Agent Card.
+  file: xquik-docs-agent-card.json
+  name: Xquik
+  url: https://docs.xquik.com/
+  protocol_version: '0.3'
+  preferred_transport: HTTP+JSON
+  grade: flavored
+  deviations: [supportedInterfaces-instead-of-additionalInterfaces, protocol-version-0.3]
+  note: >-
+    A second card scoped to the documentation host and its read-only docs MCP server. It is
+    a real provider-served document but it is written against the pre-1.0 shape, so it is
+    graded separately and is NOT the card the AgentCard pointer resolves to.
+x-evidence:
+  fetched: '2026-08-13'
+  url: https://xquik.com/.well-known/agent-card.json
+  http_status: 200
+  content_type: application/json;charset=utf-8
+  bytes: 1634
+  legacy_path_checked: https://xquik.com/.well-known/agent.json
+  legacy_path_status: 404

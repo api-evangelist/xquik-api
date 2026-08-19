@@ -4,8 +4,25 @@ schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main
 provider: Xquik
 providerId: xquik
 created: '2026-08-01'
-modified: '2026-08-01'
+modified: '2026-08-13'
 reconciled: true
+method: searched
+source: https://xquik.com/en#pricing
+plan_count: 4
+verified: >-
+  Re-read from the live pricing section on 2026-08-13 (HTTP 200). All four tiers matched
+  verbatim — Pay As You Go $10 minimum top-up / 66,666 credits (never expire), Starter $20
+  per month / 140,000 credits, Pro $99 per month / 770,000 credits, Business $199 per month
+  / 1,670,000 credits, monthly credits rolling over. The page's own schema.org AggregateOffer
+  reports lowPrice 20, highPrice 199, offerCount 3 for the subscription tiers.
+credit_costs:
+  scrape_tweet_profile_or_follower: 1 credit per result
+  post_tweet_or_reply: 30 credits
+  other_write_actions: 10 credits
+  read_or_extract_article: 5 credits
+  attached_media: 2 credits per started MB
+  active_monitor: 21 credits per hour (includes event and webhook delivery)
+  source: https://xquik.com/en#pricing
 tags:
   - social media data
   - automation

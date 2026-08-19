@@ -1,0 +1,84 @@
+generated: '2026-08-13'
+method: searched
+source: https://docs.xquik.com/changelog
+derived_from: openapi/_original/xquik-rest-api-openapi.json
+description: >-
+  Versioning, deprecation and operational-transparency posture for the Xquik API, read from
+  the provider's changelog and deprecation policy and reconciled against the published spec.
+versioning:
+  scheme: uri-path
+  current: v1
+  base: https://xquik.com/api/v1
+  contract_header: xquik-api-contract
+  contract_value: '2026-04-29'
+  contract_note: >-
+    A dated response-contract header layered on top of the path version. Default v1 keeps
+    the legacy contract; the opt-in contract normalizes field casing, timestamps, error
+    objects, pagination fields and prefixed IDs, and turns 502 dependency failures into 424.
+    The provider states future major versions should make this contract the default.
+  docs: https://docs.xquik.com/api-reference/overview
+deprecation:
+  policy: true
+  policy_file: lifecycle/xquik-deprecation-policy.md
+  policy_summary: >-
+    v1 behaviour is preserved where practical; breaking changes are announced in the public
+    changelog before release; deprecated operations stay documented through their transition
+    window; urgent security or legal changes may be immediate.
+  changelog: https://docs.xquik.com/changelog
+  sunset_header: false
+  deprecation_header: false
+  rfc8594: false
+  note: >-
+    No Sunset or Deprecation response header is documented, and no operation in the
+    published spec carries `deprecated: true`. Removals are announced in the changelog
+    instead — e.g. the April 2026 withdrawal of the follower.gained / follower.lost event
+    types and the credits-only billing migration.
+deprecated_operations: []
+recent_breaking_changes:
+- date: '2026-04'
+  change: Billing migrated to a credits-only model; GET /account creditInfo replaced currentPeriod.
+  source: https://docs.xquik.com/changelog
+- date: '2026-04'
+  change: Monitor event types follower.gained and follower.lost withdrawn.
+  source: https://docs.xquik.com/changelog
+status_page:
+  published: false
+  probed:
+  - url: https://status.xquik.com
+    status: unresolved (DNS did not resolve)
+  - url: https://xquik.com/status
+    status: 404
+  - url: https://docs.xquik.com/status
+    status: 404
+  note: >-
+    No status page or uptime history is published as of 2026-08-13. This is the clearest
+    remaining operational-transparency gap for an otherwise well-instrumented provider, and
+    it is recorded as an honest absence — no StatusPage pointer is emitted.
+health_endpoint:
+  url: https://xquik.com/api/health
+  advertised_in: security/xquik-trust-center.md
+  probe_status: 403
+  probe_note: >-
+    Returned a Cloudflare bot-challenge page to an unauthenticated APIEvangelistBot request
+    on 2026-08-13, so it could not be confirmed as a machine-readable health signal. A
+    health route behind a bot challenge is not a substitute for a status page.
+sla:
+  published: false
+  note: No uptime target or SLA document found on xquik.com or docs.xquik.com.
+support_response_targets:
+  source: https://docs.xquik.com/security
+  scope: security reports only
+  targets:
+  - acknowledgement within 24 hours
+  - initial triage within 72 hours
+  - mitigation plan after triage
+  - progress updates at least every 14 days
+x-evidence:
+  checked: '2026-08-13'
+  urls:
+  - url: https://docs.xquik.com/changelog
+    status: 200
+  - url: https://xquik.com/status
+    status: 404
+  - url: https://docs.xquik.com/status
+    status: 404

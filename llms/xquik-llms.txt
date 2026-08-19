@@ -2,31 +2,49 @@
 
 > Xquik is an independent third-party service. Not affiliated with X Corp. "Twitter" and "X" are trademarks of X Corp.
 
-Xquik supports public X data, connected-account actions, monitoring, exports, webhooks, and agents.
+Xquik helps teams search public X data, run exports, publish from connected accounts, monitor accounts or topics, run giveaway draws, and connect AI agents to X workflows.
 
 ## Primary Links
 
-- Documentation: https://docs.xquik.com
-- API reference: https://docs.xquik.com/api-reference/overview
-- OpenAPI 3.1 schema: https://xquik.com/openapi.json
-- API catalog: https://xquik.com/.well-known/api-catalog
-- APIs.json index: https://xquik.com/apis.yml
-- MCP endpoint: https://xquik.com/mcp
-- MCP manifest: https://xquik.com/.well-known/mcp.json
-- MCP authentication: https://xquik.com/auth.md
-- Agent index: https://xquik.com/.well-known/agent-index.json
-- A2A agent card: https://xquik.com/.well-known/agent-card.json
-- Agent Skills: https://xquik.com/.well-known/agent-skills/index.json
-- Pricing: https://xquik.com/en#pricing
-- SDKs and CLI: https://github.com/Xquik-dev
+- [Documentation](https://docs.xquik.com): Product guides and integration instructions.
+- [API reference](https://docs.xquik.com/api-reference/overview): Endpoint guides and request examples.
+- [OpenAPI 3.1 schema](https://xquik.com/openapi.json): Machine-readable REST API contract.
+- [API catalog](https://xquik.com/.well-known/api-catalog): Public API discovery metadata.
+- MCP endpoint `https://xquik.com/mcp`: Authenticated remote MCP transport.
+- [MCP manifest](https://xquik.com/.well-known/mcp.json): Machine-readable MCP server metadata.
+- [MCP authentication](https://xquik.com/auth.md): OAuth and API-key client instructions.
+- [MCP protected resource metadata](https://xquik.com/.well-known/oauth-protected-resource/mcp): RFC 9728 discovery metadata.
+- [Agent index](https://xquik.com/.well-known/agent-index.json): Index of Xquik agent discovery resources.
+- [A2A agent card](https://xquik.com/.well-known/agent-card.json): Public agent capabilities and endpoints.
+- [Agent Skills index](https://xquik.com/.well-known/agent-skills/index.json): Hosted Skill discovery metadata.
+- [Pricing](https://xquik.com/en#pricing): Current plans and usage options.
+- [Public SDKs](https://github.com/Xquik-dev): Generated client libraries and examples.
+
+## Core Capabilities
+
+- Search public X posts, accounts, replies, mentions, reposts, lists, and follower data.
+- Publish and manage posts from connected accounts through supported dashboard and API workflows.
+- Run account or keyword monitors and deliver signed webhook events to external systems.
+- Export structured results as CSV, XLSX, JSON, or Markdown for analysis and audit trails.
+- Connect AI agents through MCP and use public SDKs generated from the OpenAPI schema.
 
 ## Access
 
 - Dashboard login uses magic links.
-- API keys are user-managed and revocable.
-- OAuth 2.1 supports third-party clients.
-- MCP clients should use OAuth 2.1 discovery.
+- API keys are managed from the account dashboard.
+- OAuth 2.1 is available for third-party clients.
+- MCP clients should use OAuth 2.1 discovery. API-key fallback is client-specific. ChatGPT custom apps require OAuth.
+- Codex error `Authorization server response missing required issuer: expected https://xquik.com`: use an Xquik API key through `bearer_token_env_var`.
+- [Codex OAuth troubleshooting](https://docs.xquik.com/guides/troubleshooting#codex-oauth-issuer-validation-error): Follow the documented API-key fallback.
+- [Codex upstream issue](https://github.com/openai/codex/issues/31573): Track the client compatibility fix.
+- Affected Goose releases can report the same issuer error. Use Goose's documented environment-backed bearer header.
+
+## Locales
+
+- English
+- Turkish
+- Spanish
 
 ## Contact
 
-- Support: mailto:support@xquik.com
+- [Support](mailto:support@xquik.com)

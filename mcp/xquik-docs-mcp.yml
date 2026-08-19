@@ -1,0 +1,54 @@
+generated: '2026-08-13'
+method: probed
+publisher: Xquik
+status: published
+source: https://docs.xquik.com/mcp
+description: >-
+  Xquik's second, read-only MCP server, scoped to the documentation site. Unlike the API
+  MCP server it is anonymous, so `initialize` and `tools/list` both returned 200 on
+  2026-08-13 and the real tool set — with input schemas — is saved verbatim beside this
+  manifest in xquik-docs-mcp-tools.json.
+server:
+  name: Xquik
+  version: 1.0.0
+  transport: streamable-http
+  protocol: mcp
+  protocol_version: '2025-06-18'
+  url: https://docs.xquik.com/mcp
+  auth: none
+documentation: https://docs.xquik.com/mcp/docs-mcp
+tools:
+- name: search_xquik
+  title: Search documentation
+  description: Search the Xquik knowledge base for docs, code examples, API references and guides.
+  input_schema: {query: string}
+  read_only: true
+- name: query_docs_filesystem_xquik
+  description: >-
+    Run a read-only shell-like query (ls/head/cat) against a virtualized in-memory
+    filesystem of the documentation site, rooted at /.
+  input_schema: {command: string}
+  read_only: true
+- name: submit_feedback
+  title: Submit documentation feedback
+  description: Report an incorrect, outdated, confusing or incomplete documentation page.
+  input_schema: {path: string, feedback: string}
+  read_only: false
+tools_file: xquik-docs-mcp-tools.json
+deployment:
+  mode: remote
+  endpoint: https://docs.xquik.com/mcp
+  auth: none
+  verified: probed
+  probe: open
+  probe_detail: >-
+    POST tools/list -> 200 text/event-stream, 3 tools with inputSchema; POST initialize ->
+    200 advertising tools.listChanged and resources.listChanged.
+  checked: '2026-08-13'
+x-evidence:
+  fetched: '2026-08-13'
+  url: https://docs.xquik.com/mcp
+  tools_list_status: 200
+  initialize_status: 200
+  content_type: text/event-stream
+  tool_count: 3

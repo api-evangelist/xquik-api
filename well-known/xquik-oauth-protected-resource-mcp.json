@@ -1,0 +1,1 @@
+{"authorization_servers":["https://xquik.com"],"bearer_methods_supported":["header"],"resource":"https://xquik.com/mcp","resource_documentation":"https://docs.xquik.com/mcp/overview","resource_name":"Xquik MCP Server","scopes_supported":["mcp:tools"]}

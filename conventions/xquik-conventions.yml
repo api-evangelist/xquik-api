@@ -1,0 +1,121 @@
+generated: '2026-08-13'
+method: searched
+source: https://docs.xquik.com/llms.txt
+docs:
+- https://docs.xquik.com/guides/error-handling
+- https://docs.xquik.com/guides/rate-limits
+- https://docs.xquik.com/api-reference/authentication
+- https://docs.xquik.com/guides/response-formats-exports
+derived_from: openapi/_original/xquik-rest-api-openapi.json
+description: >-
+  Cross-cutting request/response semantics for the Xquik REST API, read from the provider's
+  docs and reconciled against the published OpenAPI 3.1 contract.
+authentication:
+  styles:
+  - type: apiKey
+    header: x-api-key
+    alias_header: Xquik-Api-Key
+    format: xq_ + 64 hex characters
+    also_accepted_as: 'Authorization: Bearer xq_...'
+  - type: apiKey
+    scope: guest
+    note: Guest key with a fixed paid_reads scope; 33 eligible GET routes only.
+  - type: http bearer
+    note: OAuth 2.1 access token (authorization code + PKCE).
+  - type: cookie
+    name: __Host-xquik_session
+    note: Browser session for same-origin dashboard routes (API key management, account update).
+  - type: payment
+    note: >-
+      Machine Payments Protocol — 7 fixed-price GET operations accept an anonymous
+      `Authorization: Payment` credential over Tempo/USDC after a 402 challenge.
+  detail: authentication/xquik-api-authentication.yml
+idempotency:
+  supported: true
+  header: Idempotency-Key
+  parameter_component: '#/components/parameters/WriteIdempotencyKey'
+  applies_to: >-
+    Connected-account write operations (tweets, likes, retweets, follows, remove-follower,
+    DMs, media upload, profile/avatar/banner updates, community create/delete/join/leave)
+    and support ticket creation (#/components/parameters/SupportIdempotencyKey).
+  conflict_status: 409
+  conflict_codes: [idempotency_key_conflict, idempotency_conflict, invalid_idempotency_key, missing_idempotency_key]
+  conflict_response: '#/components/responses/WriteIdempotencyConflict'
+  retry_rule: >-
+    Retry a write only when `safeToRetry` is true, and use a NEW Idempotency-Key on the
+    retry. Reusing a key with different content returns 409.
+  key_format: UUID v4 (guest wallet flows document UUID v4 idempotency keys as secrets)
+  injected_by_mcp: true
+  evidence: 22 operations reference WriteIdempotencyKey/SupportIdempotencyKey in the published spec.
+pagination:
+  default_contract:
+    style: cursor
+    response_fields_platform: [hasMore, nextCursor]
+    response_fields_x_data: [has_next_page, next_cursor]
+    request_params: [after, afterCursor, cursor]
+    note: >-
+      Send nextCursor as `after` for events, draws and extractions; `afterCursor` for
+      drafts. Monitors, webhooks and API keys return up to 200 unpaginated items.
+  opt_in_contract:
+    response_fields: [has_more, next_cursor]
+    request_params: [cursor, after, afterCursor]
+  opaque_cursors: true
+  page_size_max: 200
+  stale_cursor: 409 busy (honor Retry-After, retry once) / 410 gone (restart cursorless and dedupe IDs)
+versioning:
+  scheme: uri-path
+  current: v1
+  contract_header: xquik-api-contract
+  contract_value: '2026-04-29'
+  opt_in_changes:
+  - snake_case response fields
+  - date-time fields as Unix seconds
+  - 'structured error object { error: { type, code, message } }'
+  - has_more / next_cursor pagination fields
+  - recognized-resource `object` field
+  - 'prefixed IDs (evt_, drw_, ext_, mon_, wh_, key_, xacct_)'
+  - dependency failures return 424 instead of 502
+  note: Default v1 keeps the legacy contract so existing integrations do not break.
+error_envelope:
+  default: '{ "error": "error_code", "message": "Human-readable description" }'
+  opt_in: '{ "error": { "type": "...", "code": "...", "message": "..." } }'
+  rfc9457: false
+  extra_fields: [reason, retryAfter, retryAfterMs, payment_options]
+  write_lifecycle_fields: [writeActionId, status, terminal, charged, retryable, safeToRetry, statusUrl, nextAction]
+  catalog: errors/xquik-error-codes.yml
+rate_limit_signaling:
+  status: 429
+  headers: [Retry-After]
+  body_fields: [retryAfter, retryAfterMs]
+  buckets: read 300/1s, write 120/60s, delete 60/60s (fixed window, per account)
+  detail: rate-limits/xquik-rate-limits.yml
+request_tracing:
+  request_id_header: null
+  note: >-
+    No request-id/correlation header is documented for REST. Durable writes are traced
+    instead by `writeActionId` + `statusUrl`, and webhook deliveries by `deliveryId` plus
+    the X-Xquik-Nonce/X-Xquik-Timestamp signature headers.
+async_writes:
+  status: 202
+  pattern: >-
+    A write may return 202 with a pending action. Store writeActionId, poll statusUrl
+    (GET /api/v1/x/write-actions/{id}) while `terminal` is false, and follow Retry-After /
+    pollAfterMs / nextAction.
+  status_operation: getWriteActionStatus
+payments:
+  challenge_401: Anonymous non-MPP paid reads (26 routes) return 401 WWW-Authenticate Bearer with a guest-wallet action.
+  challenge_402: The 7 direct MPP reads return 402 WWW-Authenticate Payment.
+  receipt_header: Payment-Receipt
+  rule: Never start checkout without explicit user confirmation.
+webhooks:
+  signature_header: X-Xquik-Signature
+  algorithm: HMAC-SHA256 over timestamp + nonce + raw body
+  extra_headers: [X-Xquik-Nonce, X-Xquik-Timestamp]
+  retry: up to 10 attempts, backoff 1s to 60s; 410 Gone exhausts immediately
+  detail: asyncapi/xquik-asyncapi.yaml
+cross_links:
+  errors: errors/xquik-error-codes.yml
+  lifecycle: lifecycle/xquik-lifecycle.yml
+  authentication: authentication/xquik-api-authentication.yml
+  rate_limits: rate-limits/xquik-rate-limits.yml
+  scopes: scopes/xquik-scopes.yml

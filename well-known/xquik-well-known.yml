@@ -1,34 +1,81 @@
-generated: '2026-08-01'
-method: declared
+generated: '2026-08-13'
+method: probed
+source: live GET probes of https://xquik.com/.well-known/* and https://docs.xquik.com/.well-known/*
 publisher: Xquik
-description: Provider-authored discovery surface for Xquik's public API and MCP server.
+description: >-
+  Xquik's discovery surface, re-probed on 2026-08-13. Every 200 below was saved verbatim
+  into this directory. This replaces the 2026-08-01 provider-declared index: the paths and
+  statuses are identical, but each one is now an observed HTTP response rather than a claim.
 hosts:
-  - host: https://xquik.com
-    documents:
-      - path: /.well-known/api-catalog
-        status: 200
-        type: application/linkset+json
-      - path: /.well-known/mcp.json
-        status: 200
-        type: application/json
-      - path: /.well-known/agent-index.json
-        status: 200
-        type: application/json
-      - path: /.well-known/agent-skills/index.json
-        status: 200
-        type: application/json
-      - path: /.well-known/oauth-authorization-server
-        status: 200
-        type: application/json
-      - path: /.well-known/oauth-protected-resource/mcp
-        status: 200
-        type: application/json
-      - path: /.well-known/security.txt
-        status: 200
-        type: text/plain
-      - path: /.well-known/http-message-signatures-directory
-        status: 200
-        type: application/json
-      - path: /.well-known/agent-card.json
-        status: 200
-        type: application/json
+- host: https://xquik.com
+  documents:
+  - path: /.well-known/api-catalog
+    status: 200
+    type: application/linkset+json
+    file: xquik-api-catalog.json
+    standard: RFC 9727
+  - path: /.well-known/mcp.json
+    status: 200
+    type: application/json
+    file: xquik-mcp.json
+  - path: /.well-known/agent-index.json
+    status: 200
+    type: application/json
+    file: xquik-agent-index.json
+  - path: /.well-known/agent-skills/index.json
+    status: 200
+    type: application/json
+    file: xquik-agent-skills-index.json
+    standard: Agent Skills discovery 0.2.0
+  - path: /.well-known/oauth-authorization-server
+    status: 200
+    type: application/json
+    file: xquik-oauth-authorization-server.json
+    standard: RFC 8414
+  - path: /.well-known/oauth-protected-resource/mcp
+    status: 200
+    type: application/json
+    file: xquik-oauth-protected-resource-mcp.json
+    standard: RFC 9728
+  - path: /.well-known/openid-configuration
+    status: 200
+    type: application/json
+    file: xquik-openid-configuration.json
+    note: Served with the same body as /.well-known/oauth-authorization-server.
+  - path: /.well-known/security.txt
+    status: 200
+    type: text/plain
+    file: xquik-security.txt
+    standard: RFC 9116
+  - path: /.well-known/http-message-signatures-directory
+    status: 200
+    type: application/http-message-signatures-directory+json
+    file: xquik-http-message-signatures-directory.json
+    note: One Ed25519 key, kid xquik-web-bot-auth-2026-04 (Web Bot Auth).
+  - path: /.well-known/ai-plugin.json
+    status: 200
+    type: application/json
+    file: xquik-ai-plugin.json
+    note: >-
+      Not listed in the provider's own 2026-08-01 index; found on this probe. Points at
+      https://xquik.com/openapi.yaml.
+  - path: /.well-known/agent-card.json
+    status: 200
+    type: application/json
+    file: ../a2a/xquik-agent-card.json
+    standard: A2A 1.0.0
+  - path: /.well-known/agent.json
+    status: 404
+    note: Legacy pre-0.3 A2A path; the canonical path above is the one served.
+- host: https://docs.xquik.com
+  documents:
+  - path: /.well-known/agent-card.json
+    status: 200
+    type: application/json
+    file: ../a2a/xquik-docs-agent-card.json
+    note: A second, docs-scoped agent card describing the read-only documentation MCP server.
+x-evidence:
+  checked: '2026-08-13'
+  user_agent: APIEvangelistBot/1.0
+  hits: 13
+  misses: 1

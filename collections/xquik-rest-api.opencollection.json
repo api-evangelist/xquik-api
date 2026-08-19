@@ -1,0 +1,5209 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Xquik API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "apikey",
+      "key": "x-api-key",
+      "value": "{{x-api-key}}",
+      "placement": "header"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Account",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get account info",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/account",
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Get account info."
+        },
+        {
+          "info": {
+            "name": "Update account locale",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://xquik.com/api/v1/account",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Update account locale."
+        },
+        {
+          "info": {
+            "name": "Set linked X username",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://xquik.com/api/v1/account/x-identity",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Set linked X username."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "API Keys",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List API keys",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/api-keys",
+            "auth": {
+              "type": "apikey",
+              "key": "__Host-xquik_session",
+              "value": "{{__Host-xquik_session}}",
+              "placement": "query"
+            }
+          },
+          "docs": "List API keys."
+        },
+        {
+          "info": {
+            "name": "Create API key",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://xquik.com/api/v1/api-keys",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "__Host-xquik_session",
+              "value": "{{__Host-xquik_session}}",
+              "placement": "query"
+            }
+          },
+          "docs": "Create API key."
+        },
+        {
+          "info": {
+            "name": "Revoke API key",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://xquik.com/api/v1/api-keys/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Resource ID returned by the matching create or list endpoint."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "__Host-xquik_session",
+              "value": "{{__Host-xquik_session}}",
+              "placement": "query"
+            }
+          },
+          "docs": "Revoke API key."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Subscribe",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Create subscription checkout",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://xquik.com/api/v1/subscribe",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Create a subscription checkout or billing-management URL only after the user confirms. The request never completes payment by itself.\n"
+        },
+        {
+          "info": {
+            "name": "Get credits balance",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/credits",
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Get credits balance."
+        },
+        {
+          "info": {
+            "name": "Create credit top-up checkout",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://xquik.com/api/v1/credits/topup",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Create a Stripe Checkout session only after the user confirms. The request never completes payment or adds credits by itself.\n"
+        },
+        {
+          "info": {
+            "name": "Get top-up billing status",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/credits/topup/status",
+            "params": [
+              {
+                "name": "session_id",
+                "value": "",
+                "type": "query",
+                "description": "Top-up session ID to inspect."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Get top-up billing status."
+        },
+        {
+          "info": {
+            "name": "Charge saved card for credits",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://xquik.com/api/v1/credits/quick-topup",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "__Host-xquik_session",
+              "value": "{{__Host-xquik_session}}",
+              "placement": "query"
+            }
+          },
+          "docs": "Charge saved card for credits."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Composition",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Build, refine, or check a post draft",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://xquik.com/api/v1/compose",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Run one step of Xquik's three-step writing workflow. Compose returns questions, editorial rules, and source-specific Radar recommendations. Refine returns goal-specific guidance. Score applies deterministic text checks. It does not predict reach or expose X ranking weights.\n"
+        },
+        {
+          "info": {
+            "name": "List saved drafts",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/drafts",
+            "params": [
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query",
+                "description": "Maximum number of items to return (1-100, default 50). For paid per-result endpoints, the returned count may be lower when remaining credits cannot cover the requested page. If zero paid results are affordable, the endpoint returns 402 insufficient_credits.\n"
+              },
+              {
+                "name": "afterCursor",
+                "value": "",
+                "type": "query",
+                "description": "Cursor for pagination"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "List saved drafts."
+        },
+        {
+          "info": {
+            "name": "Save a tweet draft",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://xquik.com/api/v1/drafts",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Save a tweet draft."
+        },
+        {
+          "info": {
+            "name": "Get draft by ID",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/drafts/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Resource ID returned by the matching create or list endpoint."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Get draft by ID."
+        },
+        {
+          "info": {
+            "name": "Delete a draft",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://xquik.com/api/v1/drafts/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Resource ID returned by the matching create or list endpoint."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Delete a draft."
+        },
+        {
+          "info": {
+            "name": "List cached style profiles",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/styles",
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "List cached style profiles."
+        },
+        {
+          "info": {
+            "name": "Analyze writing style from recent tweets",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://xquik.com/api/v1/styles",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Analyze writing style from recent tweets."
+        },
+        {
+          "info": {
+            "name": "Compare two style profiles",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/styles/compare",
+            "params": [
+              {
+                "name": "username1",
+                "value": "",
+                "type": "query",
+                "description": "First username to compare"
+              },
+              {
+                "name": "username2",
+                "value": "",
+                "type": "query",
+                "description": "Second username to compare"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Compare two style profiles."
+        },
+        {
+          "info": {
+            "name": "Get cached style profile",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/styles/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Style profile ID or X username"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Get cached style profile."
+        },
+        {
+          "info": {
+            "name": "Save style profile with custom tweets",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://xquik.com/api/v1/styles/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Style profile ID or X username"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Save style profile with custom tweets."
+        },
+        {
+          "info": {
+            "name": "Delete a style profile",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://xquik.com/api/v1/styles/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Style profile ID or X username"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Delete a style profile."
+        },
+        {
+          "info": {
+            "name": "Get engagement metrics for style tweets",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/styles/:id/performance",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Style profile ID or X username"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Get engagement metrics for style tweets."
+        },
+        {
+          "info": {
+            "name": "Get trending topics from curated sources",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/radar",
+            "params": [
+              {
+                "name": "after",
+                "value": "",
+                "type": "query",
+                "description": "Cursor for pagination (from prior response nextCursor)."
+              },
+              {
+                "name": "category",
+                "value": "",
+                "type": "query",
+                "description": "Filter by category."
+              },
+              {
+                "name": "hours",
+                "value": "",
+                "type": "query",
+                "description": "Lookback window in hours (1-72, default 6)."
+              },
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query",
+                "description": "Number of items to return (1-100, default 50)."
+              },
+              {
+                "name": "region",
+                "value": "",
+                "type": "query",
+                "description": "Region filter. Use `global` or a region code such as `US`, `GB`, `TR`, or `ES`."
+              },
+              {
+                "name": "source",
+                "value": "",
+                "type": "query",
+                "description": "Source filter. One of: github, google_trends, hacker_news, polymarket, reddit, trustmrr, wikipedia"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Get trending topics from curated sources."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Monitors",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List monitors",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/monitors",
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "List monitors."
+        },
+        {
+          "info": {
+            "name": "Create monitor",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://xquik.com/api/v1/monitors",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Creates an account monitor. Monitors are unlimited. Active monitors check every 1 second and cost 21 credits per hour. Events and webhook deliveries are included. Creation requires available credits for the first hourly charge and username lookup."
+        },
+        {
+          "info": {
+            "name": "List keyword monitors",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/monitors/keywords",
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "List keyword monitors."
+        },
+        {
+          "info": {
+            "name": "Create keyword monitor",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://xquik.com/api/v1/monitors/keywords",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Creates a keyword monitor. Keyword monitors are unlimited. Active monitors check every 1 second and cost 21 credits per hour. Events and webhook deliveries are included. Creation requires available credits for the first hourly charge."
+        },
+        {
+          "info": {
+            "name": "Get keyword monitor",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/monitors/keywords/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Resource ID returned by the matching create or list endpoint."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Get keyword monitor."
+        },
+        {
+          "info": {
+            "name": "Update keyword monitor",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://xquik.com/api/v1/monitors/keywords/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Resource ID returned by the matching create or list endpoint."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Update keyword monitor."
+        },
+        {
+          "info": {
+            "name": "Delete keyword monitor",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://xquik.com/api/v1/monitors/keywords/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Resource ID returned by the matching create or list endpoint."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Delete keyword monitor."
+        },
+        {
+          "info": {
+            "name": "Get monitor",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/monitors/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Resource ID returned by the matching create or list endpoint."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Get monitor."
+        },
+        {
+          "info": {
+            "name": "Update monitor",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://xquik.com/api/v1/monitors/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Resource ID returned by the matching create or list endpoint."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Update monitor."
+        },
+        {
+          "info": {
+            "name": "Delete monitor",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://xquik.com/api/v1/monitors/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Resource ID returned by the matching create or list endpoint."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Delete monitor."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Events",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List events",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/events",
+            "params": [
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query",
+                "description": "Maximum number of items to return (1-100, default 50). For paid per-result endpoints, the returned count may be lower when remaining credits cannot cover the requested page. If zero paid results are affordable, the endpoint returns 402 insufficient_credits.\n"
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Cursor for keyset pagination from prior response next_cursor"
+              },
+              {
+                "name": "monitorId",
+                "value": "",
+                "type": "query",
+                "description": "Filter events by monitor ID"
+              },
+              {
+                "name": "eventType",
+                "value": "",
+                "type": "query",
+                "description": "Filter events by type"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "List events."
+        },
+        {
+          "info": {
+            "name": "Get event",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/events/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Resource ID returned by the matching create or list endpoint."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Get event."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Extractions",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List extraction jobs",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/extractions",
+            "params": [
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query",
+                "description": "Maximum number of items to return (1-100, default 50). For paid per-result endpoints, the returned count may be lower when remaining credits cannot cover the requested page. If zero paid results are affordable, the endpoint returns 402 insufficient_credits.\n"
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Cursor for keyset pagination from prior response next_cursor"
+              },
+              {
+                "name": "toolType",
+                "value": "",
+                "type": "query",
+                "description": "Filter by extraction tool type"
+              },
+              {
+                "name": "status",
+                "value": "",
+                "type": "query",
+                "description": "Filter by job status"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "List extraction jobs."
+        },
+        {
+          "info": {
+            "name": "Run extraction",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://xquik.com/api/v1/extractions",
+            "params": [
+              {
+                "name": "dry_run",
+                "value": "true",
+                "type": "query",
+                "description": "Return a cost estimate without creating or running an extraction."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Run extraction."
+        },
+        {
+          "info": {
+            "name": "Estimate extraction cost",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://xquik.com/api/v1/extractions/estimate",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Estimate extraction cost."
+        },
+        {
+          "info": {
+            "name": "Get extraction results",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/extractions/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Extraction public ID (UUID)"
+              },
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query",
+                "description": "Maximum number of results to return (1-1000, default 100)"
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Cursor for keyset pagination from prior response next_cursor"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Get extraction results."
+        },
+        {
+          "info": {
+            "name": "Export extraction results",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/extractions/:id/export",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Extraction public ID"
+              },
+              {
+                "name": "format",
+                "value": "",
+                "type": "query",
+                "description": "Export file format"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Export extraction results."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Draws",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List draws",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/draws",
+            "params": [
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query",
+                "description": "Maximum number of items to return (1-100, default 50). For paid per-result endpoints, the returned count may be lower when remaining credits cannot cover the requested page. If zero paid results are affordable, the endpoint returns 402 insufficient_credits.\n"
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Cursor for keyset pagination from prior response next_cursor"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "List draws."
+        },
+        {
+          "info": {
+            "name": "Run giveaway draw",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://xquik.com/api/v1/draws",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Runs a giveaway draw from a source tweet. The draw first checks the minimum credits needed to inspect the source tweet and at least one candidate. Remaining credits cap how many replies and retweeters can be inspected before filters and winner selection run."
+        },
+        {
+          "info": {
+            "name": "Get draw details",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/draws/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Draw public ID returned by create and list draw responses."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Get draw details."
+        },
+        {
+          "info": {
+            "name": "Export draw data",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/draws/:id/export",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Draw public ID returned by create and list draw responses."
+              },
+              {
+                "name": "format",
+                "value": "",
+                "type": "query",
+                "description": "Export output format"
+              },
+              {
+                "name": "type",
+                "value": "",
+                "type": "query",
+                "description": "Export winners or all entries"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Export draw data."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Webhooks",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List webhooks",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/webhooks",
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "List webhooks."
+        },
+        {
+          "info": {
+            "name": "Create webhook",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://xquik.com/api/v1/webhooks",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Create webhook."
+        },
+        {
+          "info": {
+            "name": "Update webhook",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://xquik.com/api/v1/webhooks/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Resource ID returned by the matching create or list endpoint."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Update webhook."
+        },
+        {
+          "info": {
+            "name": "Deactivate webhook",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://xquik.com/api/v1/webhooks/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Resource ID returned by the matching create or list endpoint."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Deactivate webhook."
+        },
+        {
+          "info": {
+            "name": "List webhook deliveries",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/webhooks/:id/deliveries",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Resource ID returned by the matching create or list endpoint."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "List webhook deliveries."
+        },
+        {
+          "info": {
+            "name": "Test webhook endpoint",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://xquik.com/api/v1/webhooks/:id/test",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Resource ID returned by the matching create or list endpoint."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Test webhook endpoint."
+        },
+        {
+          "info": {
+            "name": "Test and resume webhook endpoint",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://xquik.com/api/v1/webhooks/:id/resume",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Resource ID returned by the matching create or list endpoint."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Test and resume webhook endpoint."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Tweets",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get multiple tweets by IDs",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/tweets",
+            "params": [
+              {
+                "name": "ids",
+                "value": "",
+                "type": "query",
+                "description": "Comma-separated tweet IDs (max 100)"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Get multiple tweets by IDs."
+        },
+        {
+          "info": {
+            "name": "Search tweets by query, Tweet ID, X status URL, or account date window",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/tweets/search",
+            "params": [
+              {
+                "name": "q",
+                "value": "",
+                "type": "query",
+                "description": "Search query (keywords,"
+              },
+              {
+                "name": "queryType",
+                "value": "",
+                "type": "query",
+                "description": "Sort order - Latest (chronological) or Top (engagement-ranked)"
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Pagination cursor from previous response"
+              },
+              {
+                "name": "sinceTime",
+                "value": "",
+                "type": "query",
+                "description": "ISO 8601 timestamp - only return tweets after this time"
+              },
+              {
+                "name": "untilTime",
+                "value": "",
+                "type": "query",
+                "description": "ISO 8601 timestamp - only return tweets before this time"
+              },
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query",
+                "description": "Max tweets to return (server paginates internally). Omit for single page (~20). This is an upper bound for paid authenticated calls: remaining credits can reduce the returned page size, and zero affordable results returns 402 insufficient_credits.\n"
+              },
+              {
+                "name": "fromUser",
+                "value": "",
+                "type": "query",
+                "description": "Filter by author username."
+              },
+              {
+                "name": "toUser",
+                "value": "",
+                "type": "query",
+                "description": "Filter replies sent to a username."
+              },
+              {
+                "name": "mentioning",
+                "value": "",
+                "type": "query",
+                "description": "Filter tweets mentioning a username."
+              },
+              {
+                "name": "language",
+                "value": "",
+                "type": "query",
+                "description": "Language code filter, e.g. en or tr."
+              },
+              {
+                "name": "sinceDate",
+                "value": "",
+                "type": "query",
+                "description": "Start date in YYYY-MM-DD format."
+              },
+              {
+                "name": "untilDate",
+                "value": "",
+                "type": "query",
+                "description": "End date in YYYY-MM-DD format."
+              },
+              {
+                "name": "mediaType",
+                "value": "",
+                "type": "query",
+                "description": "Filter by media type."
+              },
+              {
+                "name": "minFaves",
+                "value": "",
+                "type": "query",
+                "description": "Minimum likes threshold."
+              },
+              {
+                "name": "minRetweets",
+                "value": "",
+                "type": "query",
+                "description": "Minimum retweets threshold."
+              },
+              {
+                "name": "minReplies",
+                "value": "",
+                "type": "query",
+                "description": "Minimum replies threshold."
+              },
+              {
+                "name": "minQuotes",
+                "value": "",
+                "type": "query",
+                "description": "Minimum quote count threshold."
+              },
+              {
+                "name": "verifiedOnly",
+                "value": "",
+                "type": "query",
+                "description": "Only return tweets from verified authors."
+              },
+              {
+                "name": "replies",
+                "value": "",
+                "type": "query",
+                "description": "Reply mode."
+              },
+              {
+                "name": "retweets",
+                "value": "",
+                "type": "query",
+                "description": "Retweet mode."
+              },
+              {
+                "name": "quotes",
+                "value": "",
+                "type": "query",
+                "description": "Quote mode."
+              },
+              {
+                "name": "exactPhrase",
+                "value": "",
+                "type": "query",
+                "description": "Exact phrase to match."
+              },
+              {
+                "name": "excludeWords",
+                "value": "",
+                "type": "query",
+                "description": "Words or quoted phrases to exclude. Separate with spaces, commas, or lines."
+              },
+              {
+                "name": "anyWords",
+                "value": "",
+                "type": "query",
+                "description": "Words or quoted phrases where any one can match. Separate with spaces, commas, or lines."
+              },
+              {
+                "name": "hashtags",
+                "value": "",
+                "type": "query",
+                "description": "Hashtags separated by spaces, commas, or lines."
+              },
+              {
+                "name": "cashtags",
+                "value": "",
+                "type": "query",
+                "description": "Cashtags separated by spaces, commas, or lines."
+              },
+              {
+                "name": "url",
+                "value": "",
+                "type": "query",
+                "description": "URL substring or domain filter."
+              },
+              {
+                "name": "conversationId",
+                "value": "",
+                "type": "query",
+                "description": "Conversation ID filter."
+              },
+              {
+                "name": "inReplyToTweetId",
+                "value": "",
+                "type": "query",
+                "description": "Only replies to this tweet ID."
+              },
+              {
+                "name": "quotesOfTweetId",
+                "value": "",
+                "type": "query",
+                "description": "Only quotes of this tweet ID."
+              },
+              {
+                "name": "retweetsOfTweetId",
+                "value": "",
+                "type": "query",
+                "description": "Only retweets of this tweet ID."
+              },
+              {
+                "name": "listId",
+                "value": "",
+                "type": "query",
+                "description": "Search within a list ID."
+              },
+              {
+                "name": "place",
+                "value": "",
+                "type": "query",
+                "description": "Search within a place ID."
+              },
+              {
+                "name": "placeCountry",
+                "value": "",
+                "type": "query",
+                "description": "Search within a country code."
+              },
+              {
+                "name": "pointRadius",
+                "value": "",
+                "type": "query",
+                "description": "Geo point radius, e.g. -73.99 40.73 25mi."
+              },
+              {
+                "name": "boundingBox",
+                "value": "",
+                "type": "query",
+                "description": "Geo bounding box, e.g. -74.1 40.6 -73.9 40.8."
+              },
+              {
+                "name": "advancedQuery",
+                "value": "",
+                "type": "query",
+                "description": "Raw advanced search query appended as-is."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Search tweets by query, Tweet ID, X status URL, or account date window."
+        },
+        {
+          "info": {
+            "name": "Get tweet with full text, author, metrics and media",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/tweets/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Numeric tweet ID, 15-20 digits"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Get tweet with full text, author, metrics and media."
+        },
+        {
+          "info": {
+            "name": "List visible users who liked a tweet",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/tweets/:id/favoriters",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Tweet ID to get favoriters"
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Pagination cursor for favoriters"
+              },
+              {
+                "name": "pageSize",
+                "value": "",
+                "type": "query",
+                "description": "Maximum user profiles requested from this page (20-200, default 200). The response can contain fewer profiles because the source returned fewer or remaining credits cover fewer results. Keep requesting next_cursor while has_next_page is true. The deprecated limit and count aliases remain accepted.\n"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Returns liker profiles that X makes visible for the post. X can withhold liker identities even when the post reports likes. In that case this endpoint returns 424 `favoriters_unavailable` instead of a misleading empty success.\n"
+        },
+        {
+          "info": {
+            "name": "Get bookmarked tweets",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/bookmarks",
+            "params": [
+              {
+                "name": "folderId",
+                "value": "",
+                "type": "query",
+                "description": "Optional bookmark folder ID"
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Pagination cursor for bookmarks"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Get bookmarked tweets."
+        },
+        {
+          "info": {
+            "name": "Get bookmark folders",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/bookmarks/folders",
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Get bookmark folders."
+        },
+        {
+          "info": {
+            "name": "Get home timeline",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/timeline",
+            "params": [
+              {
+                "name": "seenTweetIds",
+                "value": "",
+                "type": "query",
+                "description": "Comma-separated tweet IDs to exclude from results. Empty entries are ignored."
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Pagination cursor for timeline"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Get home timeline."
+        },
+        {
+          "info": {
+            "name": "List quote tweets of a tweet",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/tweets/:id/quotes",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Numeric tweet ID to get quotes, 15-20 digits"
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Pagination cursor for quote tweets"
+              },
+              {
+                "name": "pageSize",
+                "value": "",
+                "type": "query",
+                "description": "Maximum page items (1-100, default 20). Source, filters, or credits can reduce results. Continue while has_next_page is true. Deprecated limit and count aliases remain accepted.\n"
+              },
+              {
+                "name": "sinceTime",
+                "value": "",
+                "type": "query",
+                "description": "Unix timestamp - return quotes posted after this time"
+              },
+              {
+                "name": "untilTime",
+                "value": "",
+                "type": "query",
+                "description": "Unix timestamp - return quotes posted before this time"
+              },
+              {
+                "name": "includeReplies",
+                "value": "",
+                "type": "query",
+                "description": "Include reply quotes (default false)"
+              },
+              {
+                "name": "fromUser",
+                "value": "",
+                "type": "query",
+                "description": "Filter by author username."
+              },
+              {
+                "name": "toUser",
+                "value": "",
+                "type": "query",
+                "description": "Filter replies sent to a username."
+              },
+              {
+                "name": "mentioning",
+                "value": "",
+                "type": "query",
+                "description": "Filter tweets mentioning a username."
+              },
+              {
+                "name": "language",
+                "value": "",
+                "type": "query",
+                "description": "Language code filter, e.g. en or tr."
+              },
+              {
+                "name": "sinceDate",
+                "value": "",
+                "type": "query",
+                "description": "Start date in YYYY-MM-DD format."
+              },
+              {
+                "name": "untilDate",
+                "value": "",
+                "type": "query",
+                "description": "End date in YYYY-MM-DD format."
+              },
+              {
+                "name": "mediaType",
+                "value": "",
+                "type": "query",
+                "description": "Filter by media type."
+              },
+              {
+                "name": "minFaves",
+                "value": "",
+                "type": "query",
+                "description": "Minimum likes threshold."
+              },
+              {
+                "name": "minRetweets",
+                "value": "",
+                "type": "query",
+                "description": "Minimum retweets threshold."
+              },
+              {
+                "name": "minReplies",
+                "value": "",
+                "type": "query",
+                "description": "Minimum replies threshold."
+              },
+              {
+                "name": "minQuotes",
+                "value": "",
+                "type": "query",
+                "description": "Minimum quote count threshold."
+              },
+              {
+                "name": "verifiedOnly",
+                "value": "",
+                "type": "query",
+                "description": "Only return tweets from verified authors."
+              },
+              {
+                "name": "replies",
+                "value": "",
+                "type": "query",
+                "description": "Reply mode."
+              },
+              {
+                "name": "retweets",
+                "value": "",
+                "type": "query",
+                "description": "Retweet mode."
+              },
+              {
+                "name": "quotes",
+                "value": "",
+                "type": "query",
+                "description": "Quote mode."
+              },
+              {
+                "name": "exactPhrase",
+                "value": "",
+                "type": "query",
+                "description": "Exact phrase to match."
+              },
+              {
+                "name": "excludeWords",
+                "value": "",
+                "type": "query",
+                "description": "Words or quoted phrases to exclude. Separate with spaces, commas, or lines."
+              },
+              {
+                "name": "anyWords",
+                "value": "",
+                "type": "query",
+                "description": "Words or quoted phrases where any one can match. Separate with spaces, commas, or lines."
+              },
+              {
+                "name": "hashtags",
+                "value": "",
+                "type": "query",
+                "description": "Hashtags separated by spaces, commas, or lines."
+              },
+              {
+                "name": "cashtags",
+                "value": "",
+                "type": "query",
+                "description": "Cashtags separated by spaces, commas, or lines."
+              },
+              {
+                "name": "url",
+                "value": "",
+                "type": "query",
+                "description": "URL substring or domain filter."
+              },
+              {
+                "name": "conversationId",
+                "value": "",
+                "type": "query",
+                "description": "Conversation ID filter."
+              },
+              {
+                "name": "inReplyToTweetId",
+                "value": "",
+                "type": "query",
+                "description": "Only replies to this tweet ID."
+              },
+              {
+                "name": "quotesOfTweetId",
+                "value": "",
+                "type": "query",
+                "description": "Only quotes of this tweet ID."
+              },
+              {
+                "name": "retweetsOfTweetId",
+                "value": "",
+                "type": "query",
+                "description": "Only retweets of this tweet ID."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "List quote tweets of a tweet."
+        },
+        {
+          "info": {
+            "name": "List replies to a tweet",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/tweets/:id/replies",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Tweet ID to get replies"
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Pagination cursor for tweet replies"
+              },
+              {
+                "name": "mode",
+                "value": "",
+                "type": "query",
+                "description": "Use standard for pagination and filters. Use complete for maximum coverage. Complete mode accepts only limit. Remove other pagination and filter parameters.\n"
+              },
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query",
+                "description": "With mode=complete, maximum combined direct and nested reply rows (1-25000, default 25000). Without complete mode, this is the deprecated pageSize alias and accepts only 1-100.\n"
+              },
+              {
+                "name": "pageSize",
+                "value": "",
+                "type": "query",
+                "description": "Maximum page items (1-100, default 20). Source, filters, or credits can reduce results. Continue while has_next_page is true. Deprecated limit and count aliases remain accepted.\n"
+              },
+              {
+                "name": "sinceTime",
+                "value": "",
+                "type": "query",
+                "description": "Unix timestamp - return replies posted after this time"
+              },
+              {
+                "name": "untilTime",
+                "value": "",
+                "type": "query",
+                "description": "Unix timestamp - return replies posted before this time"
+              },
+              {
+                "name": "fromUser",
+                "value": "",
+                "type": "query",
+                "description": "Filter by author username."
+              },
+              {
+                "name": "toUser",
+                "value": "",
+                "type": "query",
+                "description": "Filter replies sent to a username."
+              },
+              {
+                "name": "mentioning",
+                "value": "",
+                "type": "query",
+                "description": "Filter tweets mentioning a username."
+              },
+              {
+                "name": "language",
+                "value": "",
+                "type": "query",
+                "description": "Language code filter, e.g. en or tr."
+              },
+              {
+                "name": "sinceDate",
+                "value": "",
+                "type": "query",
+                "description": "Start date in YYYY-MM-DD format."
+              },
+              {
+                "name": "untilDate",
+                "value": "",
+                "type": "query",
+                "description": "End date in YYYY-MM-DD format."
+              },
+              {
+                "name": "mediaType",
+                "value": "",
+                "type": "query",
+                "description": "Filter by media type."
+              },
+              {
+                "name": "minFaves",
+                "value": "",
+                "type": "query",
+                "description": "Minimum likes threshold."
+              },
+              {
+                "name": "minRetweets",
+                "value": "",
+                "type": "query",
+                "description": "Minimum retweets threshold."
+              },
+              {
+                "name": "minReplies",
+                "value": "",
+                "type": "query",
+                "description": "Minimum replies threshold."
+              },
+              {
+                "name": "minQuotes",
+                "value": "",
+                "type": "query",
+                "description": "Minimum quote count threshold."
+              },
+              {
+                "name": "verifiedOnly",
+                "value": "",
+                "type": "query",
+                "description": "Only return tweets from verified authors."
+              },
+              {
+                "name": "replies",
+                "value": "",
+                "type": "query",
+                "description": "Reply mode."
+              },
+              {
+                "name": "retweets",
+                "value": "",
+                "type": "query",
+                "description": "Retweet mode."
+              },
+              {
+                "name": "quotes",
+                "value": "",
+                "type": "query",
+                "description": "Quote mode."
+              },
+              {
+                "name": "exactPhrase",
+                "value": "",
+                "type": "query",
+                "description": "Exact phrase to match."
+              },
+              {
+                "name": "excludeWords",
+                "value": "",
+                "type": "query",
+                "description": "Words or quoted phrases to exclude. Separate with spaces, commas, or lines."
+              },
+              {
+                "name": "anyWords",
+                "value": "",
+                "type": "query",
+                "description": "Words or quoted phrases where any one can match. Separate with spaces, commas, or lines."
+              },
+              {
+                "name": "hashtags",
+                "value": "",
+                "type": "query",
+                "description": "Hashtags separated by spaces, commas, or lines."
+              },
+              {
+                "name": "cashtags",
+                "value": "",
+                "type": "query",
+                "description": "Cashtags separated by spaces, commas, or lines."
+              },
+              {
+                "name": "url",
+                "value": "",
+                "type": "query",
+                "description": "URL substring or domain filter."
+              },
+              {
+                "name": "conversationId",
+                "value": "",
+                "type": "query",
+                "description": "Conversation ID filter."
+              },
+              {
+                "name": "inReplyToTweetId",
+                "value": "",
+                "type": "query",
+                "description": "Only replies to this tweet ID."
+              },
+              {
+                "name": "quotesOfTweetId",
+                "value": "",
+                "type": "query",
+                "description": "Only quotes of this tweet ID."
+              },
+              {
+                "name": "retweetsOfTweetId",
+                "value": "",
+                "type": "query",
+                "description": "Only retweets of this tweet ID."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Returns direct replies. Complete mode merges available timeline views, supported rankings, every forward cursor module, labeled hidden-content branches, exact-parent time partitions scaled to the reported reply count, and search. It separates nested replies and returns 424 below 80% coverage.\n"
+        },
+        {
+          "info": {
+            "name": "List users who retweeted a tweet",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/tweets/:id/retweeters",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Tweet ID to get retweeters"
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Pagination cursor for retweeters"
+              },
+              {
+                "name": "pageSize",
+                "value": "",
+                "type": "query",
+                "description": "Maximum user profiles requested from this page (20-200, default 200). The response can contain fewer profiles because the source returned fewer or remaining credits cover fewer results. Keep requesting next_cursor while has_next_page is true. The deprecated limit and count aliases remain accepted.\n"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "List users who retweeted a tweet."
+        },
+        {
+          "info": {
+            "name": "Get full conversation thread for a tweet",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/tweets/:id/thread",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Tweet ID to get thread context"
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Pagination cursor for thread tweets"
+              },
+              {
+                "name": "pageSize",
+                "value": "",
+                "type": "query",
+                "description": "Maximum page items (1-100, default 20). Source, filters, or credits can reduce results. Continue while has_next_page is true. Deprecated limit and count aliases remain accepted.\n"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Get full conversation thread for a tweet."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "X Write",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Create tweet",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://xquik.com/api/v1/x/tweets",
+            "headers": [
+              {
+                "name": "Idempotency-Key",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Create tweet."
+        },
+        {
+          "info": {
+            "name": "Get write action status",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/write-actions/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Write action ID returned by a pending write response."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Get write action status."
+        },
+        {
+          "info": {
+            "name": "Delete tweet",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://xquik.com/api/v1/x/tweets/:id",
+            "headers": [
+              {
+                "name": "Idempotency-Key",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Tweet ID to delete"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Delete tweet."
+        },
+        {
+          "info": {
+            "name": "Like tweet",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://xquik.com/api/v1/x/tweets/:id/like",
+            "headers": [
+              {
+                "name": "Idempotency-Key",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Tweet ID to like"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Like tweet."
+        },
+        {
+          "info": {
+            "name": "Unlike tweet",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://xquik.com/api/v1/x/tweets/:id/like",
+            "headers": [
+              {
+                "name": "Idempotency-Key",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Tweet ID to unlike"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Unlike tweet."
+        },
+        {
+          "info": {
+            "name": "Retweet",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://xquik.com/api/v1/x/tweets/:id/retweet",
+            "headers": [
+              {
+                "name": "Idempotency-Key",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Tweet ID to retweet"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Retweet."
+        },
+        {
+          "info": {
+            "name": "Unretweet",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://xquik.com/api/v1/x/tweets/:id/retweet",
+            "headers": [
+              {
+                "name": "Idempotency-Key",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Tweet ID to unretweet"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Unretweet."
+        },
+        {
+          "info": {
+            "name": "Follow user",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://xquik.com/api/v1/x/users/:id/follow",
+            "headers": [
+              {
+                "name": "Idempotency-Key",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "User ID to follow"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Follow user."
+        },
+        {
+          "info": {
+            "name": "Unfollow user",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://xquik.com/api/v1/x/users/:id/follow",
+            "headers": [
+              {
+                "name": "Idempotency-Key",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "User ID to unfollow"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Unfollow user."
+        },
+        {
+          "info": {
+            "name": "Remove follower",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://xquik.com/api/v1/x/users/:id/remove-follower",
+            "headers": [
+              {
+                "name": "Idempotency-Key",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "User ID to remove from your followers"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Remove follower."
+        },
+        {
+          "info": {
+            "name": "Send direct message",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://xquik.com/api/v1/x/dm/:userId",
+            "headers": [
+              {
+                "name": "Idempotency-Key",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "userId",
+                "value": "",
+                "type": "path",
+                "description": "Recipient user ID"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Send direct message."
+        },
+        {
+          "info": {
+            "name": "Upload media",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://xquik.com/api/v1/x/media",
+            "headers": [
+              {
+                "name": "Idempotency-Key",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Upload media."
+        },
+        {
+          "info": {
+            "name": "Update X profile",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://xquik.com/api/v1/x/profile",
+            "headers": [
+              {
+                "name": "Idempotency-Key",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Update X profile."
+        },
+        {
+          "info": {
+            "name": "Update profile avatar",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://xquik.com/api/v1/x/profile/avatar",
+            "headers": [
+              {
+                "name": "Idempotency-Key",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Update profile avatar."
+        },
+        {
+          "info": {
+            "name": "Update profile banner",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://xquik.com/api/v1/x/profile/banner",
+            "headers": [
+              {
+                "name": "Idempotency-Key",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Update profile banner."
+        },
+        {
+          "info": {
+            "name": "Create community",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://xquik.com/api/v1/x/communities",
+            "headers": [
+              {
+                "name": "Idempotency-Key",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Create community."
+        },
+        {
+          "info": {
+            "name": "Delete community",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://xquik.com/api/v1/x/communities/:id",
+            "headers": [
+              {
+                "name": "Idempotency-Key",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Resource ID returned by the matching create or list endpoint."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Delete community."
+        },
+        {
+          "info": {
+            "name": "Join community",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://xquik.com/api/v1/x/communities/:id/join",
+            "headers": [
+              {
+                "name": "Idempotency-Key",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Resource ID returned by the matching create or list endpoint."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Join community."
+        },
+        {
+          "info": {
+            "name": "Leave community",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://xquik.com/api/v1/x/communities/:id/join",
+            "headers": [
+              {
+                "name": "Idempotency-Key",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Resource ID returned by the matching create or list endpoint."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Leave community."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Trends",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get trending hashtags and topics from X by region",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/trends",
+            "params": [
+              {
+                "name": "woeid",
+                "value": "",
+                "type": "query",
+                "description": "Region WOEID (1=Worldwide, 23424977=US, 23424975=UK, 23424969=Turkey)"
+              },
+              {
+                "name": "count",
+                "value": "",
+                "type": "query",
+                "description": "Number of trending topics to return (1-50, default 30)"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Get trending hashtags and topics from X by region."
+        },
+        {
+          "info": {
+            "name": "Get trending hashtags and topics by region (alias)",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/trends",
+            "params": [
+              {
+                "name": "woeid",
+                "value": "",
+                "type": "query",
+                "description": "Region Yahoo WOEID code (1=Worldwide, 23424977=US, 23424975=UK, 23424969=Turkey)"
+              },
+              {
+                "name": "count",
+                "value": "",
+                "type": "query",
+                "description": "Number of trending topics returned (1-50, default 30)"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Get trending hashtags and topics by region (alias)."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Articles",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get full X Article content with cover image and metadata",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/articles/:tweetId",
+            "params": [
+              {
+                "name": "tweetId",
+                "value": "",
+                "type": "path",
+                "description": "Numeric tweet ID of the article, 15-20 digits. If you have a tweet URL, use the final status ID."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Retrieve the full content of an X Article (long-form post) by numeric tweet ID. Returns article_not_found when the tweet is valid but is not an X Article."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Users",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Look up multiple users by IDs in one call",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/users/batch",
+            "params": [
+              {
+                "name": "ids",
+                "value": "",
+                "type": "query",
+                "description": "Comma-separated numeric user IDs (1-100 values). Duplicate IDs are ignored while preserving first-seen order."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Look up multiple users by IDs in one call."
+        },
+        {
+          "info": {
+            "name": "Search users by name or username",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/users/search",
+            "params": [
+              {
+                "name": "q",
+                "value": "",
+                "type": "query",
+                "description": "User search query"
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Pagination cursor for user search"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Search users by name or username."
+        },
+        {
+          "info": {
+            "name": "Get user profile with follower counts and verification",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/users/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "X username (without @) or user ID"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Get user profile with follower counts and verification."
+        },
+        {
+          "info": {
+            "name": "Check if one user follows another",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/followers/check",
+            "params": [
+              {
+                "name": "source",
+                "value": "",
+                "type": "query",
+                "description": "Source username, @username, or X or Twitter profile URL"
+              },
+              {
+                "name": "target",
+                "value": "",
+                "type": "query",
+                "description": "Target username, @username, or X or Twitter profile URL"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Check if one user follows another."
+        },
+        {
+          "info": {
+            "name": "List recent tweets posted by a user",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/users/:id/tweets",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "X user ID or username"
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Pagination cursor for user tweets"
+              },
+              {
+                "name": "pageSize",
+                "value": "",
+                "type": "query",
+                "description": "Maximum page items (1-100, default 20). Source, filters, or credits can reduce results. Continue while has_next_page is true. Deprecated limit and count aliases remain accepted.\n"
+              },
+              {
+                "name": "includeReplies",
+                "value": "",
+                "type": "query",
+                "description": "Include reply tweets"
+              },
+              {
+                "name": "includeParentTweet",
+                "value": "",
+                "type": "query",
+                "description": "Include parent tweet for replies"
+              },
+              {
+                "name": "fromUser",
+                "value": "",
+                "type": "query",
+                "description": "Filter by author username."
+              },
+              {
+                "name": "toUser",
+                "value": "",
+                "type": "query",
+                "description": "Filter replies sent to a username."
+              },
+              {
+                "name": "mentioning",
+                "value": "",
+                "type": "query",
+                "description": "Filter tweets mentioning a username."
+              },
+              {
+                "name": "language",
+                "value": "",
+                "type": "query",
+                "description": "Language code filter, e.g. en or tr."
+              },
+              {
+                "name": "sinceDate",
+                "value": "",
+                "type": "query",
+                "description": "Start date in YYYY-MM-DD format."
+              },
+              {
+                "name": "untilDate",
+                "value": "",
+                "type": "query",
+                "description": "End date in YYYY-MM-DD format."
+              },
+              {
+                "name": "mediaType",
+                "value": "",
+                "type": "query",
+                "description": "Filter by media type."
+              },
+              {
+                "name": "minFaves",
+                "value": "",
+                "type": "query",
+                "description": "Minimum likes threshold."
+              },
+              {
+                "name": "minRetweets",
+                "value": "",
+                "type": "query",
+                "description": "Minimum retweets threshold."
+              },
+              {
+                "name": "minReplies",
+                "value": "",
+                "type": "query",
+                "description": "Minimum replies threshold."
+              },
+              {
+                "name": "minQuotes",
+                "value": "",
+                "type": "query",
+                "description": "Minimum quote count threshold."
+              },
+              {
+                "name": "verifiedOnly",
+                "value": "",
+                "type": "query",
+                "description": "Only return tweets from verified authors."
+              },
+              {
+                "name": "replies",
+                "value": "",
+                "type": "query",
+                "description": "Reply mode."
+              },
+              {
+                "name": "retweets",
+                "value": "",
+                "type": "query",
+                "description": "Retweet mode."
+              },
+              {
+                "name": "quotes",
+                "value": "",
+                "type": "query",
+                "description": "Quote mode."
+              },
+              {
+                "name": "exactPhrase",
+                "value": "",
+                "type": "query",
+                "description": "Exact phrase to match."
+              },
+              {
+                "name": "excludeWords",
+                "value": "",
+                "type": "query",
+                "description": "Words or quoted phrases to exclude. Separate with spaces, commas, or lines."
+              },
+              {
+                "name": "anyWords",
+                "value": "",
+                "type": "query",
+                "description": "Words or quoted phrases where any one can match. Separate with spaces, commas, or lines."
+              },
+              {
+                "name": "hashtags",
+                "value": "",
+                "type": "query",
+                "description": "Hashtags separated by spaces, commas, or lines."
+              },
+              {
+                "name": "cashtags",
+                "value": "",
+                "type": "query",
+                "description": "Cashtags separated by spaces, commas, or lines."
+              },
+              {
+                "name": "url",
+                "value": "",
+                "type": "query",
+                "description": "URL substring or domain filter."
+              },
+              {
+                "name": "conversationId",
+                "value": "",
+                "type": "query",
+                "description": "Conversation ID filter."
+              },
+              {
+                "name": "inReplyToTweetId",
+                "value": "",
+                "type": "query",
+                "description": "Only replies to this tweet ID."
+              },
+              {
+                "name": "quotesOfTweetId",
+                "value": "",
+                "type": "query",
+                "description": "Only quotes of this tweet ID."
+              },
+              {
+                "name": "retweetsOfTweetId",
+                "value": "",
+                "type": "query",
+                "description": "Only retweets of this tweet ID."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "List recent tweets posted by a user."
+        },
+        {
+          "info": {
+            "name": "List a user's With Replies timeline",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/users/:id/replies",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Target user ID or username for the replies timeline."
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Pagination cursor for user replies"
+              },
+              {
+                "name": "pageSize",
+                "value": "",
+                "type": "query",
+                "description": "Maximum page items (1-100, default 20). Source, filters, or credits can reduce results. Continue while has_next_page is true. Deprecated limit and count aliases remain accepted.\n"
+              },
+              {
+                "name": "includeParentTweet",
+                "value": "",
+                "type": "query",
+                "description": "Include each reply's parent tweet."
+              },
+              {
+                "name": "fromUser",
+                "value": "",
+                "type": "query",
+                "description": "Filter by author username."
+              },
+              {
+                "name": "toUser",
+                "value": "",
+                "type": "query",
+                "description": "Filter replies sent to a username."
+              },
+              {
+                "name": "mentioning",
+                "value": "",
+                "type": "query",
+                "description": "Filter tweets mentioning a username."
+              },
+              {
+                "name": "language",
+                "value": "",
+                "type": "query",
+                "description": "Language code filter, e.g. en or tr."
+              },
+              {
+                "name": "sinceDate",
+                "value": "",
+                "type": "query",
+                "description": "Start date in YYYY-MM-DD format."
+              },
+              {
+                "name": "untilDate",
+                "value": "",
+                "type": "query",
+                "description": "End date in YYYY-MM-DD format."
+              },
+              {
+                "name": "mediaType",
+                "value": "",
+                "type": "query",
+                "description": "Filter by media type."
+              },
+              {
+                "name": "minFaves",
+                "value": "",
+                "type": "query",
+                "description": "Minimum likes threshold."
+              },
+              {
+                "name": "minRetweets",
+                "value": "",
+                "type": "query",
+                "description": "Minimum retweets threshold."
+              },
+              {
+                "name": "minReplies",
+                "value": "",
+                "type": "query",
+                "description": "Minimum replies threshold."
+              },
+              {
+                "name": "minQuotes",
+                "value": "",
+                "type": "query",
+                "description": "Minimum quote count threshold."
+              },
+              {
+                "name": "verifiedOnly",
+                "value": "",
+                "type": "query",
+                "description": "Only return tweets from verified authors."
+              },
+              {
+                "name": "replies",
+                "value": "",
+                "type": "query",
+                "description": "Reply mode."
+              },
+              {
+                "name": "retweets",
+                "value": "",
+                "type": "query",
+                "description": "Retweet mode."
+              },
+              {
+                "name": "quotes",
+                "value": "",
+                "type": "query",
+                "description": "Quote mode."
+              },
+              {
+                "name": "exactPhrase",
+                "value": "",
+                "type": "query",
+                "description": "Exact phrase to match."
+              },
+              {
+                "name": "excludeWords",
+                "value": "",
+                "type": "query",
+                "description": "Words or quoted phrases to exclude. Separate with spaces, commas, or lines."
+              },
+              {
+                "name": "anyWords",
+                "value": "",
+                "type": "query",
+                "description": "Words or quoted phrases where any one can match. Separate with spaces, commas, or lines."
+              },
+              {
+                "name": "hashtags",
+                "value": "",
+                "type": "query",
+                "description": "Hashtags separated by spaces, commas, or lines."
+              },
+              {
+                "name": "cashtags",
+                "value": "",
+                "type": "query",
+                "description": "Cashtags separated by spaces, commas, or lines."
+              },
+              {
+                "name": "url",
+                "value": "",
+                "type": "query",
+                "description": "URL substring or domain filter."
+              },
+              {
+                "name": "conversationId",
+                "value": "",
+                "type": "query",
+                "description": "Conversation ID filter."
+              },
+              {
+                "name": "inReplyToTweetId",
+                "value": "",
+                "type": "query",
+                "description": "Only replies to this tweet ID."
+              },
+              {
+                "name": "quotesOfTweetId",
+                "value": "",
+                "type": "query",
+                "description": "Only quotes of this tweet ID."
+              },
+              {
+                "name": "retweetsOfTweetId",
+                "value": "",
+                "type": "query",
+                "description": "Only retweets of this tweet ID."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Returns the user's timeline with replies included by default."
+        },
+        {
+          "info": {
+            "name": "List tweets liked by a user",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/users/:id/likes",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "User ID or username"
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Pagination cursor for liked tweets"
+              },
+              {
+                "name": "pageSize",
+                "value": "",
+                "type": "query",
+                "description": "Maximum page items (1-100, default 20). Source, filters, or credits can reduce results. Continue while has_next_page is true. Deprecated limit and count aliases remain accepted.\n"
+              },
+              {
+                "name": "fromUser",
+                "value": "",
+                "type": "query",
+                "description": "Filter by author username."
+              },
+              {
+                "name": "toUser",
+                "value": "",
+                "type": "query",
+                "description": "Filter replies sent to a username."
+              },
+              {
+                "name": "mentioning",
+                "value": "",
+                "type": "query",
+                "description": "Filter tweets mentioning a username."
+              },
+              {
+                "name": "language",
+                "value": "",
+                "type": "query",
+                "description": "Language code filter, e.g. en or tr."
+              },
+              {
+                "name": "sinceDate",
+                "value": "",
+                "type": "query",
+                "description": "Start date in YYYY-MM-DD format."
+              },
+              {
+                "name": "untilDate",
+                "value": "",
+                "type": "query",
+                "description": "End date in YYYY-MM-DD format."
+              },
+              {
+                "name": "mediaType",
+                "value": "",
+                "type": "query",
+                "description": "Filter by media type."
+              },
+              {
+                "name": "minFaves",
+                "value": "",
+                "type": "query",
+                "description": "Minimum likes threshold."
+              },
+              {
+                "name": "minRetweets",
+                "value": "",
+                "type": "query",
+                "description": "Minimum retweets threshold."
+              },
+              {
+                "name": "minReplies",
+                "value": "",
+                "type": "query",
+                "description": "Minimum replies threshold."
+              },
+              {
+                "name": "minQuotes",
+                "value": "",
+                "type": "query",
+                "description": "Minimum quote count threshold."
+              },
+              {
+                "name": "verifiedOnly",
+                "value": "",
+                "type": "query",
+                "description": "Only return tweets from verified authors."
+              },
+              {
+                "name": "replies",
+                "value": "",
+                "type": "query",
+                "description": "Reply mode."
+              },
+              {
+                "name": "retweets",
+                "value": "",
+                "type": "query",
+                "description": "Retweet mode."
+              },
+              {
+                "name": "quotes",
+                "value": "",
+                "type": "query",
+                "description": "Quote mode."
+              },
+              {
+                "name": "exactPhrase",
+                "value": "",
+                "type": "query",
+                "description": "Exact phrase to match."
+              },
+              {
+                "name": "excludeWords",
+                "value": "",
+                "type": "query",
+                "description": "Words or quoted phrases to exclude. Separate with spaces, commas, or lines."
+              },
+              {
+                "name": "anyWords",
+                "value": "",
+                "type": "query",
+                "description": "Words or quoted phrases where any one can match. Separate with spaces, commas, or lines."
+              },
+              {
+                "name": "hashtags",
+                "value": "",
+                "type": "query",
+                "description": "Hashtags separated by spaces, commas, or lines."
+              },
+              {
+                "name": "cashtags",
+                "value": "",
+                "type": "query",
+                "description": "Cashtags separated by spaces, commas, or lines."
+              },
+              {
+                "name": "url",
+                "value": "",
+                "type": "query",
+                "description": "URL substring or domain filter."
+              },
+              {
+                "name": "conversationId",
+                "value": "",
+                "type": "query",
+                "description": "Conversation ID filter."
+              },
+              {
+                "name": "inReplyToTweetId",
+                "value": "",
+                "type": "query",
+                "description": "Only replies to this tweet ID."
+              },
+              {
+                "name": "quotesOfTweetId",
+                "value": "",
+                "type": "query",
+                "description": "Only quotes of this tweet ID."
+              },
+              {
+                "name": "retweetsOfTweetId",
+                "value": "",
+                "type": "query",
+                "description": "Only retweets of this tweet ID."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "List tweets liked by a user."
+        },
+        {
+          "info": {
+            "name": "List media tweets posted by a user",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/users/:id/media",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "User ID or username for media lookup"
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Pagination cursor for media tweets"
+              },
+              {
+                "name": "pageSize",
+                "value": "",
+                "type": "query",
+                "description": "Maximum page items (1-100, default 20). Source, filters, or credits can reduce results. Continue while has_next_page is true. Deprecated limit and count aliases remain accepted.\n"
+              },
+              {
+                "name": "fromUser",
+                "value": "",
+                "type": "query",
+                "description": "Filter by author username."
+              },
+              {
+                "name": "toUser",
+                "value": "",
+                "type": "query",
+                "description": "Filter replies sent to a username."
+              },
+              {
+                "name": "mentioning",
+                "value": "",
+                "type": "query",
+                "description": "Filter tweets mentioning a username."
+              },
+              {
+                "name": "language",
+                "value": "",
+                "type": "query",
+                "description": "Language code filter, e.g. en or tr."
+              },
+              {
+                "name": "sinceDate",
+                "value": "",
+                "type": "query",
+                "description": "Start date in YYYY-MM-DD format."
+              },
+              {
+                "name": "untilDate",
+                "value": "",
+                "type": "query",
+                "description": "End date in YYYY-MM-DD format."
+              },
+              {
+                "name": "mediaType",
+                "value": "",
+                "type": "query",
+                "description": "Filter by media type."
+              },
+              {
+                "name": "minFaves",
+                "value": "",
+                "type": "query",
+                "description": "Minimum likes threshold."
+              },
+              {
+                "name": "minRetweets",
+                "value": "",
+                "type": "query",
+                "description": "Minimum retweets threshold."
+              },
+              {
+                "name": "minReplies",
+                "value": "",
+                "type": "query",
+                "description": "Minimum replies threshold."
+              },
+              {
+                "name": "minQuotes",
+                "value": "",
+                "type": "query",
+                "description": "Minimum quote count threshold."
+              },
+              {
+                "name": "verifiedOnly",
+                "value": "",
+                "type": "query",
+                "description": "Only return tweets from verified authors."
+              },
+              {
+                "name": "replies",
+                "value": "",
+                "type": "query",
+                "description": "Reply mode."
+              },
+              {
+                "name": "retweets",
+                "value": "",
+                "type": "query",
+                "description": "Retweet mode."
+              },
+              {
+                "name": "quotes",
+                "value": "",
+                "type": "query",
+                "description": "Quote mode."
+              },
+              {
+                "name": "exactPhrase",
+                "value": "",
+                "type": "query",
+                "description": "Exact phrase to match."
+              },
+              {
+                "name": "excludeWords",
+                "value": "",
+                "type": "query",
+                "description": "Words or quoted phrases to exclude. Separate with spaces, commas, or lines."
+              },
+              {
+                "name": "anyWords",
+                "value": "",
+                "type": "query",
+                "description": "Words or quoted phrases where any one can match. Separate with spaces, commas, or lines."
+              },
+              {
+                "name": "hashtags",
+                "value": "",
+                "type": "query",
+                "description": "Hashtags separated by spaces, commas, or lines."
+              },
+              {
+                "name": "cashtags",
+                "value": "",
+                "type": "query",
+                "description": "Cashtags separated by spaces, commas, or lines."
+              },
+              {
+                "name": "url",
+                "value": "",
+                "type": "query",
+                "description": "URL substring or domain filter."
+              },
+              {
+                "name": "conversationId",
+                "value": "",
+                "type": "query",
+                "description": "Conversation ID filter."
+              },
+              {
+                "name": "inReplyToTweetId",
+                "value": "",
+                "type": "query",
+                "description": "Only replies to this tweet ID."
+              },
+              {
+                "name": "quotesOfTweetId",
+                "value": "",
+                "type": "query",
+                "description": "Only quotes of this tweet ID."
+              },
+              {
+                "name": "retweetsOfTweetId",
+                "value": "",
+                "type": "query",
+                "description": "Only retweets of this tweet ID."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "List media tweets posted by a user."
+        },
+        {
+          "info": {
+            "name": "List mutual followers between you and a user",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/users/:id/followers-you-know",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "User ID for followers-you-know lookup"
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Pagination cursor for followers-you-know"
+              },
+              {
+                "name": "pageSize",
+                "value": "",
+                "type": "query",
+                "description": "Maximum user profiles requested from this page (20-200, default 200). The response can contain fewer profiles because the source returned fewer or remaining credits cover fewer results. Keep requesting next_cursor while has_next_page is true. The deprecated limit and count aliases remain accepted.\n"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "List mutual followers between you and a user."
+        },
+        {
+          "info": {
+            "name": "Get notifications",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/notifications",
+            "params": [
+              {
+                "name": "type",
+                "value": "",
+                "type": "query",
+                "description": "Notification type filter. Unrecognized values fall back to All."
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Pagination cursor for notifications"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Get notifications."
+        },
+        {
+          "info": {
+            "name": "Get DM conversation history",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/dm/:userId/history",
+            "params": [
+              {
+                "name": "userId",
+                "value": "",
+                "type": "path",
+                "description": "Target user ID"
+              },
+              {
+                "name": "account",
+                "value": "",
+                "type": "query",
+                "description": "X handle (without the `@` prefix) of the connected X account used to read the conversation. The account must be a participant in the conversation.\n"
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Pagination cursor for DM history"
+              },
+              {
+                "name": "maxId",
+                "value": "",
+                "type": "query",
+                "description": "Legacy pagination cursor (backward compat)"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Get DM conversation history."
+        },
+        {
+          "info": {
+            "name": "List followers of a user",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/users/:id/followers",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Target user ID or username for follower lookup."
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Pagination cursor for followers list"
+              },
+              {
+                "name": "after",
+                "value": "",
+                "type": "query",
+                "description": "Legacy cursor alias. Prefer cursor."
+              },
+              {
+                "name": "pageSize",
+                "value": "",
+                "type": "query",
+                "description": "Maximum user profiles requested from this page (20-200, default 200). The response can contain fewer profiles because the source returned fewer or remaining credits cover fewer results. Keep requesting next_cursor while has_next_page is true. The deprecated limit and count aliases remain accepted.\n"
+              },
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query",
+                "description": "Legacy integer page size alias for following lists. Prefer pageSize."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "List followers of a user."
+        },
+        {
+          "info": {
+            "name": "List accounts a user follows",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/users/:id/following",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "User ID or username for following lookup"
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Pagination cursor for following list"
+              },
+              {
+                "name": "after",
+                "value": "",
+                "type": "query",
+                "description": "Deprecated following cursor alias. Prefer cursor."
+              },
+              {
+                "name": "pageSize",
+                "value": "",
+                "type": "query",
+                "description": "Maximum user profiles requested from this page (20-200, default 200). The response can contain fewer profiles because the source returned fewer or remaining credits cover fewer results. Keep requesting next_cursor while has_next_page is true. The deprecated limit and count aliases remain accepted.\n"
+              },
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query",
+                "description": "Legacy page size alias. Prefer pageSize."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "List accounts a user follows."
+        },
+        {
+          "info": {
+            "name": "List tweets mentioning a user",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/users/:id/mentions",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "User ID or username for mentions lookup"
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Pagination cursor for mentions"
+              },
+              {
+                "name": "pageSize",
+                "value": "",
+                "type": "query",
+                "description": "Maximum page items (1-100, default 20). Source, filters, or credits can reduce results. Continue while has_next_page is true. Deprecated limit and count aliases remain accepted.\n"
+              },
+              {
+                "name": "sinceTime",
+                "value": "",
+                "type": "query",
+                "description": "Unix timestamp - return mentions after this time"
+              },
+              {
+                "name": "untilTime",
+                "value": "",
+                "type": "query",
+                "description": "Unix timestamp - return mentions before this time"
+              },
+              {
+                "name": "fromUser",
+                "value": "",
+                "type": "query",
+                "description": "Filter by author username."
+              },
+              {
+                "name": "toUser",
+                "value": "",
+                "type": "query",
+                "description": "Filter replies sent to a username."
+              },
+              {
+                "name": "mentioning",
+                "value": "",
+                "type": "query",
+                "description": "Filter tweets mentioning a username."
+              },
+              {
+                "name": "language",
+                "value": "",
+                "type": "query",
+                "description": "Language code filter, e.g. en or tr."
+              },
+              {
+                "name": "sinceDate",
+                "value": "",
+                "type": "query",
+                "description": "Start date in YYYY-MM-DD format."
+              },
+              {
+                "name": "untilDate",
+                "value": "",
+                "type": "query",
+                "description": "End date in YYYY-MM-DD format."
+              },
+              {
+                "name": "mediaType",
+                "value": "",
+                "type": "query",
+                "description": "Filter by media type."
+              },
+              {
+                "name": "minFaves",
+                "value": "",
+                "type": "query",
+                "description": "Minimum likes threshold."
+              },
+              {
+                "name": "minRetweets",
+                "value": "",
+                "type": "query",
+                "description": "Minimum retweets threshold."
+              },
+              {
+                "name": "minReplies",
+                "value": "",
+                "type": "query",
+                "description": "Minimum replies threshold."
+              },
+              {
+                "name": "minQuotes",
+                "value": "",
+                "type": "query",
+                "description": "Minimum quote count threshold."
+              },
+              {
+                "name": "verifiedOnly",
+                "value": "",
+                "type": "query",
+                "description": "Only return tweets from verified authors."
+              },
+              {
+                "name": "replies",
+                "value": "",
+                "type": "query",
+                "description": "Reply mode."
+              },
+              {
+                "name": "retweets",
+                "value": "",
+                "type": "query",
+                "description": "Retweet mode."
+              },
+              {
+                "name": "quotes",
+                "value": "",
+                "type": "query",
+                "description": "Quote mode."
+              },
+              {
+                "name": "exactPhrase",
+                "value": "",
+                "type": "query",
+                "description": "Exact phrase to match."
+              },
+              {
+                "name": "excludeWords",
+                "value": "",
+                "type": "query",
+                "description": "Words or quoted phrases to exclude. Separate with spaces, commas, or lines."
+              },
+              {
+                "name": "anyWords",
+                "value": "",
+                "type": "query",
+                "description": "Words or quoted phrases where any one can match. Separate with spaces, commas, or lines."
+              },
+              {
+                "name": "hashtags",
+                "value": "",
+                "type": "query",
+                "description": "Hashtags separated by spaces, commas, or lines."
+              },
+              {
+                "name": "cashtags",
+                "value": "",
+                "type": "query",
+                "description": "Cashtags separated by spaces, commas, or lines."
+              },
+              {
+                "name": "url",
+                "value": "",
+                "type": "query",
+                "description": "URL substring or domain filter."
+              },
+              {
+                "name": "conversationId",
+                "value": "",
+                "type": "query",
+                "description": "Conversation ID filter."
+              },
+              {
+                "name": "inReplyToTweetId",
+                "value": "",
+                "type": "query",
+                "description": "Only replies to this tweet ID."
+              },
+              {
+                "name": "quotesOfTweetId",
+                "value": "",
+                "type": "query",
+                "description": "Only quotes of this tweet ID."
+              },
+              {
+                "name": "retweetsOfTweetId",
+                "value": "",
+                "type": "query",
+                "description": "Only retweets of this tweet ID."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "List tweets mentioning a user."
+        },
+        {
+          "info": {
+            "name": "List verified followers of a user",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/users/:id/verified-followers",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "User ID or username for verified followers"
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Pagination cursor for verified followers"
+              },
+              {
+                "name": "pageSize",
+                "value": "",
+                "type": "query",
+                "description": "Maximum user profiles requested from this page (20-200, default 200). The response can contain fewer profiles because the source returned fewer or remaining credits cover fewer results. Keep requesting next_cursor while has_next_page is true. The deprecated limit and count aliases remain accepted.\n"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "List verified followers of a user."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Media",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Download images and videos from tweets",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://xquik.com/api/v1/x/media/download",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Download images and videos from tweets."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "X Accounts",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List connected X accounts",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/accounts",
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "List connected X accounts."
+        },
+        {
+          "info": {
+            "name": "Connect X account",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://xquik.com/api/v1/x/accounts",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Connect X account."
+        },
+        {
+          "info": {
+            "name": "Get X account connection status",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/account-connection-attempts/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Connection attempt ID returned by `POST /x/accounts`."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Get X account connection status."
+        },
+        {
+          "info": {
+            "name": "Submit X account email verification code",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://xquik.com/api/v1/x/account-connection-challenges/:id/submit",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Resource ID returned by the matching create or list endpoint."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Submit X account email verification code."
+        },
+        {
+          "info": {
+            "name": "Get X account details",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/accounts/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Resource ID returned by the matching create or list endpoint."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Get X account details."
+        },
+        {
+          "info": {
+            "name": "Disconnect X account",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://xquik.com/api/v1/x/accounts/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Resource ID returned by the matching create or list endpoint."
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Disconnect X account."
+        },
+        {
+          "info": {
+            "name": "Re-authenticate X account",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://xquik.com/api/v1/x/accounts/:id/reauth",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Resource ID returned by the matching create or list endpoint."
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Re-authenticate X account."
+        },
+        {
+          "info": {
+            "name": "Bulk retry temporarily failed X accounts",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://xquik.com/api/v1/x/accounts/bulk-retry",
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Clears loginFailedAt and loginFailureReason for all accounts with transient or automated failure reasons, making them eligible for retry on next use.\n"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Support",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Download support ticket media",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/support/attachments/:id",
+            "headers": [
+              {
+                "name": "Range",
+                "value": "bytes=0-1048575"
+              }
+            ],
+            "params": [
+              {
+                "name": "id",
+                "value": "att_a1b2c3d4e5f6a1b2c3d4e5f6",
+                "type": "path",
+                "description": "Support attachment public ID"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Streams an authenticated user's support image or video. Video requests support one standard byte range for seeking and resumable playback.\n"
+        },
+        {
+          "info": {
+            "name": "List user's support tickets",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/support/tickets",
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "List user's support tickets."
+        },
+        {
+          "info": {
+            "name": "Create a support ticket",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://xquik.com/api/v1/support/tickets",
+            "headers": [
+              {
+                "name": "Idempotency-Key",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Create a support ticket."
+        },
+        {
+          "info": {
+            "name": "Get ticket with all messages",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/support/tickets/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "tkt_a1b2c3d4e5f6a1b2c3d4e5f6",
+                "type": "path",
+                "description": "Support ticket public ID"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Get ticket with all messages."
+        },
+        {
+          "info": {
+            "name": "Update ticket status",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://xquik.com/api/v1/support/tickets/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "tkt_a1b2c3d4e5f6a1b2c3d4e5f6",
+                "type": "path",
+                "description": "Support ticket public ID to update"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Update ticket status."
+        },
+        {
+          "info": {
+            "name": "Reply to a support ticket",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://xquik.com/api/v1/support/tickets/:id/messages",
+            "headers": [
+              {
+                "name": "Idempotency-Key",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "id",
+                "value": "tkt_a1b2c3d4e5f6a1b2c3d4e5f6",
+                "type": "path",
+                "description": "Support ticket public ID for the reply"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Reply to a support ticket."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Guest Wallets",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Create an accountless prepaid wallet checkout",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://xquik.com/api/v1/guest-wallets",
+            "headers": [
+              {
+                "name": "Idempotency-Key",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Create a one-use Stripe-hosted checkout after the user explicitly confirms a $10-$250 USD amount. This request creates no charge by itself. The user opens checkout_url on Stripe. This endpoint returns the paid-read API key without requiring an Xquik account, email, dashboard, or Xquik web page. An idempotent replay returns the same key.\n"
+        },
+        {
+          "info": {
+            "name": "Create another guest wallet checkout",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://xquik.com/api/v1/guest-wallets/topups",
+            "headers": [
+              {
+                "name": "Idempotency-Key",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            },
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Create a one-use Stripe-hosted checkout for an existing paid-read guest key after the user explicitly confirms a $10-$250 USD amount. The key remains the same. This request creates no charge by itself and never redirects through an Xquik web page.\n"
+        },
+        {
+          "info": {
+            "name": "Get guest wallet and payment status",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/guest-wallets/status",
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Poll after Stripe payment. Use usable to decide whether paid reads can run. An active wallet can remain usable while a top-up is pending. A new wallet becomes usable only after verified webhook fulfillment. Send the guest key as Authorization: Bearer.\n"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Communities",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get community name, description and member count",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/communities/:id/info",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Community ID"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Get community name, description and member count."
+        },
+        {
+          "info": {
+            "name": "List members of a community",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/communities/:id/members",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Community ID for member lookup"
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Pagination cursor"
+              },
+              {
+                "name": "pageSize",
+                "value": "",
+                "type": "query",
+                "description": "Items per page (20-200, default 20). This is an upper bound for paid authenticated calls: remaining credits can reduce the returned page size, and zero affordable results returns 402 insufficient_credits.\n"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "List members of a community."
+        },
+        {
+          "info": {
+            "name": "List moderators of a community",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/communities/:id/moderators",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Community ID for moderator lookup"
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Pagination cursor for community moderators"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "List moderators of a community."
+        },
+        {
+          "info": {
+            "name": "List tweets posted in a community",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/communities/:id/tweets",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "Community ID for tweet lookup"
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Pagination cursor for community tweets"
+              },
+              {
+                "name": "pageSize",
+                "value": "",
+                "type": "query",
+                "description": "Maximum page items (1-100, default 20). Source, filters, or credits can reduce results. Continue while has_next_page is true. Deprecated limit and count aliases remain accepted.\n"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "List tweets posted in a community."
+        },
+        {
+          "info": {
+            "name": "Search tweets within an X Community by keyword",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/communities/search",
+            "params": [
+              {
+                "name": "communityId",
+                "value": "",
+                "type": "query",
+                "description": "Numeric ID of the community whose posts to search"
+              },
+              {
+                "name": "q",
+                "value": "",
+                "type": "query",
+                "description": "Search query"
+              },
+              {
+                "name": "queryType",
+                "value": "",
+                "type": "query",
+                "description": "Sort order (Latest or Top)"
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Pagination cursor for community search"
+              },
+              {
+                "name": "pageSize",
+                "value": "",
+                "type": "query",
+                "description": "Maximum page items (1-100, default 20). Source, filters, or credits can reduce results. Continue while has_next_page is true. Deprecated limit and count aliases remain accepted.\n"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Returns tweets, not community records. Requires a Community ID."
+        },
+        {
+          "info": {
+            "name": "Search tweets within an X Community",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/communities/tweets",
+            "params": [
+              {
+                "name": "communityId",
+                "value": "",
+                "type": "query",
+                "description": "Numeric ID of the community to search"
+              },
+              {
+                "name": "q",
+                "value": "",
+                "type": "query",
+                "description": "Keyword query within the selected community"
+              },
+              {
+                "name": "queryType",
+                "value": "",
+                "type": "query",
+                "description": "Sort order for community results (Latest or Top)"
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Pagination cursor for community results"
+              },
+              {
+                "name": "pageSize",
+                "value": "",
+                "type": "query",
+                "description": "Maximum page items (1-100, default 20). Source, filters, or credits can reduce results. Continue while has_next_page is true. Deprecated limit and count aliases remain accepted.\n"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "Requires a Community ID and keyword query."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Lists",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List followers of an X List",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/lists/:id/followers",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "List ID"
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Pagination cursor for list followers"
+              },
+              {
+                "name": "pageSize",
+                "value": "",
+                "type": "query",
+                "description": "Maximum user profiles requested from this page (20-200, default 200). The response can contain fewer profiles because the source returned fewer or remaining credits cover fewer results. Keep requesting next_cursor while has_next_page is true. The deprecated limit and count aliases remain accepted.\n"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "List followers of an X List."
+        },
+        {
+          "info": {
+            "name": "List members of an X List",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/lists/:id/members",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "List ID for member lookup"
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Pagination cursor for list members"
+              },
+              {
+                "name": "pageSize",
+                "value": "",
+                "type": "query",
+                "description": "Members per page (20-200, default 20)"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "List members of an X List."
+        },
+        {
+          "info": {
+            "name": "List tweets from an X List",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://xquik.com/api/v1/x/lists/:id/tweets",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "List ID for tweet lookup"
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Pagination cursor for list tweets"
+              },
+              {
+                "name": "pageSize",
+                "value": "",
+                "type": "query",
+                "description": "Maximum page items (1-100, default 20). Source, filters, or credits can reduce results. Continue while has_next_page is true. Deprecated limit and count aliases remain accepted.\n"
+              },
+              {
+                "name": "sinceTime",
+                "value": "",
+                "type": "query",
+                "description": "Unix timestamp - filter after"
+              },
+              {
+                "name": "untilTime",
+                "value": "",
+                "type": "query",
+                "description": "Unix timestamp - filter before"
+              },
+              {
+                "name": "includeReplies",
+                "value": "",
+                "type": "query",
+                "description": "Include replies (default false)"
+              }
+            ],
+            "auth": {
+              "type": "apikey",
+              "key": "x-api-key",
+              "value": "{{x-api-key}}",
+              "placement": "header"
+            }
+          },
+          "docs": "List tweets from an X List."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

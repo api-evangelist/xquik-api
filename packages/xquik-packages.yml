@@ -1,0 +1,133 @@
+generated: '2026-08-13'
+method: searched
+source: https://docs.xquik.com/sdks
+note: >-
+  Every package below was resolved against its public registry metadata endpoint on
+  2026-08-13. All nine first-party artifacts are Stainless-generated from the published
+  OpenAPI 3.1 contract at https://xquik.com/openapi.json. Java and Kotlin are published as
+  source builds only — a Maven Central search for "x-twitter-scraper" returned numFound 0,
+  which matches the provider's own "Maven Central pending" note in the spec description.
+packages:
+- language: javascript
+  registry: npm
+  name: x-twitter-scraper
+  url: https://www.npmjs.com/package/x-twitter-scraper
+  install: npm i x-twitter-scraper
+  repository: https://github.com/Xquik-dev/x-twitter-scraper-typescript
+  docs: https://docs.xquik.com/sdks/typescript
+  official: true
+  version: 0.12.0
+  published: '2026-08-12'
+- language: python
+  registry: pypi
+  name: x-twitter-scraper
+  url: https://pypi.org/project/x-twitter-scraper/
+  install: pip install x-twitter-scraper
+  repository: https://github.com/Xquik-dev/x-twitter-scraper-python
+  docs: https://docs.xquik.com/sdks/python
+  official: true
+  version: 0.11.0
+  published: '2026-08-12'
+- language: go
+  registry: pkg.go.dev
+  name: github.com/Xquik-dev/x-twitter-scraper-go
+  url: https://pkg.go.dev/github.com/Xquik-dev/x-twitter-scraper-go
+  install: go get github.com/Xquik-dev/x-twitter-scraper-go
+  repository: https://github.com/Xquik-dev/x-twitter-scraper-go
+  docs: https://docs.xquik.com/sdks/go
+  official: true
+  version: v0.16.0
+  published: '2026-08-12'
+- language: ruby
+  registry: rubygems
+  name: x-twitter-scraper
+  url: https://rubygems.org/gems/x-twitter-scraper
+  install: gem install x-twitter-scraper
+  repository: https://github.com/Xquik-dev/x-twitter-scraper-ruby
+  docs: https://docs.xquik.com/sdks/ruby
+  official: true
+  version: 0.10.0
+  published: '2026-08-12'
+- language: php
+  registry: packagist
+  name: xquik/x-twitter-scraper
+  url: https://packagist.org/packages/xquik/x-twitter-scraper
+  install: composer require xquik/x-twitter-scraper
+  repository: https://github.com/Xquik-dev/x-twitter-scraper-php
+  docs: https://docs.xquik.com/sdks/php
+  official: true
+  version: v0.13.0
+  published: '2026-08-12'
+- language: csharp
+  registry: nuget
+  name: XTwitterScraper
+  url: https://www.nuget.org/packages/XTwitterScraper
+  install: dotnet add package XTwitterScraper
+  repository: https://github.com/Xquik-dev/x-twitter-scraper-csharp
+  docs: https://docs.xquik.com/sdks/csharp-x-api-sdk
+  official: true
+  version: 0.6.0
+  published: '2026-07-31'
+- language: go
+  registry: pkg.go.dev
+  name: github.com/Xquik-dev/x-twitter-scraper-cli
+  url: https://pkg.go.dev/github.com/Xquik-dev/x-twitter-scraper-cli
+  install: go install github.com/Xquik-dev/x-twitter-scraper-cli/cmd/x-twitter-scraper@latest
+  repository: https://github.com/Xquik-dev/x-twitter-scraper-cli
+  docs: https://docs.xquik.com/sdks/cli
+  official: true
+  kind: cli
+  version: v0.13.0
+  published: '2026-08-12'
+- language: hcl
+  registry: terraform-registry
+  name: Xquik-dev/x-twitter-scraper
+  url: https://registry.terraform.io/providers/Xquik-dev/x-twitter-scraper/latest
+  repository: https://github.com/Xquik-dev/terraform-provider-x-twitter-scraper
+  docs: https://docs.xquik.com/sdks/terraform
+  official: true
+  kind: terraform-provider
+  version: 0.7.1
+  published: '2026-08-11'
+- language: javascript
+  registry: npm
+  name: '@xquik/tweetclaw'
+  url: https://www.npmjs.com/package/@xquik/tweetclaw
+  install: openclaw plugins install clawhub:@xquik/tweetclaw
+  repository: https://github.com/Xquik-dev/tweetclaw
+  docs: https://docs.xquik.com/guides/tweetclaw
+  official: true
+  kind: agent-plugin
+  version: 1.6.41
+  published: '2026-07-31'
+- language: java
+  registry: null
+  name: x-twitter-scraper-java
+  url: https://github.com/Xquik-dev/x-twitter-scraper-java
+  install: source build (clone and build; no Maven coordinates published)
+  docs: https://docs.xquik.com/sdks/java
+  official: true
+  version: null
+  published: null
+  note: >-
+    Checked search.maven.org for "x-twitter-scraper" on 2026-08-13 — numFound 0. The SDK
+    exists as a GitHub source build only, so a consumer cannot pin a released version.
+- language: kotlin
+  registry: null
+  name: x-twitter-scraper-kotlin
+  url: https://github.com/Xquik-dev/x-twitter-scraper-kotlin
+  install: source build (clone and build; no Maven coordinates published)
+  docs: https://docs.xquik.com/sdks/kotlin
+  official: true
+  version: null
+  published: null
+  note: >-
+    Checked search.maven.org for "x-twitter-scraper" on 2026-08-13 — numFound 0. Source
+    build only, same posture as the Java SDK.
+summary:
+  official_count: 11
+  registries: [npm, pypi, rubygems, packagist, nuget, pkg.go.dev, terraform-registry]
+  unpublished: [java, kotlin]
+  freshness: >-
+    Nine of eleven artifacts published a release on 2026-07-31 or later; seven of them on
+    2026-08-12, one day before this probe. No abandonment signal.

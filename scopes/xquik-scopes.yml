@@ -1,0 +1,62 @@
+generated: '2026-08-13'
+method: probed
+source: https://xquik.com/.well-known/oauth-authorization-server
+docs: https://docs.xquik.com/oauth/overview
+description: >-
+  Xquik's OAuth 2.1 scope surface, read from the provider's own RFC 8414 authorization-server
+  metadata and RFC 9728 protected-resource metadata rather than from the OpenAPI (the spec
+  declares the OAuth credential as an http bearer scheme, so it carries no oauth2 flow or
+  scope map — deriving from the spec alone yields nothing). The live MCP 401 challenge
+  advertises the same single scope, and the A2A agent card declares it too, so all three
+  provider-published surfaces agree.
+schemes:
+- name: oauth2
+  type: oauth2
+  spec: OAuth 2.1 with PKCE (S256)
+  issuer: https://xquik.com
+  flows:
+  - flow: authorizationCode
+    authorizationUrl: https://xquik.com/api/oauth/authorize
+    tokenUrl: https://xquik.com/api/oauth/token
+    revocationUrl: https://xquik.com/api/oauth/revoke
+    registrationUrl: https://xquik.com/api/oauth/register
+    grant_types: [authorization_code, refresh_token]
+    code_challenge_methods: [S256]
+    token_endpoint_auth_methods: [none, client_secret_post]
+    client_id_metadata_document_supported: true
+  sources:
+  - https://xquik.com/.well-known/oauth-authorization-server
+  - https://xquik.com/.well-known/oauth-protected-resource/mcp
+  - a2a/xquik-agent-card.json
+scopes:
+- scope: mcp:tools
+  description: Run approved Xquik MCP tools.
+  flows: [authorizationCode]
+  resources: [https://xquik.com/mcp]
+  sources:
+  - https://xquik.com/.well-known/oauth-authorization-server
+  - https://xquik.com/.well-known/oauth-protected-resource/mcp
+  - https://xquik.com/mcp (WWW-Authenticate challenge, scope="mcp:tools")
+protected_resources:
+- resource: https://xquik.com/mcp
+  name: Xquik MCP Server
+  authorization_servers: [https://xquik.com]
+  bearer_methods_supported: [header]
+  scopes_supported: [mcp:tools]
+  documentation: https://docs.xquik.com/mcp/overview
+note: >-
+  One scope, not a granular permission model. An mcp:tools token inherits whatever the
+  underlying account may do; read/write separation is enforced by the credential type
+  (guest paid_reads key vs full account key) rather than by scope. The agent card carried
+  read/write scopes when this repo was first profiled on 2026-08-01; the live card now
+  carries mcp:tools, matching the authorization server.
+x-evidence:
+  fetched: '2026-08-13'
+  urls:
+  - url: https://xquik.com/.well-known/oauth-authorization-server
+    status: 200
+  - url: https://xquik.com/.well-known/oauth-protected-resource/mcp
+    status: 200
+  - url: https://xquik.com/mcp
+    status: 401
+    www_authenticate: Bearer realm="OAuth", resource_metadata="https://xquik.com/.well-known/oauth-protected-resource/mcp", scope="mcp:tools"

@@ -1,0 +1,261 @@
+generated: '2026-08-13'
+method: derived
+source: openapi/_original/xquik-rest-api-openapi.json
+docs: https://docs.xquik.com/guides/error-handling
+searched_from:
+- https://docs.xquik.com/guides/error-handling
+- https://docs.xquik.com/llms.txt
+format: vendor-envelope
+rfc9457: false
+description: >-
+  Xquik does not use RFC 9457 problem+json. Every REST error returns a vendor envelope whose
+  machine-readable code is `error` (or `error.code` under the opt-in 2026-04-29 contract).
+  The status classes below are derived from the 4xx/5xx responses in the published OpenAPI
+  and enriched with the retry semantics the error-handling guide states. The full public
+  code registry is the `Error` schema enum, reproduced at the end of this file.
+envelope:
+  default: '{ "error": "error_code", "message": "Human-readable description" }'
+  opt_in: '{ "error": { "type": "...", "code": "...", "message": "..." } }'
+  opt_in_header: 'xquik-api-contract: 2026-04-29'
+  optional_fields: [message, reason, retryAfter, retryAfterMs, payment_options]
+statuses:
+- status: 400
+  meaning: "Request validation failed."
+  retry: no
+  action: "Fix the body, query or path before resending."
+  operations: 98
+  example_codes: [account_required, invalid_user_id, missing_params, missing_query]
+- status: 401
+  meaning: "Authentication missing, invalid, or an anonymous paid read needs a guest wallet."
+  retry: no
+  action: "Check x-api-key / bearer token, or read the WWW-Authenticate Bearer challenge and its guest-wallet action. Never start checkout without user confirmation."
+  operations: 126
+  example_codes: []
+  note: No error code appears in a response example for this status in the spec; the code arrives in the `error` field at runtime.
+- status: 402
+  meaning: "Billing, credits, or a direct MPP payment challenge."
+  retry: no
+  action: "Read payment_options and get explicit user confirmation, or pay the MPP challenge and retry with Authorization: Payment."
+  operations: 64
+  example_codes: [insufficient_credits]
+- status: 403
+  meaning: "Permission or connected-account health."
+  retry: no
+  action: "Delete an extra key, check billing, use a participating DM account, or re-authenticate the X account."
+  operations: 20
+  example_codes: [account_needs_reauth, account_restricted, api_key_limit_reached, dm_not_permitted]
+- status: 404
+  meaning: "Resource not found."
+  retry: no
+  action: "Verify the resource, account, username, tweet, media, article, draft or style ID."
+  operations: 65
+  example_codes: [account_not_found, article_not_found, tweet_not_found]
+- status: 409
+  meaning: "Conflict \u2014 duplicate resource, busy cursor, or idempotency key reuse."
+  retry: conditional
+  action: "For a busy cursor follow Retry-After and retry once. For idempotency conflicts reuse the key only with the original request body."
+  operations: 34
+  example_codes: [connection_challenge_inactive, idempotency_conflict, idempotency_key_conflict, monitor_already_exists, monitor_profile_unavailable]
+- status: 410
+  meaning: "Gone \u2014 expired checkout, expired connection challenge, or a dead cursor."
+  retry: no
+  action: "Restart cursorless and deduplicate IDs; re-create an expired checkout or challenge."
+  operations: 10
+  example_codes: [checkout_unavailable, connection_challenge_expired]
+- status: 413
+  meaning: "Request body too large."
+  retry: no
+  action: "Reduce the payload."
+  operations: 2
+  example_codes: [body_too_large]
+- status: 415
+  meaning: "Unsupported media type."
+  retry: no
+  action: "Send an allowed type (AVIF, GIF, JPEG, PNG, WebP, MP4)."
+  operations: 2
+  example_codes: [unsupported_media_type]
+- status: 416
+  meaning: "Requested range not satisfiable."
+  retry: no
+  action: "Send a valid Range header."
+  operations: 1
+  example_codes: [invalid_range]
+- status: 422
+  meaning: "Write validation rejected by X."
+  retry: no
+  action: "Fix the account capability, target, content, DM permission or media URL."
+  operations: 21
+  example_codes: []
+  note: No error code appears in a response example for this status in the spec; the code arrives in the `error` field at runtime.
+- status: 423
+  meaning: "Locked \u2014 guest wallet temporarily unavailable."
+  retry: conditional
+  action: "Wait and retry the wallet operation."
+  operations: 2
+  example_codes: [guest_wallet_unavailable]
+- status: 424
+  meaning: "Failed dependency \u2014 upstream dependency failed (opt-in contract; 502 in default v1)."
+  retry: yes
+  action: "Use the endpoint-specific fallback or retry with backoff."
+  operations: 41
+  example_codes: []
+  note: No error code appears in a response example for this status in the spec; the code arrives in the `error` field at runtime.
+- status: 429
+  meaning: "Rate limit, action cooldown, or X daily limit."
+  retry: conditional
+  action: "Retry rate_limit_exceeded and x_rate_limited after Retry-After. Wait out login_cooldown via retryAfterMs. Do not retry x_daily_limit on the same X account for 24 hours."
+  operations: 127
+  example_codes: []
+  note: No error code appears in a response example for this status in the spec; the code arrives in the `error` field at runtime.
+- status: 500
+  meaning: "Internal error."
+  retry: yes
+  action: "Retry with capped exponential backoff and jitter; writes only when safeToRetry is true, with a new Idempotency-Key."
+  operations: 18
+  example_codes: []
+  note: No error code appears in a response example for this status in the spec; the code arrives in the `error` field at runtime.
+- status: 502
+  meaning: "Upstream dependency failure (default v1)."
+  retry: yes
+  action: "Retry with backoff; see 424 under the opt-in contract."
+  operations: 42
+  example_codes: []
+  note: No error code appears in a response example for this status in the spec; the code arrives in the `error` field at runtime.
+- status: 503
+  meaning: "Service or dependency unavailable."
+  retry: yes
+  action: "Retry with capped exponential backoff and jitter."
+  operations: 30
+  example_codes: [guest_wallets_unavailable]
+write_lifecycle:
+  status: 202
+  fields: [writeActionId, status, terminal, charged, retryable, safeToRetry, statusUrl, nextAction]
+  poll_operation: getWriteActionStatus
+  rule: >-
+    A 202 write can remain pending. Store writeActionId and poll statusUrl while `terminal`
+    is false. Retry only when `safeToRetry` is true, with a new Idempotency-Key.
+  notable_codes:
+  - code: x_write_ambiguous
+    status: 202
+    meaning: Dispatch occurred but confirmation is pending.
+    action: Poll statusUrl; do not retry while terminal or safeToRetry is false.
+  - code: x_daily_limit
+    status: 429
+    meaning: The connected X account reached its daily posting limit.
+    action: Wait 24 hours; not retryable.
+registry:
+  source: '#/components/schemas/Error -> LegacyErrorCode enum'
+  count: 112
+  codes:
+  - account_already_connected
+  - account_needs_reauth
+  - account_not_found
+  - account_required
+  - account_restricted
+  - api_key_limit_reached
+  - article_not_found
+  - body_too_large
+  - checkout_unavailable
+  - closed
+  - connection_challenge_expired
+  - connection_challenge_inactive
+  - coverage_cursor_gone
+  - coverage_cursor_unavailable
+  - dm_not_permitted
+  - draft_not_found
+  - expired
+  - favoriters_unavailable
+  - forbidden
+  - guest_wallet_unavailable
+  - guest_wallets_disabled
+  - guest_wallets_unavailable
+  - idempotency_conflict
+  - idempotency_key_conflict
+  - insufficient_credits
+  - internal_error
+  - invalid_community_id
+  - invalid_complete_replies_request
+  - invalid_coverage_cursor
+  - invalid_coverage_request
+  - invalid_format
+  - invalid_id
+  - invalid_idempotency_key
+  - invalid_input
+  - invalid_json
+  - invalid_list_id
+  - invalid_output_options
+  - invalid_params
+  - invalid_payment_amount
+  - invalid_range
+  - invalid_reply_options
+  - invalid_tool_type
+  - invalid_tweet_id
+  - invalid_tweet_url
+  - invalid_user_id
+  - invalid_user_ids
+  - invalid_username
+  - login_cooldown
+  - login_failed
+  - login_rate_limited
+  - login_service_unavailable
+  - media_download_failed
+  - missing_idempotency_key
+  - missing_ids
+  - missing_params
+  - missing_query
+  - missing_url
+  - monitor_already_exists
+  - monitor_profile_unavailable
+  - no_cached_style
+  - no_credits
+  - no_media
+  - no_subscription
+  - not_found
+  - passkey_required
+  - payment_failed
+  - rate_limit_exceeded
+  - rate_limited
+  - read_request_timeout
+  - replies_incomplete
+  - service_unavailable
+  - style_not_found
+  - subscription_inactive
+  - support_media_rate_limit
+  - support_request_rate_limit
+  - too_many_ids
+  - too_many_tweets
+  - tweet_not_found
+  - unauthenticated
+  - unknown_field
+  - unsupported_field
+  - unsupported_media_type
+  - user_not_found
+  - webhook_inactive
+  - write_tracking_unavailable
+  - x_account_feature_required
+  - x_account_protected
+  - x_account_suspended
+  - x_api_rate_limited
+  - x_api_unauthorized
+  - x_api_unavailable
+  - x_auth_failure
+  - x_content_too_long
+  - x_daily_limit
+  - x_dm_not_allowed
+  - x_duplicate_action
+  - x_login_auth_failed
+  - x_login_challenge
+  - x_login_denied
+  - x_login_failed
+  - x_login_proxy_error
+  - x_login_rate_limited
+  - x_login_service_unavailable
+  - x_login_suspended
+  - x_rate_limited
+  - x_rejected
+  - x_target_not_found
+  - x_transient_error
+  - x_user_lookup_failed
+  - x_write_ambiguous
+  - x_write_failed
+  - x_write_unconfirmed

@@ -1,0 +1,15 @@
+generated: '2026-08-04'
+method: harvested
+status: published
+provider_published: true
+source: https://xquik.com/asyncapi.yaml
+description: AsyncAPI 3.1.0 published by Xquik at their own domain and harvested verbatim
+  into _original/. The provider wrote this document; API Evangelist only fetched it.
+verified: '2026-08-04'
+evidence:
+- url: https://xquik.com/asyncapi.yaml
+  status: 200
+  note: 'asyncapi: 3.1.0, 3,677 bytes, served from the provider domain.'
+- url: https://xquik.com/zzz-control-nonsense
+  status: 404
+  note: control path — host does not soft-404, so the 200 above is real.

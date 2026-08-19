@@ -1,0 +1,85 @@
+generated: '2026-08-13'
+method: searched
+source: https://docs.xquik.com/mcp/tools
+docs:
+- https://docs.xquik.com/guides/twitter-webhook-testing
+- https://docs.xquik.com/webhooks/verification
+- https://docs.xquik.com/guides/extraction-workflow
+derived_from: openapi/_original/xquik-rest-api-openapi.json
+description: >-
+  Xquik publishes NO test-mode credential and no test/live key separation — an `xq_` key is
+  a live key and every metered call spends real credits. What it does publish is a set of
+  non-destructive rehearsal surfaces: a cost estimator, a dry-run flag, a signed webhook
+  test delivery, and a credit-free MCP catalog sandbox. Those are recorded below exactly as
+  documented; nothing here is an invented test value.
+test_live_separation:
+  supported: false
+  key_prefixes:
+    live: xq_ + 64 hex
+    test: null
+  note: >-
+    There is no test key prefix and no sandbox base URL. The nearest thing to a limited
+    credential is a guest `paid_reads` key, which is scoped to 33 GET routes but is funded
+    with real money ($10-$250 hosted checkout).
+rehearsal_surfaces:
+- name: Extraction cost estimate
+  kind: cost-preview
+  operation: estimateExtraction
+  route: POST /api/v1/extractions/estimate
+  spends_credits: false
+  detail: >-
+    Returns creditsRequired and creditsAvailable. The docs instruct agents to always call
+    it before POST /api/v1/extractions; the available balance must cover the job.
+- name: Extraction dry run
+  kind: dry-run
+  operation: createExtraction
+  route: POST /api/v1/extractions?dry_run=true
+  parameter: dry_run (query, boolean, default false)
+  spends_credits: false
+  detail: Estimates cost without creating an extraction. Also accepts resultsLimit to preview capped costs.
+- name: Signed webhook test delivery
+  kind: fixture-trigger
+  operation: testWebhook
+  route: POST /api/v1/webhooks/{id}/test
+  detail: >-
+    Sends a signed `webhook.test` event to the registered HTTPS endpoint so a receiver can
+    verify HMAC-SHA256 handling before real monitor events arrive.
+- name: Webhook resume
+  kind: fixture-trigger
+  operation: resumeWebhook
+  route: POST /api/v1/webhooks/{id}/resume
+  detail: >-
+    Sends a signed webhook.test, reactivates the endpoint and resets consecutiveFailures —
+    but only after the receiver returns 2xx.
+- name: MCP catalog sandbox
+  kind: code-sandbox
+  tool: explore
+  server: https://xquik.com/mcp
+  spends_credits: false
+  detail: >-
+    Runs an async arrow function against `spec.endpoints` server-side. Makes no network
+    call and spends no credits, so an agent can plan a call before paying for one.
+- name: Compose workflow
+  kind: free-operation
+  operation: compose
+  route: POST /api/v1/compose
+  spends_credits: false
+  detail: Three-step compose/refine/score workflow documented as free, no usage cost.
+free_operations:
+  note: Reading stored monitor events is free; Radar is free for all subscribers.
+webhook_signature_verification:
+  headers: [X-Xquik-Signature, X-Xquik-Nonce, X-Xquik-Timestamp]
+  signature_format: sha256=<64 hex>
+  algorithm: HMAC-SHA256 over timestamp + nonce + raw body with the endpoint secret
+  secret_delivery: returned once at webhook creation
+  fixtures: asyncapi/xquik-asyncapi.yaml carries the provider's own example headers and payload
+gaps:
+- No test-mode API key or sandbox host.
+- No published set of magic test identifiers (no test tweet IDs, usernames or accounts).
+- No time simulation / test clocks.
+x-evidence:
+  fetched: '2026-08-13'
+  urls:
+  - https://docs.xquik.com/mcp/tools
+  - https://docs.xquik.com/llms.txt
+  http_status: 200

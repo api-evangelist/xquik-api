@@ -1,32 +1,95 @@
-generated: '2026-08-01'
-method: declared
-source: https://xquik.com/apis.yml
+generated: '2026-08-13'
+method: probed
+source: live probes of the Xquik discovery surface, 2026-08-13
 publisher: Xquik
+description: >-
+  Standards Xquik conforms to. The 2026-08-01 version of this file was a provider
+  declaration; every entry below has now been re-checked against the live document or
+  endpoint, and each carries the HTTP status observed on 2026-08-13.
 standards:
-  - id: openapi-3.1
-    conforms: true
-    evidence: https://xquik.com/openapi.json
-  - id: oauth-2.1
-    conforms: true
-    evidence: https://xquik.com/.well-known/oauth-authorization-server
-  - id: rfc9728-oauth-protected-resource
-    conforms: true
-    evidence: https://xquik.com/.well-known/oauth-protected-resource/mcp
-  - id: rfc9727-api-catalog
-    conforms: true
-    evidence: https://xquik.com/.well-known/api-catalog
-  - id: rfc9116-security-txt
-    conforms: true
-    evidence: https://xquik.com/.well-known/security.txt
-  - id: mcp
-    conforms: true
-    evidence: https://xquik.com/.well-known/mcp.json
-  - id: agent-skills-discovery-0.2
-    conforms: true
-    evidence: https://xquik.com/.well-known/agent-skills/index.json
-  - id: a2a-agent-card-1.0
-    conforms: true
-    evidence: https://xquik.com/.well-known/agent-card.json
-  - id: rfc9457-problem-details
-    conforms: false
-    evidence: Xquik uses its documented error envelope.
+- id: openapi-3.1
+  conforms: true
+  evidence: https://xquik.com/openapi.json
+  status: 200
+  detail: OpenAPI 3.1.0, 100 paths, 127 operations, 127 unique operationIds, 104 component schemas.
+- id: oauth-2.1
+  conforms: true
+  evidence: https://xquik.com/.well-known/oauth-authorization-server
+  status: 200
+  detail: PKCE S256 required, authorization_code + refresh_token, dynamic client registration, client_id metadata documents.
+- id: rfc8414-oauth-authorization-server-metadata
+  conforms: true
+  evidence: https://xquik.com/.well-known/oauth-authorization-server
+  status: 200
+- id: rfc9728-oauth-protected-resource
+  conforms: true
+  evidence: https://xquik.com/.well-known/oauth-protected-resource/mcp
+  status: 200
+  detail: Referenced from the live MCP 401 WWW-Authenticate challenge via resource_metadata.
+- id: rfc9727-api-catalog
+  conforms: true
+  evidence: https://xquik.com/.well-known/api-catalog
+  status: 200
+  detail: application/linkset+json with service-desc and describedby for both the API root and the MCP resource.
+- id: rfc9116-security-txt
+  conforms: true
+  evidence: https://xquik.com/.well-known/security.txt
+  status: 200
+  detail: Contact, Expires (2027-07-01), Preferred-Languages, Canonical and Policy fields present.
+- id: mcp
+  conforms: true
+  evidence: https://xquik.com/.well-known/mcp.json
+  status: 200
+  detail: >-
+    Server manifest against the 2025-12-11 MCP server schema; streamable-http remote at
+    https://xquik.com/mcp. The endpoint itself answered 401 with a correct OAuth challenge
+    on probe. A second anonymous docs MCP server at https://docs.xquik.com/mcp answered
+    tools/list 200 with 3 tools.
+- id: agent-skills-discovery-0.2
+  conforms: true
+  evidence: https://xquik.com/.well-known/agent-skills/index.json
+  status: 200
+  detail: One skill (`xquik`), type skill-md, with a sha256 digest; SKILL.md fetched 200.
+- id: a2a-agent-card-1.0
+  conforms: true
+  evidence: https://xquik.com/.well-known/agent-card.json
+  status: 200
+  detail: >-
+    Graded conformant — capabilities object, protocolVersion 1.0.0, skills array,
+    preferredTransport and default input/output modes present. See a2a/xquik-api-a2a.yml.
+- id: web-bot-auth-http-message-signatures
+  conforms: true
+  evidence: https://xquik.com/.well-known/http-message-signatures-directory
+  status: 200
+  detail: One Ed25519 signing key published (kid xquik-web-bot-auth-2026-04).
+- id: openid-connect-discovery
+  conforms: partial
+  evidence: https://xquik.com/.well-known/openid-configuration
+  status: 200
+  detail: >-
+    The path is served, but with the same body as the OAuth authorization-server metadata —
+    no id_token / userinfo / jwks_uri. Xquik is an OAuth 2.1 provider, not an OIDC provider;
+    recorded as partial rather than claiming OIDC.
+- id: ai-plugin-manifest
+  conforms: true
+  evidence: https://xquik.com/.well-known/ai-plugin.json
+  status: 200
+- id: asyncapi-3
+  conforms: true
+  evidence: asyncapi/xquik-asyncapi.yaml
+  detail: AsyncAPI 3.1.0 for the signed monitor-event webhook surface, published by the provider.
+- id: rfc9457-problem-details
+  conforms: false
+  evidence: Xquik uses its own error envelope; see errors/xquik-error-codes.yml.
+- id: rfc8594-sunset-header
+  conforms: false
+  evidence: No Sunset or Deprecation response header is documented; see lifecycle/xquik-lifecycle.yml.
+compliance_program:
+  certifications: []
+  note: >-
+    Xquik publishes privacy, terms, a security-reporting page and a vulnerability-disclosure
+    policy, and states plainly that it "does not claim unlisted certifications". No SOC 2 /
+    ISO 27001 / PCI / HIPAA attestation is claimed, and none is asserted here.
+x-evidence:
+  checked: '2026-08-13'
+  probe_count: 12

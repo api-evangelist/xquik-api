@@ -1,0 +1,73 @@
+generated: '2026-08-13'
+method: searched
+source: https://docs.xquik.com/changelog
+description: >-
+  Xquik publishes a dated, human-written changelog grouped by month with New / Changed /
+  Removed sections. Captured here is the recent window read on 2026-08-13; the live page
+  remains the source of truth.
+scheme:
+  versioning: uri-path v1, with a dated opt-in response contract header
+  contract_header: 'xquik-api-contract: 2026-04-29'
+  current_api_version: v1
+  current_mcp_version: 2.6.0
+  cadence: monthly
+entries:
+- label: July 2026
+  api_version: v1
+  breaking: false
+  additions:
+  - Accountless guest wallets prepay 33 GET routes through a scoped paid_reads key
+  - POST /guest-wallets, GET /guest-wallets/status and POST /guest-wallets/topups support hosted checkout after confirmation without an account
+  - Active guest keys expose the same 33-route read-only catalog through API MCP
+  - API MCP v2.6.0 supports MCP 2026-07-28 through server/discover
+  - POST /compose returns 7 source-specific radarRecommendations
+  - GET /x/account-connection-attempts/{id} reports pending, successful, failed or waiting-for-email-code
+  changes:
+  - Modern MCP calls are request-scoped and require no initialization session; stateless 2025-era clients stay compatible
+  - Account connection email-code challenges return a resumable 202 requires_email_code
+  - POST /x/accounts can return a durable 202 pending with Location and Retry-After
+  - Direct MPP now covers 7 fixed-price charge operations; follow checks and article reads cost USD 0.00075
+  - Every response after an accepted MPP payment includes Payment-Receipt, including non-2xx
+  - 26 non-MPP anonymous paid reads return 401 WWW-Authenticate Bearer; the 7 direct MPP reads return 402 WWW-Authenticate Payment
+  removals:
+  - Obsolete public proxy_country and loginCountry account fields
+- label: April 2026
+  api_version: v1
+  breaking: true
+  breaking_note: >-
+    Billing migrated to a credits-only model (usage-quota removed), GET /account replaced
+    currentPeriod with creditInfo, POST /extractions/estimate replaced usagePercent /
+    projectedPercent with creditsRequired / creditsAvailable, and two monitor event types
+    were withdrawn.
+  additions:
+  - POST /x/tweets accepts a media field (1-4 image URLs); text is optional when media is present
+  - POST /x/media accepts image/webp and image/avif
+  - health field (healthy, locked, needsReauth, recovering, suspended, temporaryIssue) added to X account responses
+  - New error code login_cooldown (429) with reason, retryAfterMs and Retry-After
+  - All 17 write endpoints document standardised 403/422/429/503 error responses
+  - GET /radar items expose 15 metadata fields per source (was 8)
+  - MPP pay-per-use expanded to 31 endpoints
+  - New framework guides — LangChain, Pydantic AI, CrewAI, Mastra, Google ADK, Microsoft Agent Framework
+  changes:
+  - Billing migrated to credits-only
+  - Real-time WebSocket monitor sync retired in favour of an async poller (no public contract change)
+  - POST /x/tweets/{id}/like and /retweet are now end-to-end idempotent — acting twice returns 200 instead of a 500 plus account cooldown
+  removals:
+  - Event types follower.gained and follower.lost no longer emitted
+  - Error code shadow_account (422) removed from POST /monitors
+  - Error code stream_registration_failed (502) removed from POST /monitors
+  - Telegram bot endpoints and integrations pipeline endpoints removed
+- label: March 2026
+  api_version: v1
+  breaking: false
+  additions:
+  - MPP expanded from 16 to 31 eligible endpoints
+  - Webhook delivery signing uses HMAC-SHA256 with the X-Xquik-Signature header
+  changes:
+  - OAuth 2.1 discovery metadata served from /.well-known/oauth-authorization-server
+  - Rate-limit responses include the Retry-After header
+x-evidence:
+  fetched: '2026-08-13'
+  url: https://docs.xquik.com/changelog
+  http_status: 200
+  read_via: docs MCP query_docs_filesystem_xquik (cat /changelog.mdx)

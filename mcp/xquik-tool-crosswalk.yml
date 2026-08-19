@@ -1,0 +1,108 @@
+generated: '2026-08-13'
+method: derived
+source: mcp/xquik-mcp.yml, mcp/xquik-docs-mcp.yml, openapi/xquik-rest-api-openapi.yml
+docs: https://docs.xquik.com/mcp/tools
+description: >-
+  Binds Xquik's MCP tools to the OpenAPI operations behind them. Xquik ships a code-mode
+  MCP server, not a tool-per-operation one: two tools front a scoped route catalog, so the
+  crosswalk is deliberately one-to-many. That shape matters for agent readiness — a client
+  cannot read a tool name and know what it may call; it must first run `explore` against
+  `spec.endpoints`, and the real input contract of any call is the OpenAPI operation's own
+  parameters and requestBody.
+surfaces:
+  openapi:
+    file: openapi/xquik-rest-api-openapi.yml
+    source: https://xquik.com/openapi.json
+    operations: 127
+    gated: false
+  mcp_api:
+    url: https://xquik.com/mcp
+    gated: true
+    gate: OAuth 2.1 bearer, scope mcp:tools (tools/list returned 401 on 2026-08-13)
+    tools_source: https://docs.xquik.com/mcp/tools
+  mcp_docs:
+    url: https://docs.xquik.com/mcp
+    gated: false
+    tools_source: live tools/list, 200 (mcp/xquik-docs-mcp-tools.json)
+  graphql: null
+crosswalk:
+- tool: xquik
+  server: https://xquik.com/mcp
+  category: api-execution
+  binding: rest
+  rest: [all-catalog-routes]
+  confidence: high
+  note: >-
+    Generic dispatcher. `xquik.request(path, { method, body, query })` executes any route
+    the authenticated credential is allowed to call, so it inherits the parameters and
+    requestBody of whichever OpenAPI operation the path resolves to. The provider documents
+    the catalog as 120 routes for a full credential (119 returning JSON or text through
+    MCP) and 33 GET routes for an active guest `paid_reads` key, against 127 operations in
+    the published spec. Auth and required `Idempotency-Key` headers are injected by the
+    server.
+- tool: explore
+  server: https://xquik.com/mcp
+  category: discovery
+  binding: none
+  rest: []
+  confidence: high
+  note: >-
+    Searches `spec.endpoints` in a sandbox; makes no network call and spends no credits.
+    There is no REST operation that returns the catalog, so this is an MCP-only capability
+    over the same OpenAPI document.
+- tool: search_xquik
+  server: https://docs.xquik.com/mcp
+  category: documentation
+  binding: none
+  rest: []
+  confidence: high
+- tool: query_docs_filesystem_xquik
+  server: https://docs.xquik.com/mcp
+  category: documentation
+  binding: none
+  rest: []
+  confidence: high
+- tool: submit_feedback
+  server: https://docs.xquik.com/mcp
+  category: documentation
+  binding: none
+  rest: []
+  confidence: high
+mcp_only:
+- tool: explore
+  reason: Catalog/spec search executed server-side; no public REST equivalent.
+- tool: search_xquik
+  reason: Documentation search over docs.xquik.com content, not the API.
+- tool: query_docs_filesystem_xquik
+  reason: Read-only virtual filesystem over the docs site, not the API.
+- tool: submit_feedback
+  reason: Documentation feedback channel; no REST operation exists for it.
+rest_only:
+- capability: Support attachments
+  operations: [downloadSupportAttachment]
+  reason: >-
+    The provider's own docs say "Use REST for private support media" — this route is not
+    served through MCP.
+  confidence: high
+- capability: Guest wallet credential lifecycle
+  operations: [createGuestWallet, getGuestWalletStatus, topUpGuestWallet]
+  reason: >-
+    Docs state "Guest credential routes use REST"; a guest key sees only the 33 eligible
+    GET reads through MCP.
+  confidence: high
+- capability: Remaining catalog gap
+  operations: []
+  reason: >-
+    127 spec operations against a documented 120-route MCP catalog leaves roughly seven
+    operations outside MCP. The provider names the support-media and guest-credential
+    routes; the exact remainder cannot be enumerated without an authenticated tools/list,
+    so it is recorded as a gap rather than guessed.
+  confidence: low
+coverage:
+  tools_named: 5
+  tools_bound_to_rest: 1
+  mcp_only_tools: 4
+  rest_operations_total: 127
+  rest_operations_reachable_via_mcp: 120
+  rest_operations_reachable_guest: 33
+  source_of_counts: https://docs.xquik.com/mcp/tools

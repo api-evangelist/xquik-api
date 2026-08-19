@@ -1,0 +1,245 @@
+generated: '2026-08-13'
+method: derived
+source: openapi/_original/xquik-rest-api-openapi.json
+docs: https://docs.xquik.com/guides/tweet-profile-api-fields
+description: >-
+  Entity-relationship graph derived from the published OpenAPI 3.1 contract: 104 component
+  schemas, their $ref edges, and the operations that return each root entity. Xquik's data
+  core splits into two halves — public X objects it reads (tweet, user, community, list,
+  trend, article) and Xquik-owned platform objects it manages (monitor, event, webhook,
+  delivery, extraction, draw, api-key, x-account, write-action, draft, style, guest-wallet).
+id_prefixes:
+  note: >-
+    Prefixed IDs are returned only under the opt-in contract header
+    `xquik-api-contract: 2026-04-29`; default v1 returns bare numeric string IDs.
+  prefixes:
+    event: evt_
+    draw: drw_
+    extraction: ext_
+    monitor: mon_
+    webhook: wh_
+    api_key: key_
+    x_account: xacct_
+entities:
+- schema: ApiKey
+  entity: api-key
+  returned_by: [listApiKeys]
+- schema: Draft
+  entity: draft
+  returned_by: [listDrafts]
+- schema: DraftDetail
+  entity: draft
+  returned_by: [createDraft, getDraft]
+- schema: DrawDetail
+  entity: draw
+  returned_by: [getDraw]
+- schema: DrawListItem
+  entity: draw
+  returned_by: [listDraws]
+- schema: Winner
+  entity: draw
+  returned_by: [createDraw, getDraw]
+- schema: Event
+  entity: event
+  returned_by: [listEvents]
+  references: [EventType]
+- schema: EventDetail
+  entity: event
+  returned_by: [getEvent]
+  references: [EventType]
+- schema: ExtractionJob
+  entity: extraction
+  returned_by: [listExtractions]
+  references: [ExtractionToolType]
+- schema: GuestWalletCreateResponse
+  entity: guest-wallet
+  returned_by: [createGuestWallet]
+  references: [GuestWalletCheckoutResponse]
+- schema: GuestWalletStatusResponse
+  entity: guest-wallet
+  returned_by: [getGuestWalletStatus]
+  references: [GuestWalletPurchaseStatus]
+- schema: GuestWalletTopupResponse
+  entity: guest-wallet
+  returned_by: [topUpGuestWallet]
+  references: [GuestWalletCheckoutResponse]
+- schema: KeywordMonitor
+  entity: monitor
+  returned_by: [createKeywordMonitor, getKeywordMonitor, listKeywordMonitors, updateKeywordMonitor]
+  references: [EventTypeArray]
+- schema: Monitor
+  entity: monitor
+  returned_by: [getMonitor, listMonitors, updateMonitor]
+  references: [EventTypeArray]
+- schema: RadarItem
+  entity: radar-item
+  returned_by: [getRadar]
+- schema: StyleProfile
+  entity: style
+  returned_by: [analyzeStyle, compareStyles, getStyle, saveStyle]
+- schema: StyleProfileSummary
+  entity: style
+  returned_by: [listStyles]
+- schema: SupportAttachment
+  entity: support-ticket
+  returned_by: [getTicket]
+- schema: EmbeddedTweet
+  entity: tweet
+  returned_by: []
+  references: [ContentDisclosure, EmbeddedTweet, TweetArticleMetadata, TweetCard, TweetCommunityNote, TweetEdit, TweetMedia, TweetNote, TweetPlace, TweetPreviousCounts, UserProfile]
+- schema: SearchTweet
+  entity: tweet
+  returned_by: []
+  references: [ContentDisclosure, EmbeddedTweet, TweetArticleMetadata, TweetCard, TweetCommunityNote, TweetEdit, TweetMedia, TweetNote, TweetPlace, TweetPreviousCounts, UserProfile]
+- schema: TweetDetail
+  entity: tweet
+  returned_by: [lookupTweet]
+  references: [ContentDisclosure, EmbeddedTweet, TweetArticleMetadata, TweetAuthor, TweetCard, TweetCommunityNote, TweetEdit, TweetMedia, TweetNote, TweetPlace, TweetPreviousCounts]
+- schema: TweetReplies
+  entity: tweet
+  returned_by: [getTweetReplies]
+  references: [PaginatedTweets, ReplyCoverageDiagnostic, SearchTweet]
+- schema: BatchUsers
+  entity: user
+  returned_by: [getBatchUsers]
+  references: [UserProfile]
+- schema: TweetAuthor
+  entity: user
+  returned_by: [lookupTweet]
+  references: [UserProfile]
+- schema: UserProfile
+  entity: user
+  returned_by: [getUser]
+  references: [UserAffiliateLabel, UserHighlightsInfo, UserIdentityVerification]
+- schema: Webhook
+  entity: webhook
+  returned_by: [listWebhooks, resumeWebhook, updateWebhook]
+  references: [EventTypeArray]
+- schema: Delivery
+  entity: webhook-delivery
+  returned_by: [listWebhookDeliveries]
+- schema: XWriteAction
+  entity: write-action
+  returned_by: []
+  references: [XWriteActionAccount, XWriteActionBilling, XWriteActionNextAction, XWriteActionRequest, XWriteActionResult, XWriteActionTarget]
+- schema: SanitizedXAccount
+  entity: x-account
+  returned_by: [connectXAccount, reauthXAccount, submitXAccountConnectionChallenge]
+- schema: XAccount
+  entity: x-account
+  returned_by: [listXAccounts]
+- schema: XAccountDetail
+  entity: x-account
+  returned_by: [getXAccount]
+relationships:
+- from: tweet
+  kind: has_one
+  to: user
+  via: author
+  evidence: "TweetDetail.author -> TweetAuthor"
+- from: tweet
+  kind: has_many
+  to: tweet
+  via: replies
+  evidence: "TweetReplies.tweets -> SearchTweet"
+- from: tweet
+  kind: has_one
+  to: tweet
+  via: quoted/retweeted
+  evidence: "EmbeddedTweet self-reference"
+- from: tweet
+  kind: has_many
+  to: media
+  via: media
+  evidence: "TweetDetail.media -> TweetMedia"
+- from: user
+  kind: has_many
+  to: tweet
+  via: timeline
+  evidence: "PaginatedTweets -> SearchTweet"
+- from: user
+  kind: has_many
+  to: user
+  via: followers/following
+  evidence: "PaginatedUsers -> UserProfile"
+- from: monitor
+  kind: has_many
+  to: event
+  via: emits
+  evidence: "Monitor.eventTypes -> EventTypeArray -> EventType"
+- from: event
+  kind: belongs_to
+  to: monitor
+  via: monitorId
+- from: webhook
+  kind: has_many
+  to: webhook-delivery
+  via: deliveries
+  evidence: "listWebhookDeliveries -> Delivery"
+- from: webhook
+  kind: receives
+  to: event
+  via: eventTypes
+  evidence: "signed monitorEvent webhook (asyncapi/)"
+- from: extraction
+  kind: has_one
+  to: extraction-tool-type
+  via: toolType
+  evidence: "ExtractionJob.toolType -> ExtractionToolType"
+- from: extraction
+  kind: has_many
+  to: tweet
+  via: results
+  evidence: "export returns tweet/user rows"
+- from: draw
+  kind: has_many
+  to: draw-winner
+  via: winners
+  evidence: "DrawDetail -> Winner"
+- from: draw
+  kind: belongs_to
+  to: tweet
+  via: tweetUrl
+- from: x-account
+  kind: has_many
+  to: write-action
+  via: writes
+  evidence: "XWriteAction.account -> XWriteActionAccount"
+- from: write-action
+  kind: has_one
+  to: x-account
+  via: account
+  evidence: "XWriteActionAccount"
+- from: write-action
+  kind: has_one
+  to: write-action-result
+  via: result
+  evidence: "XWriteActionResult"
+- from: write-action
+  kind: has_one
+  to: billing
+  via: billing
+  evidence: "XWriteActionBilling"
+- from: draft
+  kind: belongs_to
+  to: style
+  via: styleId
+- from: style
+  kind: has_one
+  to: style-performance
+  via: performance
+  evidence: "getStylePerformance"
+- from: guest-wallet
+  kind: has_one
+  to: api-key
+  via: paid_reads key
+  evidence: "GuestWalletCreateResponse"
+- from: api-key
+  kind: belongs_to
+  to: account
+  via: ownership
+counts:
+  schemas: 104
+  operations: 127
+  entity_roots: 16
+

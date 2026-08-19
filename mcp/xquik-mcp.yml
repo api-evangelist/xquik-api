@@ -1,23 +1,70 @@
-generated: '2026-08-01'
-method: declared
+generated: '2026-08-13'
+method: probed
 publisher: Xquik
 status: published
 source: https://xquik.com/.well-known/mcp.json
 description: >-
-  Xquik operates an official remote MCP server. It supports OAuth 2.1 and
-  client-specific API-key access.
+  Xquik operates an official remote MCP server for its REST API. The manifest, the OAuth
+  protected-resource metadata and the endpoint itself were all probed live on 2026-08-13.
+  The endpoint answers, and it answers with a correct RFC 9728 challenge rather than a
+  silent failure — `tools/list` returns 401 with
+  `WWW-Authenticate: Bearer realm="OAuth", resource_metadata="...", scope="mcp:tools"`,
+  so the live tool schemas require an authenticated introspection we do not perform.
 server:
-  name: xquik
-  transport: http
+  name: com.xquik/mcp
+  title: Xquik MCP Server
+  version: 2.6.0
+  transport: streamable-http
   protocol: mcp
+  protocol_version: '2026-07-28'
   url: https://xquik.com/mcp
   manifest: https://xquik.com/.well-known/mcp.json
+  manifest_file: ../well-known/xquik-mcp.json
   auth: oauth2
+  scopes: [mcp:tools]
   protected_resource: https://xquik.com/.well-known/oauth-protected-resource/mcp
   authorization_server: https://xquik.com/.well-known/oauth-authorization-server
+  repository: https://github.com/Xquik-dev/x-twitter-scraper
 documentation: https://docs.xquik.com/mcp/overview
+tools_documentation: https://docs.xquik.com/mcp/tools
 tools:
-  - name: explore
-    description: Find the smallest relevant Xquik API operation.
-  - name: xquik
-    description: Run authenticated Xquik API operations.
+- name: explore
+  description: >-
+    Search the authenticated API catalog by running an async arrow function against
+    `spec.endpoints`. Makes no network calls and spends no credits.
+  input: code (async arrow function, up to 10,000 characters)
+  source: https://docs.xquik.com/mcp/tools
+- name: xquik
+  description: >-
+    Execute API calls the authenticated credential is allowed to make, via
+    `xquik.request(path, { method, body, query })`. Authentication and required
+    idempotency headers are injected automatically.
+  input: code (async arrow function, up to 10,000 characters)
+  source: https://docs.xquik.com/mcp/tools
+catalog:
+  shape: code-mode
+  note: >-
+    Xquik does not expose one MCP tool per operation. Two tools front a scoped route
+    catalog: full credentials see 120 catalog routes (119 return JSON or text through MCP);
+    an active guest `paid_reads` key sees exactly 33 GET routes. This is why the tool
+    crosswalk binds one tool to many operations rather than one-to-one.
+  routes_full_credential: 120
+  routes_guest_credential: 33
+deployment:
+  mode: remote
+  endpoint: https://xquik.com/mcp
+  auth: oauth
+  verified: probed
+  probe: gated
+  probe_detail: >-
+    POST tools/list -> 401 {"error":"Authentication required"} with WWW-Authenticate Bearer
+    realm="OAuth" resource_metadata="https://xquik.com/.well-known/oauth-protected-resource/mcp"
+    scope="mcp:tools"
+  checked: '2026-08-13'
+x-evidence:
+  fetched: '2026-08-13'
+  manifest_url: https://xquik.com/.well-known/mcp.json
+  manifest_status: 200
+  endpoint_url: https://xquik.com/mcp
+  tools_list_status: 401
+  initialize_status: 401

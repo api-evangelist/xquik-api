@@ -4,8 +4,10 @@ schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main
 provider: Xquik
 providerId: xquik
 created: '2026-08-01'
-modified: '2026-08-01'
+modified: '2026-08-13'
 reconciled: true
+method: searched
+source: https://docs.xquik.com/guides/rate-limits
 tags:
   - rate limiting
   - REST
@@ -14,24 +16,67 @@ sources:
   - https://docs.xquik.com/guides/rate-limits
 headers:
   retryAfter: Retry-After
+bodyFields:
+  retryAfter: retryAfter (seconds)
+  retryAfterMs: retryAfterMs (milliseconds)
 responseCodes:
   throttled: 429
+  throttledCode: rate_limit_exceeded
+algorithm: fixed-window, per Xquik account; read, write and delete buckets reset independently
 limits:
   - name: Read operations
     scope: account
+    methods: [GET, HEAD, OPTIONS]
     metric: requests_per_second
     limit: 300
     timeFrame: second
   - name: Write operations
     scope: account
+    methods: [POST, PUT, PATCH]
     metric: requests_per_minute
     limit: 120
     timeFrame: minute
   - name: Delete operations
     scope: account
+    methods: [DELETE]
     metric: requests_per_minute
     limit: 60
     timeFrame: minute
+  - name: Follow / remove-follower actions
+    scope: connected-x-account
+    routes:
+      - POST /api/v1/x/users/{id}/follow
+      - POST /api/v1/x/users/{id}/remove-follower
+    metric: actions_per_minute
+    limit: 20
+    timeFrame: minute
+    note: Shared bucket, applied beside the method tier.
+  - name: Follow / remove-follower daily cap
+    scope: connected-x-account
+    metric: actions_per_day
+    limit: 400
+    timeFrame: day
+    note: Reaching 400 blocks further attempts; track the daily count instead of retrying each minute.
+  - name: X account connection attempts
+    scope: account
+    routes:
+      - POST /api/v1/x/accounts
+    metric: attempts_per_15_minutes
+    limit: 10
+    timeFrame: 15 minutes
+    note: Wait the returned remaining seconds; maximum wait 900 seconds.
+  - name: X daily posting limit
+    scope: connected-x-account
+    metric: platform_enforced
+    limit: null
+    timeFrame: day
+    responseCode: 429
+    errorCode: x_daily_limit
+    note: Enforced by X, not by Xquik. Not retryable; wait 24 hours.
 policies:
   - name: Backoff
-    description: Wait for Retry-After before retrying a throttled request.
+    description: Wait for Retry-After before retrying a throttled request; use capped exponential backoff with jitter.
+  - name: Login cooldown
+    description: Account connection and reauthentication return a dynamic cooldown via retryAfterMs or Retry-After.
+  - name: Write retry safety
+    description: Retry a write only when safeToRetry is true, using a new Idempotency-Key.

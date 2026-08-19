@@ -1,0 +1,33 @@
+generated: '2026-08-13'
+method: derived
+source: openapi/xquik-rest-api-openapi.yml
+summary:
+  types:
+  - apiKey
+  - http
+  api_key_in:
+  - cookie
+  - header
+schemes:
+- name: apiKey
+  type: apiKey
+  in: header
+  parameter: x-api-key
+  description: 'Xquik API key passed through the x-api-key header. Xquik-Api-Key is a vendor-prefixed
+    alias. API keys beginning with xq_ can also use Authorization: Bearer.'
+  sources:
+  - openapi/xquik-rest-api-openapi.yml
+- name: oauthBearer
+  type: http
+  scheme: bearer
+  description: 'OAuth 2.1 access token passed through Authorization: Bearer. Values beginning
+    with xq_ remain Xquik API-key credentials, not OAuth tokens.'
+  sources:
+  - openapi/xquik-rest-api-openapi.yml
+- name: cookieSession
+  type: apiKey
+  in: cookie
+  parameter: __Host-xquik_session
+  description: Secure Xquik browser session cookie.
+  sources:
+  - openapi/xquik-rest-api-openapi.yml
