@@ -8,6 +8,15 @@ created: '2026-04-14'
 modified: '2026-08-13'
 specificationVersion: '0.23'
 tags:
+- social-media-data
+- X / Twitter
+- Social Listening
+- Data Extraction
+- Automation
+- Webhook
+- MCP
+- Developer API
+tags_raw:
 - social media data
 - X / Twitter
 - social listening
@@ -23,6 +32,11 @@ apis:
   humanURL: https://docs.xquik.com/api-reference/overview
   baseURL: https://xquik.com/api/v1
   tags:
+  - REST
+  - OpenAPI
+  - Webhook
+  - Automation
+  tags_raw:
   - REST
   - OpenAPI
   - webhooks
@@ -48,6 +62,10 @@ apis:
   baseURL: https://xquik.com/mcp
   tags:
   - MCP
+  - Agents
+  - Automation
+  tags_raw:
+  - MCP
   - agents
   - automation
   properties:
@@ -64,6 +82,10 @@ apis:
   humanURL: https://docs.xquik.com/mcp/overview
   baseURL: https://docs.xquik.com/mcp
   tags:
+  - MCP
+  - Documentation
+  - Agents
+  tags_raw:
   - MCP
   - documentation
   - agents
