@@ -26,36 +26,6 @@ tags_raw:
 - MCP
 - developer API
 apis:
-- name: Xquik REST API
-  description: OpenAPI 3.1 REST API for public X data, connected-account write actions, monitoring, signed
-    webhooks, exports, account management, and billing.
-  humanURL: https://docs.xquik.com/api-reference/overview
-  baseURL: https://xquik.com/api/v1
-  tags:
-  - REST
-  - OpenAPI
-  - Webhook
-  - Automation
-  tags_raw:
-  - REST
-  - OpenAPI
-  - webhooks
-  - automation
-  properties:
-  - type: OpenAPI
-    url: openapi/xquik-rest-api-openapi.yml
-  - type: OpenAPISource
-    url: https://xquik.com/openapi.json
-  - type: Documentation
-    url: https://docs.xquik.com
-  - type: APIReference
-    url: https://docs.xquik.com/api-reference/overview
-  - type: Authentication
-    url: https://docs.xquik.com/api-reference/authentication
-  - type: OpenAPI
-    url: https://xquik.com/openapi.yaml
-  - type: OpenAPI
-    url: https://docs.xquik.com/openapi.yaml
 - name: Xquik API MCP Server
   description: Hosted MCP server for the Xquik API with OAuth 2.1 and API-key access.
   humanURL: https://docs.xquik.com/mcp/overview
@@ -96,6 +66,366 @@ apis:
     url: mcp/xquik-docs-mcp.yml
   - type: Documentation
     url: https://docs.xquik.com
+- aid: xquik-api:xquik-api-account-api
+  name: Xquik Account API
+  description: Account info and settings
+  humanURL: https://docs.xquik.com/api-reference/overview
+  baseURL: https://xquik.com/api/v1
+  tags:
+  - Account
+  properties:
+  - type: OpenAPI
+    url: openapi/xquik-api-account-api-openapi.yml
+  - type: OpenAPISource
+    url: https://xquik.com/openapi.json
+  - type: Documentation
+    url: https://docs.xquik.com
+  - type: APIReference
+    url: https://docs.xquik.com/api-reference/overview
+  - type: Authentication
+    url: https://docs.xquik.com/api-reference/authentication
+- aid: xquik-api:xquik-api-api-keys-api
+  name: Xquik API Keys API
+  description: API key management (session auth only)
+  humanURL: https://docs.xquik.com/api-reference/overview
+  baseURL: https://xquik.com/api/v1
+  tags:
+  - API Keys
+  properties:
+  - type: OpenAPI
+    url: openapi/xquik-api-api-keys-api-openapi.yml
+  - type: OpenAPISource
+    url: https://xquik.com/openapi.json
+  - type: Documentation
+    url: https://docs.xquik.com
+  - type: APIReference
+    url: https://docs.xquik.com/api-reference/overview
+  - type: Authentication
+    url: https://docs.xquik.com/api-reference/authentication
+- aid: xquik-api:xquik-api-articles-api
+  name: Xquik Articles API
+  description: Long-form X Article extraction
+  humanURL: https://docs.xquik.com/api-reference/overview
+  baseURL: https://xquik.com/api/v1
+  tags:
+  - Articles
+  properties:
+  - type: OpenAPI
+    url: openapi/xquik-api-articles-api-openapi.yml
+  - type: OpenAPISource
+    url: https://xquik.com/openapi.json
+  - type: Documentation
+    url: https://docs.xquik.com
+  - type: APIReference
+    url: https://docs.xquik.com/api-reference/overview
+  - type: Authentication
+    url: https://docs.xquik.com/api-reference/authentication
+- aid: xquik-api:xquik-api-communities-api
+  name: Xquik Communities API
+  description: X Community info, members, and tweets
+  humanURL: https://docs.xquik.com/api-reference/overview
+  baseURL: https://xquik.com/api/v1
+  tags:
+  - Communities
+  properties:
+  - type: OpenAPI
+    url: openapi/xquik-api-communities-api-openapi.yml
+  - type: OpenAPISource
+    url: https://xquik.com/openapi.json
+  - type: Documentation
+    url: https://docs.xquik.com
+  - type: APIReference
+    url: https://docs.xquik.com/api-reference/overview
+  - type: Authentication
+    url: https://docs.xquik.com/api-reference/authentication
+- aid: xquik-api:xquik-api-composition-api
+  name: Xquik Composition API
+  description: AI tweet composition, drafts, writing styles, and radar
+  humanURL: https://docs.xquik.com/api-reference/overview
+  baseURL: https://xquik.com/api/v1
+  tags:
+  - Composition
+  properties:
+  - type: OpenAPI
+    url: openapi/xquik-api-composition-api-openapi.yml
+  - type: OpenAPISource
+    url: https://xquik.com/openapi.json
+  - type: Documentation
+    url: https://docs.xquik.com
+  - type: APIReference
+    url: https://docs.xquik.com/api-reference/overview
+  - type: Authentication
+    url: https://docs.xquik.com/api-reference/authentication
+- aid: xquik-api:xquik-api-draws-api
+  name: Xquik Draws API
+  description: Giveaway draws from tweet replies
+  humanURL: https://docs.xquik.com/api-reference/overview
+  baseURL: https://xquik.com/api/v1
+  tags:
+  - Draws
+  properties:
+  - type: OpenAPI
+    url: openapi/xquik-api-draws-api-openapi.yml
+  - type: OpenAPISource
+    url: https://xquik.com/openapi.json
+  - type: Documentation
+    url: https://docs.xquik.com
+  - type: APIReference
+    url: https://docs.xquik.com/api-reference/overview
+  - type: Authentication
+    url: https://docs.xquik.com/api-reference/authentication
+- aid: xquik-api:xquik-api-events-api
+  name: Xquik Events API
+  description: Activity events from monitored accounts
+  humanURL: https://docs.xquik.com/api-reference/overview
+  baseURL: https://xquik.com/api/v1
+  tags:
+  - Events
+  properties:
+  - type: OpenAPI
+    url: openapi/xquik-api-events-api-openapi.yml
+  - type: OpenAPISource
+    url: https://xquik.com/openapi.json
+  - type: Documentation
+    url: https://docs.xquik.com
+  - type: APIReference
+    url: https://docs.xquik.com/api-reference/overview
+  - type: Authentication
+    url: https://docs.xquik.com/api-reference/authentication
+- aid: xquik-api:xquik-api-extractions-api
+  name: Xquik Extractions API
+  description: Bulk data extraction (23 tool types)
+  humanURL: https://docs.xquik.com/api-reference/overview
+  baseURL: https://xquik.com/api/v1
+  tags:
+  - Extractions
+  properties:
+  - type: OpenAPI
+    url: openapi/xquik-api-extractions-api-openapi.yml
+  - type: OpenAPISource
+    url: https://xquik.com/openapi.json
+  - type: Documentation
+    url: https://docs.xquik.com
+  - type: APIReference
+    url: https://docs.xquik.com/api-reference/overview
+  - type: Authentication
+    url: https://docs.xquik.com/api-reference/authentication
+- aid: xquik-api:xquik-api-guest-wallets-api
+  name: Xquik Guest Wallets API
+  description: Accountless prepaid access for paid read endpoints
+  humanURL: https://docs.xquik.com/api-reference/overview
+  baseURL: https://xquik.com/api/v1
+  tags:
+  - Guest Wallets
+  properties:
+  - type: OpenAPI
+    url: openapi/xquik-api-guest-wallets-api-openapi.yml
+  - type: OpenAPISource
+    url: https://xquik.com/openapi.json
+  - type: Documentation
+    url: https://docs.xquik.com
+  - type: APIReference
+    url: https://docs.xquik.com/api-reference/overview
+  - type: Authentication
+    url: https://docs.xquik.com/api-reference/authentication
+- aid: xquik-api:xquik-api-lists-api
+  name: Xquik Lists API
+  description: X List followers, members, and tweets
+  humanURL: https://docs.xquik.com/api-reference/overview
+  baseURL: https://xquik.com/api/v1
+  tags:
+  - Lists
+  properties:
+  - type: OpenAPI
+    url: openapi/xquik-api-lists-api-openapi.yml
+  - type: OpenAPISource
+    url: https://xquik.com/openapi.json
+  - type: Documentation
+    url: https://docs.xquik.com
+  - type: APIReference
+    url: https://docs.xquik.com/api-reference/overview
+  - type: Authentication
+    url: https://docs.xquik.com/api-reference/authentication
+- aid: xquik-api:xquik-api-media-api
+  name: Xquik Media API
+  description: Media upload and download
+  humanURL: https://docs.xquik.com/api-reference/overview
+  baseURL: https://xquik.com/api/v1
+  tags:
+  - Media
+  properties:
+  - type: OpenAPI
+    url: openapi/xquik-api-media-api-openapi.yml
+  - type: OpenAPISource
+    url: https://xquik.com/openapi.json
+  - type: Documentation
+    url: https://docs.xquik.com
+  - type: APIReference
+    url: https://docs.xquik.com/api-reference/overview
+  - type: Authentication
+    url: https://docs.xquik.com/api-reference/authentication
+- aid: xquik-api:xquik-api-monitors-api
+  name: Xquik Monitors API
+  description: X account monitoring with 1-second checks
+  humanURL: https://docs.xquik.com/api-reference/overview
+  baseURL: https://xquik.com/api/v1
+  tags:
+  - Monitors
+  properties:
+  - type: OpenAPI
+    url: openapi/xquik-api-monitors-api-openapi.yml
+  - type: OpenAPISource
+    url: https://xquik.com/openapi.json
+  - type: Documentation
+    url: https://docs.xquik.com
+  - type: APIReference
+    url: https://docs.xquik.com/api-reference/overview
+  - type: Authentication
+    url: https://docs.xquik.com/api-reference/authentication
+- aid: xquik-api:xquik-api-subscribe-api
+  name: Xquik Subscribe API
+  description: Subscription, billing, and credits
+  humanURL: https://docs.xquik.com/api-reference/overview
+  baseURL: https://xquik.com/api/v1
+  tags:
+  - Subscribe
+  properties:
+  - type: OpenAPI
+    url: openapi/xquik-api-subscribe-api-openapi.yml
+  - type: OpenAPISource
+    url: https://xquik.com/openapi.json
+  - type: Documentation
+    url: https://docs.xquik.com
+  - type: APIReference
+    url: https://docs.xquik.com/api-reference/overview
+  - type: Authentication
+    url: https://docs.xquik.com/api-reference/authentication
+- aid: xquik-api:xquik-api-support-api
+  name: Xquik Support API
+  description: Support ticket management
+  humanURL: https://docs.xquik.com/api-reference/overview
+  baseURL: https://xquik.com/api/v1
+  tags:
+  - Support
+  properties:
+  - type: OpenAPI
+    url: openapi/xquik-api-support-api-openapi.yml
+  - type: OpenAPISource
+    url: https://xquik.com/openapi.json
+  - type: Documentation
+    url: https://docs.xquik.com
+  - type: APIReference
+    url: https://docs.xquik.com/api-reference/overview
+  - type: Authentication
+    url: https://docs.xquik.com/api-reference/authentication
+- aid: xquik-api:xquik-api-trends-api
+  name: Xquik Trends API
+  description: Trending topics and hashtags by region
+  humanURL: https://docs.xquik.com/api-reference/overview
+  baseURL: https://xquik.com/api/v1
+  tags:
+  - Trends
+  properties:
+  - type: OpenAPI
+    url: openapi/xquik-api-trends-api-openapi.yml
+  - type: OpenAPISource
+    url: https://xquik.com/openapi.json
+  - type: Documentation
+    url: https://docs.xquik.com
+  - type: APIReference
+    url: https://docs.xquik.com/api-reference/overview
+  - type: Authentication
+    url: https://docs.xquik.com/api-reference/authentication
+- aid: xquik-api:xquik-api-tweets-api
+  name: Xquik Tweets API
+  description: Look up, search, and analyze individual tweets
+  humanURL: https://docs.xquik.com/api-reference/overview
+  baseURL: https://xquik.com/api/v1
+  tags:
+  - Tweets
+  properties:
+  - type: OpenAPI
+    url: openapi/xquik-api-tweets-api-openapi.yml
+  - type: OpenAPISource
+    url: https://xquik.com/openapi.json
+  - type: Documentation
+    url: https://docs.xquik.com
+  - type: APIReference
+    url: https://docs.xquik.com/api-reference/overview
+  - type: Authentication
+    url: https://docs.xquik.com/api-reference/authentication
+- aid: xquik-api:xquik-api-users-api
+  name: Xquik Users API
+  description: Look up, search, and explore user profiles and relationships
+  humanURL: https://docs.xquik.com/api-reference/overview
+  baseURL: https://xquik.com/api/v1
+  tags:
+  - Users
+  properties:
+  - type: OpenAPI
+    url: openapi/xquik-api-users-api-openapi.yml
+  - type: OpenAPISource
+    url: https://xquik.com/openapi.json
+  - type: Documentation
+    url: https://docs.xquik.com
+  - type: APIReference
+    url: https://docs.xquik.com/api-reference/overview
+  - type: Authentication
+    url: https://docs.xquik.com/api-reference/authentication
+- aid: xquik-api:xquik-api-webhooks-api
+  name: Xquik Webhooks API
+  description: Webhook endpoint management and delivery
+  humanURL: https://docs.xquik.com/api-reference/overview
+  baseURL: https://xquik.com/api/v1
+  tags:
+  - Webhooks
+  properties:
+  - type: OpenAPI
+    url: openapi/xquik-api-webhooks-api-openapi.yml
+  - type: OpenAPISource
+    url: https://xquik.com/openapi.json
+  - type: Documentation
+    url: https://docs.xquik.com
+  - type: APIReference
+    url: https://docs.xquik.com/api-reference/overview
+  - type: Authentication
+    url: https://docs.xquik.com/api-reference/authentication
+- aid: xquik-api:xquik-api-x-accounts-api
+  name: Xquik X Accounts API
+  description: Connected X account management
+  humanURL: https://docs.xquik.com/api-reference/overview
+  baseURL: https://xquik.com/api/v1
+  tags:
+  - X Accounts
+  properties:
+  - type: OpenAPI
+    url: openapi/xquik-api-x-accounts-api-openapi.yml
+  - type: OpenAPISource
+    url: https://xquik.com/openapi.json
+  - type: Documentation
+    url: https://docs.xquik.com
+  - type: APIReference
+    url: https://docs.xquik.com/api-reference/overview
+  - type: Authentication
+    url: https://docs.xquik.com/api-reference/authentication
+- aid: xquik-api:xquik-api-x-write-api
+  name: Xquik X Write API
+  description: X write actions (tweets, likes, follows, DMs)
+  humanURL: https://docs.xquik.com/api-reference/overview
+  baseURL: https://xquik.com/api/v1
+  tags:
+  - X Write
+  properties:
+  - type: OpenAPI
+    url: openapi/xquik-api-x-write-api-openapi.yml
+  - type: OpenAPISource
+    url: https://xquik.com/openapi.json
+  - type: Documentation
+    url: https://docs.xquik.com
+  - type: APIReference
+    url: https://docs.xquik.com/api-reference/overview
+  - type: Authentication
+    url: https://docs.xquik.com/api-reference/authentication
 common:
 - type: VulnerabilityDisclosure
   url: security/xquik-api-vulnerability-disclosure.yml

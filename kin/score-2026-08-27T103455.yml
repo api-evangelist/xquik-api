@@ -1,0 +1,52 @@
+# Kin Score artifact — xquik-api — 2026-08-27T103455
+# The API Evangelist rating (https://github.com/api-evangelist/kin-score). Generated; do not edit.
+---
+kin_score:
+  slug: xquik-api
+  schema_version: 0.15.1
+  scored_at: '2026-08-27'
+  run_ts: 2026-08-27T103455
+  composite: 92.3
+  band: exemplar
+  facets:
+    discoverability: 100.0
+    contract_quality: 78.7
+    governance: 100.0
+    operational_transparency: 81.6
+    developer_ergonomics: 100.0
+    commercial_clarity: 100.0
+    contract_governance: 100.0
+    access_clarity: 100.0
+  agent_readiness:
+    score: 82.9
+    band: agent-native
+    dimensions:
+      spec_presence: true
+      agentic_access: true
+      reversibility_documented: false
+      mcp_server: documented
+      auth_clarity: served
+      idempotency: documented
+      error_semantics: verified
+      openapi_examples: verified
+      rate_limit_signal: verified
+      event_surface_described: true
+      agent_skills: true
+      well_known_catalog: true
+      consent_identity: true
+      agent_card: conformant
+      dry_run_mode: true
+      delegated_identity: served
+      protected_resource_metadata: verified
+      dynamic_client_registration: true
+      agentic_commerce: false
+  provenance:
+    mcp: first-party
+    skills: first-party
+    agentic_access: unknown
+    conformance: first-party
+    contracts:
+      total: 1
+      derived: 0
+      coverage: 100.0
+      callable: 100.0
