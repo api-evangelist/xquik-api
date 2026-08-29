@@ -3,6 +3,18 @@ description: Xquik is an independent third-party X data and automation platform.
   reads, connected-account write actions, monitoring, signed webhooks, exports, hosted MCP servers, OAuth
   2.1, API keys, 8 SDKs, a CLI, Agent Skills, and an OpenAPI 3.1 contract. Not affiliated with X Corp.
 url: https://xquik.com/apis.yml
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: true
+  label: Hosted service · you call their endpoint
+  confidence: high
+  source:
+  - openapi
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 image: https://xquik.com/logo-square.png
 created: '2026-04-14'
 modified: '2026-08-13'
