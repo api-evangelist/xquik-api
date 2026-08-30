@@ -1,0 +1,1429 @@
+openapi: 3.2.0
+info:
+  title: Xquik Media API
+  version: '1.0'
+  description: "Xquik is an independent third-party service. Not affiliated with X Corp. \"Twitter\" and \"X\" are trademarks of X Corp. Look up tweets, users, and X trends. Search tweets, check follow relationships, download media, and monitor accounts. 33 paid-read endpoints accept prepaid credits without a subscription. 7 fixed-price lookups also accept direct MPP payments. Write and automation endpoints require an API key or OAuth 2.1 bearer token.\n\n## Xquik SDKs\n\nStainless generates each SDK from this OpenAPI schema. Pick a language:\n\n- TypeScript / Node.js: `npm i x-twitter-scraper` -\n  [Xquik-dev/x-twitter-scraper-typescript](https://github.com/Xquik-dev/x-twitter-scraper-typescript)\n\n- Python: `pip install x-twitter-scraper` -\n  [Xquik-dev/x-twitter-scraper-python](https://github.com/Xquik-dev/x-twitter-scraper-python)\n\n- Go: `go get github.com/Xquik-dev/x-twitter-scraper-go` -\n  [Xquik-dev/x-twitter-scraper-go](https://github.com/Xquik-dev/x-twitter-scraper-go)\n\n- Ruby: `gem install x-twitter-scraper` -\n  [Xquik-dev/x-twitter-scraper-ruby](https://github.com/Xquik-dev/x-twitter-scraper-ruby)\n\n- Java (source build; Maven Central pending) -\n  [Xquik-dev/x-twitter-scraper-java](https://github.com/Xquik-dev/x-twitter-scraper-java)\n\n- Kotlin (source build; Maven Central pending) -\n  [Xquik-dev/x-twitter-scraper-kotlin](https://github.com/Xquik-dev/x-twitter-scraper-kotlin)\n\n- C# / .NET: `dotnet add package XTwitterScraper` -\n  [Xquik-dev/x-twitter-scraper-csharp](https://github.com/Xquik-dev/x-twitter-scraper-csharp)\n\n- PHP: `composer require xquik/x-twitter-scraper` -\n  [Xquik-dev/x-twitter-scraper-php](https://github.com/Xquik-dev/x-twitter-scraper-php)\n\n- CLI: `go install github.com/Xquik-dev/x-twitter-scraper-cli/cmd/x-twitter-scraper@latest` -\n  [Xquik-dev/x-twitter-scraper-cli](https://github.com/Xquik-dev/x-twitter-scraper-cli)\n\n- Terraform Provider (Terraform Registry) -\n  [Xquik-dev/terraform-provider-x-twitter-scraper](https://github.com/Xquik-dev/terraform-provider-x-twitter-scraper)\n\n\nOpenClaw plugin: [Xquik-dev/tweetclaw](https://github.com/Xquik-dev/tweetclaw) (`openclaw plugins install clawhub:@xquik/tweetclaw`)."
+  x-guidance: '## Common tasks
+
+
+    **Find a tweet** - GET /x/tweets/{id} with a numeric tweet ID. Returns full tweet data: text, author, metrics (likes, retweets, replies, views), media URLs, and creation timestamp. Cost: $0.00015 per lookup.
+
+
+    **Search tweets** - GET /x/tweets/search?q={query}&limit={n}. Supports X search operators, structured filters like fromUser, mediaType, minFaves, hashtags, and verifiedOnly, plus exact lookup for a pasted Tweet ID or X status URL. Plain from:user date windows are optimized for timeline completeness. Returns up to 200 tweets per page with cursor-based pagination. Cost: $0.00015 per tweet returned.
+
+
+    **Find a user** - GET /x/users/{id} where {id} is a numeric user ID or @username. Returns profile data: name, bio, follower/following counts, verification status, join date. Cost: $0.00015 per lookup.
+
+
+    **Check if A follows B** - GET /x/followers/check?source={a}&target={b} where source and target are usernames, @usernames, or X or Twitter profile URLs. Cost: $0.00075.
+
+
+    **Get trending topics** - GET /trends?woeid={region}&count={n}. WOEID 1 = worldwide, 23424977 = US, 23424975 = UK, 23424969 = Turkey. Cost: $0.00045.
+
+
+    **Download media** - POST /x/media/download with {"tweetIds": ["123", "456"]} body. Returns download URLs for images and videos. Cost: 1 credit per fresh tweet processed with media; cached repeat downloads are free.
+
+
+    **Read an article** - GET /x/articles/{tweetId} for long-form X Articles. Returns full article HTML, cover image, and metadata. Cost: $0.00075.
+
+
+    ## Pagination
+
+
+    Default v1 responses keep their existing pagination fields for compatibility. Platform list endpoints return `hasMore` and `nextCursor`; X data endpoints return `has_next_page` and `next_cursor`. Send `xquik-api-contract: 2026-04-29` to receive the unified best-practice fields `has_more` and `next_cursor`. Pass the cursor back as `?cursor={cursor}`; legacy `?after={cursor}` still works. Dynamic-priced endpoints charge per item returned, not per request.
+
+
+    ## Authentication
+
+
+    Eligible paid read endpoints accept accountless prepaid credit wallets. Fixed-price lookups also accept direct MPP payments. Media downloads, write endpoints, and automation features require authentication. Send an Xquik API key through `x-api-key`, `Xquik-Api-Key`, or `Authorization: Bearer xq_...`. Send an OAuth 2.1 access token through `Authorization: Bearer`.
+
+
+    ## Best-Practice Response Contract
+
+
+    v1 keeps its original response contract by default so existing integrations do not break. Send `xquik-api-contract: 2026-04-29` to opt in to the best-practice contract: snake_case response fields, Unix timestamps in seconds, structured error objects, `has_more` and `next_cursor` pagination fields, `object` resource identifiers, and prefixed IDs where available. Dependency failures that returned 502 in default v1 return 424 in the opt-in contract. Future major API versions should make this contract the default.'
+  contact:
+    name: Xquik
+    url: https://xquik.com
+    email: support@xquik.com
+servers:
+- url: https://xquik.com
+security:
+- apiKey: []
+- oauthBearer: []
+tags:
+- name: Media
+  description: Media upload and download
+paths:
+  /api/v1/x/media/download:
+    post:
+      operationId: downloadMedia
+      summary: Download images and videos from tweets
+      tags:
+      - Media
+      security:
+      - apiKey: []
+      - oauthBearer: []
+      requestBody:
+        required: true
+        description: Single tweet URL/ID, accepted aliases, or array of up to 50 tweet URLs/IDs for bulk download. When `tweetIds` contains at least one string value, bulk mode is used.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tweetInput:
+                  type: string
+                  description: Tweet URL or ID (single tweet)
+                  example: https://x.com/elonmusk/status/1234567890
+                tweetId:
+                  type: string
+                  description: Numeric tweet ID alias for tweetInput
+                  example: '1234567890'
+                tweetUrl:
+                  type: string
+                  description: Tweet URL alias for tweetInput
+                  example: https://x.com/elonmusk/status/1234567890
+                tweetIds:
+                  type: array
+                  items:
+                    type: string
+                  maxItems: 50
+                  description: Array of tweet URLs or IDs (bulk, max 50 string items)
+                  example:
+                  - '1234567890'
+                  - '1234567891'
+            example:
+              tweetInput: https://x.com/elonmusk/status/1234567890
+      responses:
+        '200':
+          description: 'Media download result. Single: tweetId + galleryUrl + cacheHit. Bulk: galleryUrl + totalTweets + totalMedia.'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tweetId:
+                    type: string
+                    example: '1234567890'
+                  galleryUrl:
+                    type: string
+                    example: https://xquik.com/gallery/abc123
+                  cacheHit:
+                    type: boolean
+                    example: false
+                  totalTweets:
+                    type: integer
+                    example: 2
+                  totalMedia:
+                    type: integer
+                    example: 5
+              example:
+                tweetId: '1234567890'
+                galleryUrl: https://xquik.com/gallery/abc123
+                cacheHit: false
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '402':
+          $ref: '#/components/responses/PaymentRequired'
+        '404':
+          description: Tweet media source not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: tweet_not_found
+                message: Tweet not found.
+        '424':
+          $ref: '#/components/responses/XApiError'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+        '502':
+          $ref: '#/components/responses/XApiError'
+        default:
+          content:
+            application/json:
+              example:
+                error: internal_error
+                message: Unexpected error. Try again.
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unexpected error.
+      description: Download images and videos from tweets.
+components:
+  responses:
+    PaymentRequired:
+      description: 'Payment required. Fixed-price direct MPP requests return a Machine Payments Protocol problem document and a WWW-Authenticate challenge. Authenticated X data requests return balances and explicit Stripe checkout-creation actions. Guest paid-read keys receive only the accountless guest top-up action. Direct MPP challenges also advertise the Stripe wallet action. Other authenticated endpoints return a legacy error shape. A failed request never creates checkout. Create checkout only after the user confirms a payment option.
+
+        '
+      headers:
+        WWW-Authenticate:
+          description: MPP payment challenge for eligible anonymous pay-per-use requests. Authenticated credit or subscription errors omit this header.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            oneOf:
+            - $ref: '#/components/schemas/XWritePaymentRequired'
+            - $ref: '#/components/schemas/AuthenticatedPaymentRequired'
+            - $ref: '#/components/schemas/GuestPaymentRequired'
+            - allOf:
+              - $ref: '#/components/schemas/Error'
+              - not:
+                  required:
+                  - payment_options
+          example:
+            balance: '0'
+            dashboard: /dashboard/account
+            error: insufficient_credits
+            message: Insufficient credits. Top up or subscribe to continue.
+            next_step: Ask the user to confirm a payment option before creating checkout.
+            payment_options:
+              credits:
+                create_checkout:
+                  body:
+                    dollars: 10
+                    locale: en
+                  creates: checkout_url
+                  method: POST
+                  path: /api/v1/credits/topup
+                  provider: stripe
+                  requires_authentication: true
+                  requires_user_confirmation: true
+                  response_url_field: url
+              subscription:
+                create_checkout:
+                  body:
+                    tier: starter
+                  creates: checkout_url
+                  method: POST
+                  path: /api/v1/subscribe
+                  provider: stripe
+                  requires_authentication: true
+                  requires_user_confirmation: true
+                  response_url_field: url
+            required: '1'
+            top_up_endpoint: /api/v1/credits/topup
+            top_up_url: POST /api/v1/credits/topup
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/MppPaymentRequired'
+          example:
+            account_required: false
+            challengeId: Opaque MPP challenge identifier
+            detail: Payment is required.
+            hint: Use a supported wallet with an offer from the WWW-Authenticate header.
+            status: 402
+            title: Payment Required
+            type: https://paymentauth.org/problems/payment-required
+            next_step: Ask the user to confirm a USD amount before creating checkout.
+            payment_options:
+              guest_wallet:
+                create_checkout:
+                  account_required: false
+                  amount_bounds:
+                    currency: usd
+                    maximum_minor: 25000
+                    minimum_minor: 1000
+                  body:
+                    amount_minor: 1000
+                    currency: usd
+                  creates: checkout_url
+                  method: POST
+                  path: /api/v1/guest-wallets
+                  provider: stripe
+                  required_headers:
+                    Idempotency-Key: <cryptographically random UUID v4>
+                  requires_authentication: false
+                  requires_user_confirmation: true
+                  requires_user_interaction: true
+                  response_fields:
+                  - checkout_url
+                  - api_key
+                  - status_url
+                  response_url_field: checkout_url
+    Unauthenticated:
+      description: Unauthenticated
+      headers:
+        Cache-Control:
+          description: Prevents storage of authentication responses.
+          schema:
+            type: string
+            const: no-store
+        WWW-Authenticate:
+          description: Bearer authentication challenge.
+          schema:
+            type: string
+            const: Bearer realm="xquik"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: unauthenticated
+            message: Authentication required. Provide a valid API key or bearer token.
+    RateLimitExceeded:
+      description: 'Xquik tier rate limit exceeded. The response includes a `Retry-After` header with the number of seconds to wait before retrying.
+
+        '
+      content:
+        application/json:
+          schema:
+            allOf:
+            - $ref: '#/components/schemas/Error'
+            - type: object
+              properties:
+                retryAfter:
+                  type: integer
+                  example: 60
+          example:
+            error: rate_limit_exceeded
+            message: Too many requests. Try again later.
+            retryAfter: 60
+      headers:
+        Retry-After:
+          description: Seconds until the next permitted request.
+          schema:
+            example: 60
+            minimum: 1
+            type: integer
+    XApiError:
+      description: 'Dependency unavailable, unauthorized, or rate limited. Default v1 returns 502. The best-practice response contract returns 424 for transparent dependency failures.
+
+        '
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: x_api_unavailable
+            message: X data source temporarily unavailable. Try again later.
+    InvalidInput:
+      description: Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: invalid_input
+            message: Invalid input. Check the request body.
+  schemas:
+    XWritePaymentRequired:
+      allOf:
+      - $ref: '#/components/schemas/XWriteAction'
+      - type: object
+        required:
+        - error
+        - message
+      description: 'Durable failed write action with the applicable payment guidance.
+
+        '
+    GuestWalletPurchaseRequest:
+      description: User-confirmed guest wallet checkout request.
+      type: object
+      additionalProperties: false
+      required:
+      - amount_minor
+      - currency
+      properties:
+        amount_minor:
+          type: integer
+          minimum: 1000
+          maximum: 25000
+          description: USD cents accepted for this checkout.
+          example: 1000
+        currency:
+          type: string
+          const: usd
+    XWriteActionAccount:
+      type:
+      - object
+      - 'null'
+      description: Connected account selected for the write.
+      additionalProperties: false
+      required:
+      - id
+      - username
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+      example:
+        id: '42'
+        username: example
+    Error:
+      description: 'Error response. Default v1 returns a legacy string error code. Send `xquik-api-contract: 2026-04-29` to receive the structured best-practice error object.
+
+        '
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          x-stainless-naming:
+            python:
+              type_name: ErrorValue
+            java:
+              type_name: ErrorValue
+          example: invalid_input
+          oneOf:
+          - type: string
+            title: LegacyErrorCode
+            enum:
+            - internal_error
+            - account_already_connected
+            - account_needs_reauth
+            - account_not_found
+            - account_required
+            - account_restricted
+            - api_key_limit_reached
+            - article_not_found
+            - dm_not_permitted
+            - invalid_format
+            - invalid_id
+            - invalid_input
+            - invalid_params
+            - invalid_tool_type
+            - invalid_tweet_id
+            - invalid_tweet_url
+            - invalid_user_id
+            - invalid_user_ids
+            - invalid_username
+            - invalid_json
+            - insufficient_credits
+            - login_cooldown
+            - login_failed
+            - media_download_failed
+            - missing_params
+            - missing_query
+            - monitor_already_exists
+            - no_media
+            - no_credits
+            - no_subscription
+            - not_found
+            - payment_failed
+            - rate_limit_exceeded
+            - service_unavailable
+            - style_not_found
+            - subscription_inactive
+            - tweet_not_found
+            - unauthenticated
+            - unsupported_field
+            - user_not_found
+            - body_too_large
+            - checkout_unavailable
+            - connection_challenge_expired
+            - connection_challenge_inactive
+            - draft_not_found
+            - favoriters_unavailable
+            - forbidden
+            - guest_wallet_unavailable
+            - guest_wallets_disabled
+            - guest_wallets_unavailable
+            - idempotency_conflict
+            - idempotency_key_conflict
+            - invalid_community_id
+            - invalid_idempotency_key
+            - invalid_list_id
+            - invalid_payment_amount
+            - invalid_range
+            - login_rate_limited
+            - missing_idempotency_key
+            - missing_ids
+            - no_cached_style
+            - passkey_required
+            - rate_limited
+            - read_request_timeout
+            - replies_incomplete
+            - support_media_rate_limit
+            - support_request_rate_limit
+            - too_many_ids
+            - unknown_field
+            - unsupported_media_type
+            - webhook_inactive
+            - write_tracking_unavailable
+            - x_write_unconfirmed
+            - x_account_feature_required
+            - x_account_protected
+            - x_account_suspended
+            - x_api_rate_limited
+            - x_api_unavailable
+            - x_api_unauthorized
+            - x_auth_failure
+            - x_content_too_long
+            - x_daily_limit
+            - x_dm_not_allowed
+            - x_duplicate_action
+            - x_login_auth_failed
+            - x_login_challenge
+            - x_login_denied
+            - x_login_failed
+            - x_login_proxy_error
+            - x_login_rate_limited
+            - x_login_service_unavailable
+            - x_login_suspended
+            - x_rate_limited
+            - x_rejected
+            - x_target_not_found
+            - x_transient_error
+            - x_user_lookup_failed
+            - x_write_ambiguous
+            - x_write_failed
+            example: invalid_input
+          - type: object
+            title: StructuredError
+            required:
+            - message
+            - type
+            - code
+            properties:
+              message:
+                type: string
+                example: Invalid input. Check the request body.
+              type:
+                type: string
+                enum:
+                - api_error
+                - authentication_error
+                - billing_error
+                - dependency_error
+                - invalid_request_error
+                - permission_error
+                - rate_limit_error
+                example: invalid_request_error
+              code:
+                type: string
+                title: ErrorCode
+                enum:
+                - internal_error
+                - account_already_connected
+                - account_needs_reauth
+                - account_not_found
+                - account_required
+                - account_restricted
+                - api_key_limit_reached
+                - article_not_found
+                - dm_not_permitted
+                - invalid_format
+                - invalid_id
+                - invalid_input
+                - invalid_params
+                - invalid_tool_type
+                - invalid_tweet_id
+                - invalid_tweet_url
+                - invalid_user_id
+                - invalid_user_ids
+                - invalid_username
+                - invalid_json
+                - insufficient_credits
+                - login_cooldown
+                - login_failed
+                - media_download_failed
+                - missing_params
+                - missing_query
+                - monitor_already_exists
+                - no_media
+                - no_credits
+                - no_subscription
+                - not_found
+                - payment_failed
+                - rate_limit_exceeded
+                - service_unavailable
+                - style_not_found
+                - subscription_inactive
+                - tweet_not_found
+                - unauthenticated
+                - unsupported_field
+                - user_not_found
+                - body_too_large
+                - checkout_unavailable
+                - connection_challenge_expired
+                - connection_challenge_inactive
+                - draft_not_found
+                - favoriters_unavailable
+                - forbidden
+                - guest_wallet_unavailable
+                - guest_wallets_disabled
+                - guest_wallets_unavailable
+                - idempotency_conflict
+                - idempotency_key_conflict
+                - invalid_community_id
+                - invalid_idempotency_key
+                - invalid_list_id
+                - invalid_payment_amount
+                - invalid_range
+                - login_rate_limited
+                - missing_idempotency_key
+                - missing_ids
+                - no_cached_style
+                - passkey_required
+                - rate_limited
+                - read_request_timeout
+                - replies_incomplete
+                - support_media_rate_limit
+                - support_request_rate_limit
+                - too_many_ids
+                - unknown_field
+                - unsupported_media_type
+                - webhook_inactive
+                - write_tracking_unavailable
+                - x_write_unconfirmed
+                - x_account_feature_required
+                - x_account_protected
+                - x_account_suspended
+                - x_api_rate_limited
+                - x_api_unavailable
+                - x_api_unauthorized
+                - x_auth_failure
+                - x_content_too_long
+                - x_daily_limit
+                - x_dm_not_allowed
+                - x_duplicate_action
+                - x_login_auth_failed
+                - x_login_challenge
+                - x_login_denied
+                - x_login_failed
+                - x_login_proxy_error
+                - x_login_rate_limited
+                - x_login_service_unavailable
+                - x_login_suspended
+                - x_rate_limited
+                - x_rejected
+                - x_target_not_found
+                - x_transient_error
+                - x_user_lookup_failed
+                - x_write_ambiguous
+                - x_write_failed
+                example: invalid_input
+        message:
+          type: string
+          description: Human-readable error guidance.
+          example: Invalid input. Check the request body.
+        reason:
+          type: string
+          description: Machine-readable reason for a login cooldown.
+          example: temporary_issue
+        retryAfter:
+          type: integer
+          minimum: 1
+          description: Seconds until the next permitted request.
+          example: 60
+        retryAfterMs:
+          type: integer
+          minimum: 1
+          description: Required wait in milliseconds.
+          example: 60000
+    GuestPaymentRequired:
+      description: 'Credit error for a paid-read guest key with only its accountless guest top-up action.
+
+        '
+      type: object
+      additionalProperties: false
+      required:
+      - balance
+      - error
+      - message
+      - next_step
+      - payment_options
+      - required
+      - top_up_endpoint
+      - top_up_url
+      properties:
+        balance:
+          type: string
+          pattern: ^\d+$
+          example: '0'
+        error:
+          type: string
+          enum:
+          - insufficient_credits
+          - no_credits
+          - no_subscription
+          - subscription_inactive
+          example: insufficient_credits
+        message:
+          type: string
+          example: Insufficient credits. Top up or subscribe to continue.
+        next_step:
+          type: string
+          const: Ask the user to confirm a USD amount before creating checkout.
+        payment_options:
+          type: object
+          additionalProperties: false
+          required:
+          - credits
+          properties:
+            credits:
+              type: object
+              additionalProperties: false
+              required:
+              - create_checkout
+              properties:
+                create_checkout:
+                  $ref: '#/components/schemas/GuestWalletTopupCheckoutAction'
+        required:
+          type: string
+          pattern: ^\d+$
+          example: '1'
+        top_up_endpoint:
+          type: string
+          const: /api/v1/guest-wallets/topups
+        top_up_url:
+          type: string
+          const: POST /api/v1/guest-wallets/topups
+    GuestWalletCreateCheckoutAction:
+      description: Explicit direct REST action for a new guest wallet checkout.
+      type: object
+      additionalProperties: false
+      required:
+      - account_required
+      - amount_bounds
+      - body
+      - creates
+      - method
+      - path
+      - provider
+      - required_headers
+      - requires_authentication
+      - requires_user_confirmation
+      - requires_user_interaction
+      - response_fields
+      - response_url_field
+      properties:
+        account_required:
+          type: boolean
+          const: false
+        amount_bounds:
+          $ref: '#/components/schemas/GuestWalletAmountBounds'
+        body:
+          $ref: '#/components/schemas/GuestWalletPurchaseRequest'
+        creates:
+          type: string
+          const: checkout_url
+        method:
+          type: string
+          const: POST
+        path:
+          type: string
+          const: /api/v1/guest-wallets
+        provider:
+          type: string
+          const: stripe
+        required_headers:
+          type: object
+          additionalProperties: false
+          required:
+          - Idempotency-Key
+          properties:
+            Idempotency-Key:
+              type: string
+              const: <cryptographically random UUID v4>
+        requires_authentication:
+          type: boolean
+          const: false
+        requires_user_confirmation:
+          type: boolean
+          const: true
+        requires_user_interaction:
+          type: boolean
+          const: true
+        response_fields:
+          type: array
+          minItems: 3
+          maxItems: 3
+          prefixItems:
+          - type: string
+            const: checkout_url
+          - type: string
+            const: api_key
+          - type: string
+            const: status_url
+          items:
+            type: string
+            enum:
+            - checkout_url
+            - api_key
+            - status_url
+        response_url_field:
+          type: string
+          const: checkout_url
+    GuestWalletTopupCheckoutAction:
+      description: Explicit direct REST action for a guest wallet top-up.
+      type: object
+      additionalProperties: false
+      required:
+      - account_required
+      - amount_bounds
+      - body
+      - creates
+      - method
+      - path
+      - provider
+      - required_headers
+      - requires_authentication
+      - requires_user_confirmation
+      - requires_user_interaction
+      - response_fields
+      - response_url_field
+      properties:
+        account_required:
+          type: boolean
+          const: false
+        amount_bounds:
+          $ref: '#/components/schemas/GuestWalletAmountBounds'
+        body:
+          $ref: '#/components/schemas/GuestWalletPurchaseRequest'
+        creates:
+          type: string
+          const: checkout_url
+        method:
+          type: string
+          const: POST
+        path:
+          type: string
+          const: /api/v1/guest-wallets/topups
+        provider:
+          type: string
+          const: stripe
+        required_headers:
+          type: object
+          additionalProperties: false
+          required:
+          - Idempotency-Key
+          properties:
+            Idempotency-Key:
+              type: string
+              const: <cryptographically random UUID v4>
+        requires_authentication:
+          type: boolean
+          const: true
+        requires_user_confirmation:
+          type: boolean
+          const: true
+        requires_user_interaction:
+          type: boolean
+          const: true
+        response_fields:
+          type: array
+          minItems: 2
+          maxItems: 2
+          prefixItems:
+          - type: string
+            const: checkout_url
+          - type: string
+            const: status_url
+          items:
+            type: string
+            enum:
+            - checkout_url
+            - status_url
+        response_url_field:
+          type: string
+          const: checkout_url
+    XWriteActionNextAction:
+      type:
+      - object
+      - 'null'
+      description: Exact follow-up an API client or agent should perform.
+      additionalProperties: false
+      required:
+      - type
+      properties:
+        type:
+          type: string
+          enum:
+          - poll
+          - retry
+          - verify_result
+          - fix_request
+        url:
+          type: string
+        afterMs:
+          type: integer
+          minimum: 0
+        requiresNewIdempotencyKey:
+          type: boolean
+      example:
+        type: poll
+        url: /api/v1/x/write-actions/12345
+        afterMs: 2000
+    XWriteActionRequest:
+      type: object
+      description: Stable fingerprint and sanitized payload for replay checks.
+      additionalProperties: false
+      required:
+      - hash
+      - payload
+      properties:
+        hash:
+          type:
+          - string
+          - 'null'
+          pattern: ^[0-9a-f]{64}$
+          description: Stable hash of account, action, target, and payload.
+        payload:
+          type:
+          - object
+          - 'null'
+          additionalProperties: true
+          description: Exact sanitized payload dispatched for this action.
+      example:
+        hash: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+        payload:
+          tweet_id: '9876543210'
+    XWriteAction:
+      type: object
+      required:
+      - object
+      - id
+      - writeActionId
+      - action
+      - status
+      - terminal
+      - retryable
+      - safeToRetry
+      - statusUrl
+      - pollAfterMs
+      - charged
+      - chargedCredits
+      - billing
+      - request
+      - account
+      - target
+      - targetId
+      - result
+      - nextAction
+      - sendDispatched
+      - success
+      properties:
+        object:
+          type: string
+          const: x_write_action
+        id:
+          type: string
+          example: '12345'
+        writeActionId:
+          type: string
+          example: '12345'
+        action:
+          type: string
+          example: like
+          enum:
+          - create_tweet
+          - delete_tweet
+          - like
+          - unlike
+          - retweet
+          - unretweet
+          - follow
+          - unfollow
+          - remove_follower
+          - send_dm
+          - upload_media
+          - update_profile
+          - update_avatar
+          - update_banner
+          - create_community
+          - delete_community
+          - join_community
+          - leave_community
+        status:
+          type: string
+          example: success
+          enum:
+          - accepted
+          - dispatching
+          - pending_confirmation
+          - success
+          - failed
+          - expired
+        terminal:
+          type: boolean
+          example: true
+        retryable:
+          type: boolean
+          description: True only when a new attempt can reasonably succeed.
+          example: false
+        safeToRetry:
+          type: boolean
+          description: 'True only when no write was dispatched and a new idempotency key may be used.
+
+            '
+          example: false
+        statusUrl:
+          type: string
+          example: /api/v1/x/write-actions/12345
+        pollAfterMs:
+          type:
+          - integer
+          - 'null'
+          minimum: 0
+          example: null
+        charged:
+          type: boolean
+          example: true
+        chargedCredits:
+          type: string
+          pattern: ^\d+$
+          example: '10'
+        billing:
+          $ref: '#/components/schemas/XWriteActionBilling'
+        request:
+          $ref: '#/components/schemas/XWriteActionRequest'
+        account:
+          $ref: '#/components/schemas/XWriteActionAccount'
+        target:
+          $ref: '#/components/schemas/XWriteActionTarget'
+        targetId:
+          type:
+          - string
+          - 'null'
+          example: '9876543210'
+        result:
+          $ref: '#/components/schemas/XWriteActionResult'
+        nextAction:
+          $ref: '#/components/schemas/XWriteActionNextAction'
+        requestHash:
+          type: string
+          pattern: ^[0-9a-f]{64}$
+          example: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+        requestId:
+          type: string
+          example: 01JZ8R7QSC9QKT0V7JX4M2A6B8
+        idempotent:
+          type: boolean
+          example: false
+        error:
+          type: string
+          example: x_write_ambiguous
+        message:
+          type: string
+          example: Invalid input. Check request fields.
+        sendDispatched:
+          type: boolean
+          example: true
+        sendDispatchedAt:
+          type: string
+          format: date-time
+          description: Dispatch timestamp when the write reached execution.
+          example: '2026-07-21T05:00:00Z'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2026-07-21T05:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2026-07-21T05:00:02Z'
+        completedAt:
+          type: string
+          format: date-time
+          example: '2026-07-21T05:00:02Z'
+        expiresAt:
+          type: string
+          format: date-time
+          description: 'Deadline for resolving a non-terminal write. This is not the Idempotency-Key retention deadline.
+
+            '
+          example: '2026-07-22T05:00:00Z'
+        confirmedAt:
+          type: string
+          format: date-time
+          example: '2026-07-21T05:00:02Z'
+        confirmationCheckedAt:
+          type: string
+          format: date-time
+          example: '2026-07-21T05:00:02Z'
+        confirmationAttempts:
+          type: integer
+          minimum: 0
+          example: 1
+        tweetId:
+          type: string
+          description: Compatibility field for a confirmed tweet result ID.
+          example: '9876543210'
+        messageId:
+          type: string
+          description: Compatibility field for a confirmed direct message ID.
+          example: '1234567890'
+        mediaId:
+          type: string
+          description: Compatibility field for a confirmed media upload ID.
+          example: '2345678901'
+        mediaUrl:
+          type: string
+          format: uri
+          description: Public media URL when the upload creates one.
+          example: https://media.xquik.com/example.jpg
+        communityId:
+          type: string
+          description: Compatibility field for a confirmed community ID.
+          example: '3456789012'
+        communityName:
+          type: string
+          description: Confirmed community name when available.
+          example: Builders
+        resultId:
+          type: string
+          description: Compatibility result ID for other write actions.
+          example: '9876543210'
+        media:
+          type: object
+          additionalProperties: true
+          description: Media count, kind, size, and billing details when used.
+          example:
+            count: 1
+            kind: image
+        details:
+          type: object
+          additionalProperties: true
+          description: Structured recovery context for a failed write.
+          example:
+            suggestion: Poll the action status URL.
+        success:
+          type: boolean
+          example: true
+      description: 'Durable write lifecycle record. Poll statusUrl until terminal is true. Reusing the original Idempotency-Key returns this same record. Submit a new write only when safeToRetry is true, using a new key.
+
+        '
+    XWriteActionBilling:
+      type: object
+      additionalProperties: false
+      required:
+      - status
+      - charged
+      - plannedCredits
+      - chargedCredits
+      properties:
+        status:
+          type: string
+          enum:
+          - not_charged
+          - pending
+          - charged
+          - charge_failed
+          - refunded
+          example: charged
+        charged:
+          type: boolean
+          example: true
+        plannedCredits:
+          type: string
+          pattern: ^\d+$
+          example: '10'
+        chargedCredits:
+          type: string
+          pattern: ^\d+$
+          example: '10'
+      description: 'plannedCredits is the approved maximum. chargedCredits comes from the settled credit ledger. Pending or failed writes are not charged.
+
+        '
+      example:
+        status: charged
+        charged: true
+        plannedCredits: '10'
+        chargedCredits: '10'
+    AuthenticatedPaymentRequired:
+      description: Authenticated credit or subscription error with confirmation-gated Stripe checkout actions.
+      type: object
+      additionalProperties: false
+      required:
+      - balance
+      - dashboard
+      - error
+      - message
+      - next_step
+      - payment_options
+      - required
+      - top_up_endpoint
+      - top_up_url
+      properties:
+        balance:
+          type: string
+          pattern: ^\d+$
+          description: Available credits as a decimal string.
+          example: '0'
+        dashboard:
+          type: string
+          const: /dashboard/account
+          description: Account page for manual billing management.
+        error:
+          type: string
+          enum:
+          - insufficient_credits
+          - no_credits
+          - no_subscription
+          - subscription_inactive
+          example: insufficient_credits
+        message:
+          type: string
+          example: Insufficient credits. Top up or subscribe to continue.
+        next_step:
+          type: string
+          const: Ask the user to confirm a payment option before creating checkout.
+        payment_options:
+          type: object
+          additionalProperties: false
+          required:
+          - credits
+          - subscription
+          properties:
+            credits:
+              type: object
+              additionalProperties: false
+              required:
+              - create_checkout
+              properties:
+                create_checkout:
+                  type: object
+                  additionalProperties: false
+                  required:
+                  - body
+                  - creates
+                  - method
+                  - path
+                  - provider
+                  - requires_authentication
+                  - requires_user_confirmation
+                  - response_url_field
+                  properties:
+                    body:
+                      type: object
+                      additionalProperties: false
+                      required:
+                      - dollars
+                      - locale
+                      properties:
+                        dollars:
+                          type: integer
+                          const: 10
+                        locale:
+                          type: string
+                          const: en
+                    creates:
+                      type: string
+                      const: checkout_url
+                    method:
+                      type: string
+                      const: POST
+                    path:
+                      type: string
+                      const: /api/v1/credits/topup
+                    provider:
+                      type: string
+                      const: stripe
+                    requires_authentication:
+                      type: boolean
+                      const: true
+                    requires_user_confirmation:
+                      type: boolean
+                      const: true
+                    response_url_field:
+                      type: string
+                      const: url
+            subscription:
+              type: object
+              additionalProperties: false
+              required:
+              - create_checkout
+              properties:
+                create_checkout:
+                  type: object
+                  additionalProperties: false
+                  required:
+                  - body
+                  - creates
+                  - method
+                  - path
+                  - provider
+                  - requires_authentication
+                  - requires_user_confirmation
+                  - response_url_field
+                  properties:
+                    body:
+                      type: object
+                      additionalProperties: false
+                      required:
+                      - tier
+                      properties:
+                        tier:
+                          type: string
+                          const: starter
+                    creates:
+                      type: string
+                      const: checkout_url
+                    method:
+                      type: string
+                      const: POST
+                    path:
+                      type: string
+                      const: /api/v1/subscribe
+                    provider:
+                      type: string
+                      const: stripe
+                    requires_authentication:
+                      type: boolean
+                      const: true
+                    requires_user_confirmation:
+                      type: boolean
+                      const: true
+                    response_url_field:
+                      type: string
+                      const: url
+        required:
+          type: string
+          pattern: ^\d+$
+          description: Credits required for the blocked request.
+          example: '1'
+        top_up_endpoint:
+          type: string
+          const: /api/v1/credits/topup
+        top_up_url:
+          type: string
+          const: POST /api/v1/credits/topup
+    XWriteActionTarget:
+      type:
+      - object
+      - 'null'
+      description: Existing X resource targeted by the write, when applicable.
+      additionalProperties: false
+      required:
+      - type
+      - id
+      properties:
+        type:
+          type: string
+          enum:
+          - tweet
+          - user
+          - community
+        id:
+          type: string
+      example:
+        type: tweet
+        id: '9876543210'
+    MppPaymentRequired:
+      description: Anonymous payment requirement for a direct MPP operation. The response includes an MPP challenge and an accountless Stripe action.
+      type: object
+      required:
+      - account_required
+      - detail
+      - next_step
+      - payment_options
+      - status
+      - title
+      - type
+      properties:
+        account_required:
+          type: boolean
+          const: false
+        challengeId:
+          type: string
+          description: Opaque identifier for the MPP payment challenge.
+          example: mpp_challenge_example
+        detail:
+          type: string
+          example: Payment is required.
+        hint:
+          type: string
+          description: Instructions for selecting and paying an MPP offer.
+          example: Use a supported wallet with an offer from the WWW-Authenticate header.
+        next_step:
+          type: string
+          const: Ask the user to confirm a USD amount before creating checkout.
+        payment_options:
+          type: object
+          additionalProperties: false
+          required:
+          - guest_wallet
+          properties:
+            guest_wallet:
+              type: object
+              additionalProperties: false
+              required:
+              - create_checkout
+              properties:
+                create_checkout:
+                  $ref: '#/components/schemas/GuestWalletCreateCheckoutAction'
+        status:
+          type: integer
+          const: 402
+        title:
+          type: string
+          const: Payment Required
+        type:
+          type: string
+          format: uri
+          const: https://paymentauth.org/problems/payment-required
+    GuestWalletAmountBounds:
+      description: Accepted guest wallet purchase range in USD cents.
+      type: object
+      additionalProperties: false
+      required:
+      - currency
+      - maximum_minor
+      - minimum_minor
+      properties:
+        currency:
+          type: string
+          const: usd
+        maximum_minor:
+          type: integer
+          const: 25000
+        minimum_minor:
+          type: integer
+          const: 1000
+    XWriteActionResult:
+      type:
+      - object
+      - 'null'
+      description: Confirmed result produced by the write, when available.
+      additionalProperties: false
+      properties:
+        type:
+          type: string
+          enum:
+          - tweet
+          - direct_message
+          - media
+          - community
+          - state_change
+        id:
+          type: string
+        state:
+          type: string
+      example:
+        type: state_change
+        id: '9876543210'
+        state: liked
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: 'Xquik API key passed through the x-api-key header. Xquik-Api-Key is a vendor-prefixed alias. API keys beginning with xq_ can also use Authorization: Bearer.'
+    oauthBearer:
+      type: http
+      scheme: bearer
+      description: 'OAuth 2.1 access token passed through Authorization: Bearer. Values beginning with xq_ remain Xquik API-key credentials, not OAuth tokens.'
+    cookieSession:
+      type: apiKey
+      in: cookie
+      name: __Host-xquik_session
+      description: Secure Xquik browser session cookie.
+x-service-info:
+  categories:
+  - data
+  docs:
+    homepage: https://xquik.com
+    apiReference: https://docs.xquik.com
+    llms: https://docs.xquik.com/llms.txt
+x-discovery:
+  ownershipProofs:
+  - dns:xquik.com

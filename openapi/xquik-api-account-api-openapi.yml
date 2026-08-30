@@ -1,0 +1,678 @@
+openapi: 3.2.0
+info:
+  title: Xquik Account API
+  version: '1.0'
+  description: "Xquik is an independent third-party service. Not affiliated with X Corp. \"Twitter\" and \"X\" are trademarks of X Corp. Look up tweets, users, and X trends. Search tweets, check follow relationships, download media, and monitor accounts. 33 paid-read endpoints accept prepaid credits without a subscription. 7 fixed-price lookups also accept direct MPP payments. Write and automation endpoints require an API key or OAuth 2.1 bearer token.\n\n## Xquik SDKs\n\nStainless generates each SDK from this OpenAPI schema. Pick a language:\n\n- TypeScript / Node.js: `npm i x-twitter-scraper` -\n  [Xquik-dev/x-twitter-scraper-typescript](https://github.com/Xquik-dev/x-twitter-scraper-typescript)\n\n- Python: `pip install x-twitter-scraper` -\n  [Xquik-dev/x-twitter-scraper-python](https://github.com/Xquik-dev/x-twitter-scraper-python)\n\n- Go: `go get github.com/Xquik-dev/x-twitter-scraper-go` -\n  [Xquik-dev/x-twitter-scraper-go](https://github.com/Xquik-dev/x-twitter-scraper-go)\n\n- Ruby: `gem install x-twitter-scraper` -\n  [Xquik-dev/x-twitter-scraper-ruby](https://github.com/Xquik-dev/x-twitter-scraper-ruby)\n\n- Java (source build; Maven Central pending) -\n  [Xquik-dev/x-twitter-scraper-java](https://github.com/Xquik-dev/x-twitter-scraper-java)\n\n- Kotlin (source build; Maven Central pending) -\n  [Xquik-dev/x-twitter-scraper-kotlin](https://github.com/Xquik-dev/x-twitter-scraper-kotlin)\n\n- C# / .NET: `dotnet add package XTwitterScraper` -\n  [Xquik-dev/x-twitter-scraper-csharp](https://github.com/Xquik-dev/x-twitter-scraper-csharp)\n\n- PHP: `composer require xquik/x-twitter-scraper` -\n  [Xquik-dev/x-twitter-scraper-php](https://github.com/Xquik-dev/x-twitter-scraper-php)\n\n- CLI: `go install github.com/Xquik-dev/x-twitter-scraper-cli/cmd/x-twitter-scraper@latest` -\n  [Xquik-dev/x-twitter-scraper-cli](https://github.com/Xquik-dev/x-twitter-scraper-cli)\n\n- Terraform Provider (Terraform Registry) -\n  [Xquik-dev/terraform-provider-x-twitter-scraper](https://github.com/Xquik-dev/terraform-provider-x-twitter-scraper)\n\n\nOpenClaw plugin: [Xquik-dev/tweetclaw](https://github.com/Xquik-dev/tweetclaw) (`openclaw plugins install clawhub:@xquik/tweetclaw`)."
+  x-guidance: '## Common tasks
+
+
+    **Find a tweet** - GET /x/tweets/{id} with a numeric tweet ID. Returns full tweet data: text, author, metrics (likes, retweets, replies, views), media URLs, and creation timestamp. Cost: $0.00015 per lookup.
+
+
+    **Search tweets** - GET /x/tweets/search?q={query}&limit={n}. Supports X search operators, structured filters like fromUser, mediaType, minFaves, hashtags, and verifiedOnly, plus exact lookup for a pasted Tweet ID or X status URL. Plain from:user date windows are optimized for timeline completeness. Returns up to 200 tweets per page with cursor-based pagination. Cost: $0.00015 per tweet returned.
+
+
+    **Find a user** - GET /x/users/{id} where {id} is a numeric user ID or @username. Returns profile data: name, bio, follower/following counts, verification status, join date. Cost: $0.00015 per lookup.
+
+
+    **Check if A follows B** - GET /x/followers/check?source={a}&target={b} where source and target are usernames, @usernames, or X or Twitter profile URLs. Cost: $0.00075.
+
+
+    **Get trending topics** - GET /trends?woeid={region}&count={n}. WOEID 1 = worldwide, 23424977 = US, 23424975 = UK, 23424969 = Turkey. Cost: $0.00045.
+
+
+    **Download media** - POST /x/media/download with {"tweetIds": ["123", "456"]} body. Returns download URLs for images and videos. Cost: 1 credit per fresh tweet processed with media; cached repeat downloads are free.
+
+
+    **Read an article** - GET /x/articles/{tweetId} for long-form X Articles. Returns full article HTML, cover image, and metadata. Cost: $0.00075.
+
+
+    ## Pagination
+
+
+    Default v1 responses keep their existing pagination fields for compatibility. Platform list endpoints return `hasMore` and `nextCursor`; X data endpoints return `has_next_page` and `next_cursor`. Send `xquik-api-contract: 2026-04-29` to receive the unified best-practice fields `has_more` and `next_cursor`. Pass the cursor back as `?cursor={cursor}`; legacy `?after={cursor}` still works. Dynamic-priced endpoints charge per item returned, not per request.
+
+
+    ## Authentication
+
+
+    Eligible paid read endpoints accept accountless prepaid credit wallets. Fixed-price lookups also accept direct MPP payments. Media downloads, write endpoints, and automation features require authentication. Send an Xquik API key through `x-api-key`, `Xquik-Api-Key`, or `Authorization: Bearer xq_...`. Send an OAuth 2.1 access token through `Authorization: Bearer`.
+
+
+    ## Best-Practice Response Contract
+
+
+    v1 keeps its original response contract by default so existing integrations do not break. Send `xquik-api-contract: 2026-04-29` to opt in to the best-practice contract: snake_case response fields, Unix timestamps in seconds, structured error objects, `has_more` and `next_cursor` pagination fields, `object` resource identifiers, and prefixed IDs where available. Dependency failures that returned 502 in default v1 return 424 in the opt-in contract. Future major API versions should make this contract the default.'
+  contact:
+    name: Xquik
+    url: https://xquik.com
+    email: support@xquik.com
+servers:
+- url: https://xquik.com
+security:
+- apiKey: []
+- oauthBearer: []
+tags:
+- name: Account
+  description: Account info and settings
+paths:
+  /api/v1/account:
+    get:
+      operationId: getAccount
+      summary: Get account info
+      tags:
+      - Account
+      security:
+      - apiKey: []
+      - oauthBearer: []
+      responses:
+        '200':
+          description: Account info
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - plan
+                - monitorsUsed
+                - monitorsAllowed
+                - monitorBilling
+                properties:
+                  plan:
+                    type: string
+                    enum:
+                    - active
+                    - inactive
+                    example: active
+                  monitorsUsed:
+                    type: integer
+                    example: 3
+                  monitorsAllowed:
+                    type: integer
+                    deprecated: true
+                    x-stainless-deprecation-message: Monitor slots are unlimited. Use monitorBilling.unlimitedSlots instead.
+                    description: Deprecated. Monitor slots are unlimited, so this is always Number.MAX_SAFE_INTEGER.
+                    example: 9007199254740991
+                  monitorBilling:
+                    type: object
+                    required:
+                    - activeDailyEstimate
+                    - activeHourlyBurn
+                    - creditsPerActiveMonitorDay
+                    - creditsPerActiveMonitorHour
+                    - eventsIncluded
+                    - instantCheckIntervalSeconds
+                    - unlimitedSlots
+                    properties:
+                      activeDailyEstimate:
+                        type: string
+                        description: Estimated daily credits for currently active monitors.
+                        example: '1500'
+                      activeHourlyBurn:
+                        type: string
+                        description: Credits charged each hour for currently active monitors.
+                        example: '63'
+                      creditsPerActiveMonitorDay:
+                        type: string
+                        description: Rounded daily estimate for 1 active monitor.
+                        example: '500'
+                      creditsPerActiveMonitorHour:
+                        type: string
+                        description: Hourly credits charged for 1 active monitor.
+                        example: '21'
+                      eventsIncluded:
+                        type: boolean
+                        description: Webhook and event deliveries are included in monitor billing.
+                        example: true
+                      instantCheckIntervalSeconds:
+                        type: integer
+                        description: Active monitors check every 1 second.
+                        example: 1
+                      unlimitedSlots:
+                        type: boolean
+                        description: Monitor slot count is unlimited.
+                        example: true
+                  creditInfo:
+                    type: object
+                    required:
+                    - balance
+                    - lifetimePurchased
+                    - lifetimeUsed
+                    - autoTopupEnabled
+                    - autoTopupAmountDollars
+                    - autoTopupThreshold
+                    properties:
+                      balance:
+                        type: string
+                        description: Bigint string to preserve precision above Number.MAX_SAFE_INTEGER.
+                        example: '50000'
+                      lifetimePurchased:
+                        type: string
+                        description: Total purchased credits as a bigint string.
+                        example: '140000'
+                      lifetimeUsed:
+                        type: string
+                        description: Total consumed credits as a bigint string.
+                        example: '90000'
+                      autoTopupEnabled:
+                        type: boolean
+                        example: false
+                      autoTopupAmountDollars:
+                        type: number
+                        description: Dollar amount charged when automatic top-up runs.
+                        example: 10
+                      autoTopupThreshold:
+                        type: string
+                        description: Bigint string threshold that triggers automatic top-up when enabled.
+                        example: '50000'
+                    example:
+                      balance: '50000'
+                      lifetimePurchased: '140000'
+                      lifetimeUsed: '90000'
+                      autoTopupEnabled: false
+                      autoTopupAmountDollars: 10
+                      autoTopupThreshold: '50000'
+                  xUsername:
+                    type: string
+                    description: Linked X username, omitted when no X account is connected.
+                    example: elonmusk
+              example:
+                plan: active
+                monitorsUsed: 3
+                monitorsAllowed: 9007199254740991
+                monitorBilling:
+                  activeDailyEstimate: '1500'
+                  activeHourlyBurn: '63'
+                  creditsPerActiveMonitorDay: '500'
+                  creditsPerActiveMonitorHour: '21'
+                  eventsIncluded: true
+                  instantCheckIntervalSeconds: 1
+                  unlimitedSlots: true
+                creditInfo:
+                  balance: '50000'
+                  lifetimePurchased: '140000'
+                  lifetimeUsed: '90000'
+                  autoTopupEnabled: false
+                  autoTopupAmountDollars: 10
+                  autoTopupThreshold: '50000'
+                xUsername: elonmusk
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+        default:
+          content:
+            application/json:
+              example:
+                error: internal_error
+                message: Unexpected error. Try again.
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unexpected error.
+      description: Get account info.
+    patch:
+      operationId: updateAccount
+      summary: Update account locale
+      tags:
+      - Account
+      security:
+      - apiKey: []
+      - oauthBearer: []
+      requestBody:
+        required: true
+        description: Locale preference for the account.
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - locale
+              properties:
+                locale:
+                  type: string
+                  enum:
+                  - en
+                  - tr
+                  - es
+                  example: en
+            example:
+              locale: en
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+        default:
+          content:
+            application/json:
+              example:
+                error: internal_error
+                message: Unexpected error. Try again.
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unexpected error.
+      description: Update account locale.
+  /api/v1/account/x-identity:
+    put:
+      operationId: setXIdentity
+      summary: Set linked X username
+      tags:
+      - Account
+      security:
+      - apiKey: []
+      - oauthBearer: []
+      requestBody:
+        required: true
+        description: X username to link to this account.
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - username
+              properties:
+                username:
+                  type: string
+                  description: X username without @
+                  example: elonmusk
+            example:
+              username: elonmusk
+      responses:
+        '200':
+          description: X identity linked
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - success
+                - xUsername
+                properties:
+                  success:
+                    type: boolean
+                    const: true
+                  xUsername:
+                    type: string
+                    example: elonmusk
+              example:
+                success: true
+                xUsername: elonmusk
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+        default:
+          content:
+            application/json:
+              example:
+                error: internal_error
+                message: Unexpected error. Try again.
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unexpected error.
+      description: Set linked X username.
+components:
+  responses:
+    InvalidInput:
+      description: Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: invalid_input
+            message: Invalid input. Check the request body.
+    Success:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+            - success
+            properties:
+              success:
+                type: boolean
+                const: true
+                example: true
+          example:
+            success: true
+    Unauthenticated:
+      description: Unauthenticated
+      headers:
+        Cache-Control:
+          description: Prevents storage of authentication responses.
+          schema:
+            type: string
+            const: no-store
+        WWW-Authenticate:
+          description: Bearer authentication challenge.
+          schema:
+            type: string
+            const: Bearer realm="xquik"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: unauthenticated
+            message: Authentication required. Provide a valid API key or bearer token.
+    RateLimitExceeded:
+      description: 'Xquik tier rate limit exceeded. The response includes a `Retry-After` header with the number of seconds to wait before retrying.
+
+        '
+      content:
+        application/json:
+          schema:
+            allOf:
+            - $ref: '#/components/schemas/Error'
+            - type: object
+              properties:
+                retryAfter:
+                  type: integer
+                  example: 60
+          example:
+            error: rate_limit_exceeded
+            message: Too many requests. Try again later.
+            retryAfter: 60
+      headers:
+        Retry-After:
+          description: Seconds until the next permitted request.
+          schema:
+            example: 60
+            minimum: 1
+            type: integer
+  schemas:
+    Error:
+      description: 'Error response. Default v1 returns a legacy string error code. Send `xquik-api-contract: 2026-04-29` to receive the structured best-practice error object.
+
+        '
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          x-stainless-naming:
+            python:
+              type_name: ErrorValue
+            java:
+              type_name: ErrorValue
+          example: invalid_input
+          oneOf:
+          - type: string
+            title: LegacyErrorCode
+            enum:
+            - internal_error
+            - account_already_connected
+            - account_needs_reauth
+            - account_not_found
+            - account_required
+            - account_restricted
+            - api_key_limit_reached
+            - article_not_found
+            - dm_not_permitted
+            - invalid_format
+            - invalid_id
+            - invalid_input
+            - invalid_params
+            - invalid_tool_type
+            - invalid_tweet_id
+            - invalid_tweet_url
+            - invalid_user_id
+            - invalid_user_ids
+            - invalid_username
+            - invalid_json
+            - insufficient_credits
+            - login_cooldown
+            - login_failed
+            - media_download_failed
+            - missing_params
+            - missing_query
+            - monitor_already_exists
+            - no_media
+            - no_credits
+            - no_subscription
+            - not_found
+            - payment_failed
+            - rate_limit_exceeded
+            - service_unavailable
+            - style_not_found
+            - subscription_inactive
+            - tweet_not_found
+            - unauthenticated
+            - unsupported_field
+            - user_not_found
+            - body_too_large
+            - checkout_unavailable
+            - connection_challenge_expired
+            - connection_challenge_inactive
+            - draft_not_found
+            - favoriters_unavailable
+            - forbidden
+            - guest_wallet_unavailable
+            - guest_wallets_disabled
+            - guest_wallets_unavailable
+            - idempotency_conflict
+            - idempotency_key_conflict
+            - invalid_community_id
+            - invalid_idempotency_key
+            - invalid_list_id
+            - invalid_payment_amount
+            - invalid_range
+            - login_rate_limited
+            - missing_idempotency_key
+            - missing_ids
+            - no_cached_style
+            - passkey_required
+            - rate_limited
+            - read_request_timeout
+            - replies_incomplete
+            - support_media_rate_limit
+            - support_request_rate_limit
+            - too_many_ids
+            - unknown_field
+            - unsupported_media_type
+            - webhook_inactive
+            - write_tracking_unavailable
+            - x_write_unconfirmed
+            - x_account_feature_required
+            - x_account_protected
+            - x_account_suspended
+            - x_api_rate_limited
+            - x_api_unavailable
+            - x_api_unauthorized
+            - x_auth_failure
+            - x_content_too_long
+            - x_daily_limit
+            - x_dm_not_allowed
+            - x_duplicate_action
+            - x_login_auth_failed
+            - x_login_challenge
+            - x_login_denied
+            - x_login_failed
+            - x_login_proxy_error
+            - x_login_rate_limited
+            - x_login_service_unavailable
+            - x_login_suspended
+            - x_rate_limited
+            - x_rejected
+            - x_target_not_found
+            - x_transient_error
+            - x_user_lookup_failed
+            - x_write_ambiguous
+            - x_write_failed
+            example: invalid_input
+          - type: object
+            title: StructuredError
+            required:
+            - message
+            - type
+            - code
+            properties:
+              message:
+                type: string
+                example: Invalid input. Check the request body.
+              type:
+                type: string
+                enum:
+                - api_error
+                - authentication_error
+                - billing_error
+                - dependency_error
+                - invalid_request_error
+                - permission_error
+                - rate_limit_error
+                example: invalid_request_error
+              code:
+                type: string
+                title: ErrorCode
+                enum:
+                - internal_error
+                - account_already_connected
+                - account_needs_reauth
+                - account_not_found
+                - account_required
+                - account_restricted
+                - api_key_limit_reached
+                - article_not_found
+                - dm_not_permitted
+                - invalid_format
+                - invalid_id
+                - invalid_input
+                - invalid_params
+                - invalid_tool_type
+                - invalid_tweet_id
+                - invalid_tweet_url
+                - invalid_user_id
+                - invalid_user_ids
+                - invalid_username
+                - invalid_json
+                - insufficient_credits
+                - login_cooldown
+                - login_failed
+                - media_download_failed
+                - missing_params
+                - missing_query
+                - monitor_already_exists
+                - no_media
+                - no_credits
+                - no_subscription
+                - not_found
+                - payment_failed
+                - rate_limit_exceeded
+                - service_unavailable
+                - style_not_found
+                - subscription_inactive
+                - tweet_not_found
+                - unauthenticated
+                - unsupported_field
+                - user_not_found
+                - body_too_large
+                - checkout_unavailable
+                - connection_challenge_expired
+                - connection_challenge_inactive
+                - draft_not_found
+                - favoriters_unavailable
+                - forbidden
+                - guest_wallet_unavailable
+                - guest_wallets_disabled
+                - guest_wallets_unavailable
+                - idempotency_conflict
+                - idempotency_key_conflict
+                - invalid_community_id
+                - invalid_idempotency_key
+                - invalid_list_id
+                - invalid_payment_amount
+                - invalid_range
+                - login_rate_limited
+                - missing_idempotency_key
+                - missing_ids
+                - no_cached_style
+                - passkey_required
+                - rate_limited
+                - read_request_timeout
+                - replies_incomplete
+                - support_media_rate_limit
+                - support_request_rate_limit
+                - too_many_ids
+                - unknown_field
+                - unsupported_media_type
+                - webhook_inactive
+                - write_tracking_unavailable
+                - x_write_unconfirmed
+                - x_account_feature_required
+                - x_account_protected
+                - x_account_suspended
+                - x_api_rate_limited
+                - x_api_unavailable
+                - x_api_unauthorized
+                - x_auth_failure
+                - x_content_too_long
+                - x_daily_limit
+                - x_dm_not_allowed
+                - x_duplicate_action
+                - x_login_auth_failed
+                - x_login_challenge
+                - x_login_denied
+                - x_login_failed
+                - x_login_proxy_error
+                - x_login_rate_limited
+                - x_login_service_unavailable
+                - x_login_suspended
+                - x_rate_limited
+                - x_rejected
+                - x_target_not_found
+                - x_transient_error
+                - x_user_lookup_failed
+                - x_write_ambiguous
+                - x_write_failed
+                example: invalid_input
+        message:
+          type: string
+          description: Human-readable error guidance.
+          example: Invalid input. Check the request body.
+        reason:
+          type: string
+          description: Machine-readable reason for a login cooldown.
+          example: temporary_issue
+        retryAfter:
+          type: integer
+          minimum: 1
+          description: Seconds until the next permitted request.
+          example: 60
+        retryAfterMs:
+          type: integer
+          minimum: 1
+          description: Required wait in milliseconds.
+          example: 60000
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: 'Xquik API key passed through the x-api-key header. Xquik-Api-Key is a vendor-prefixed alias. API keys beginning with xq_ can also use Authorization: Bearer.'
+    oauthBearer:
+      type: http
+      scheme: bearer
+      description: 'OAuth 2.1 access token passed through Authorization: Bearer. Values beginning with xq_ remain Xquik API-key credentials, not OAuth tokens.'
+    cookieSession:
+      type: apiKey
+      in: cookie
+      name: __Host-xquik_session
+      description: Secure Xquik browser session cookie.
+x-service-info:
+  categories:
+  - data
+  docs:
+    homepage: https://xquik.com
+    apiReference: https://docs.xquik.com
+    llms: https://docs.xquik.com/llms.txt
+x-discovery:
+  ownershipProofs:
+  - dns:xquik.com

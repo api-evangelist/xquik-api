@@ -1,0 +1,1271 @@
+openapi: 3.2.0
+info:
+  title: Xquik X Accounts API
+  version: '1.0'
+  description: "Xquik is an independent third-party service. Not affiliated with X Corp. \"Twitter\" and \"X\" are trademarks of X Corp. Look up tweets, users, and X trends. Search tweets, check follow relationships, download media, and monitor accounts. 33 paid-read endpoints accept prepaid credits without a subscription. 7 fixed-price lookups also accept direct MPP payments. Write and automation endpoints require an API key or OAuth 2.1 bearer token.\n\n## Xquik SDKs\n\nStainless generates each SDK from this OpenAPI schema. Pick a language:\n\n- TypeScript / Node.js: `npm i x-twitter-scraper` -\n  [Xquik-dev/x-twitter-scraper-typescript](https://github.com/Xquik-dev/x-twitter-scraper-typescript)\n\n- Python: `pip install x-twitter-scraper` -\n  [Xquik-dev/x-twitter-scraper-python](https://github.com/Xquik-dev/x-twitter-scraper-python)\n\n- Go: `go get github.com/Xquik-dev/x-twitter-scraper-go` -\n  [Xquik-dev/x-twitter-scraper-go](https://github.com/Xquik-dev/x-twitter-scraper-go)\n\n- Ruby: `gem install x-twitter-scraper` -\n  [Xquik-dev/x-twitter-scraper-ruby](https://github.com/Xquik-dev/x-twitter-scraper-ruby)\n\n- Java (source build; Maven Central pending) -\n  [Xquik-dev/x-twitter-scraper-java](https://github.com/Xquik-dev/x-twitter-scraper-java)\n\n- Kotlin (source build; Maven Central pending) -\n  [Xquik-dev/x-twitter-scraper-kotlin](https://github.com/Xquik-dev/x-twitter-scraper-kotlin)\n\n- C# / .NET: `dotnet add package XTwitterScraper` -\n  [Xquik-dev/x-twitter-scraper-csharp](https://github.com/Xquik-dev/x-twitter-scraper-csharp)\n\n- PHP: `composer require xquik/x-twitter-scraper` -\n  [Xquik-dev/x-twitter-scraper-php](https://github.com/Xquik-dev/x-twitter-scraper-php)\n\n- CLI: `go install github.com/Xquik-dev/x-twitter-scraper-cli/cmd/x-twitter-scraper@latest` -\n  [Xquik-dev/x-twitter-scraper-cli](https://github.com/Xquik-dev/x-twitter-scraper-cli)\n\n- Terraform Provider (Terraform Registry) -\n  [Xquik-dev/terraform-provider-x-twitter-scraper](https://github.com/Xquik-dev/terraform-provider-x-twitter-scraper)\n\n\nOpenClaw plugin: [Xquik-dev/tweetclaw](https://github.com/Xquik-dev/tweetclaw) (`openclaw plugins install clawhub:@xquik/tweetclaw`)."
+  x-guidance: '## Common tasks
+
+
+    **Find a tweet** - GET /x/tweets/{id} with a numeric tweet ID. Returns full tweet data: text, author, metrics (likes, retweets, replies, views), media URLs, and creation timestamp. Cost: $0.00015 per lookup.
+
+
+    **Search tweets** - GET /x/tweets/search?q={query}&limit={n}. Supports X search operators, structured filters like fromUser, mediaType, minFaves, hashtags, and verifiedOnly, plus exact lookup for a pasted Tweet ID or X status URL. Plain from:user date windows are optimized for timeline completeness. Returns up to 200 tweets per page with cursor-based pagination. Cost: $0.00015 per tweet returned.
+
+
+    **Find a user** - GET /x/users/{id} where {id} is a numeric user ID or @username. Returns profile data: name, bio, follower/following counts, verification status, join date. Cost: $0.00015 per lookup.
+
+
+    **Check if A follows B** - GET /x/followers/check?source={a}&target={b} where source and target are usernames, @usernames, or X or Twitter profile URLs. Cost: $0.00075.
+
+
+    **Get trending topics** - GET /trends?woeid={region}&count={n}. WOEID 1 = worldwide, 23424977 = US, 23424975 = UK, 23424969 = Turkey. Cost: $0.00045.
+
+
+    **Download media** - POST /x/media/download with {"tweetIds": ["123", "456"]} body. Returns download URLs for images and videos. Cost: 1 credit per fresh tweet processed with media; cached repeat downloads are free.
+
+
+    **Read an article** - GET /x/articles/{tweetId} for long-form X Articles. Returns full article HTML, cover image, and metadata. Cost: $0.00075.
+
+
+    ## Pagination
+
+
+    Default v1 responses keep their existing pagination fields for compatibility. Platform list endpoints return `hasMore` and `nextCursor`; X data endpoints return `has_next_page` and `next_cursor`. Send `xquik-api-contract: 2026-04-29` to receive the unified best-practice fields `has_more` and `next_cursor`. Pass the cursor back as `?cursor={cursor}`; legacy `?after={cursor}` still works. Dynamic-priced endpoints charge per item returned, not per request.
+
+
+    ## Authentication
+
+
+    Eligible paid read endpoints accept accountless prepaid credit wallets. Fixed-price lookups also accept direct MPP payments. Media downloads, write endpoints, and automation features require authentication. Send an Xquik API key through `x-api-key`, `Xquik-Api-Key`, or `Authorization: Bearer xq_...`. Send an OAuth 2.1 access token through `Authorization: Bearer`.
+
+
+    ## Best-Practice Response Contract
+
+
+    v1 keeps its original response contract by default so existing integrations do not break. Send `xquik-api-contract: 2026-04-29` to opt in to the best-practice contract: snake_case response fields, Unix timestamps in seconds, structured error objects, `has_more` and `next_cursor` pagination fields, `object` resource identifiers, and prefixed IDs where available. Dependency failures that returned 502 in default v1 return 424 in the opt-in contract. Future major API versions should make this contract the default.'
+  contact:
+    name: Xquik
+    url: https://xquik.com
+    email: support@xquik.com
+servers:
+- url: https://xquik.com
+security:
+- apiKey: []
+- oauthBearer: []
+tags:
+- name: X Accounts
+  description: Connected X account management
+paths:
+  /api/v1/x/accounts:
+    get:
+      operationId: listXAccounts
+      summary: List connected X accounts
+      tags:
+      - X Accounts
+      security:
+      - apiKey: []
+      - oauthBearer: []
+      responses:
+        '200':
+          description: X account list
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - accounts
+                properties:
+                  accounts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/XAccount'
+                    example:
+                    - id: '42'
+                      xUserId: '9876543210'
+                      xUsername: elonmusk
+                      status: active
+                      health: healthy
+                      createdAt: '2025-01-15T12:00:00Z'
+                      updatedAt: '2025-03-10T08:30:00Z'
+              example:
+                accounts:
+                - id: '42'
+                  xUserId: '9876543210'
+                  xUsername: elonmusk
+                  status: active
+                  health: healthy
+                  createdAt: '2025-01-15T12:00:00Z'
+                  updatedAt: '2025-03-10T08:30:00Z'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+        default:
+          content:
+            application/json:
+              example:
+                error: internal_error
+                message: Unexpected error. Try again.
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unexpected error.
+      description: List connected X accounts.
+    post:
+      operationId: connectXAccount
+      summary: Connect X account
+      tags:
+      - X Accounts
+      security:
+      - apiKey: []
+      - oauthBearer: []
+      requestBody:
+        required: true
+        description: X credentials (username, email, password) and the Authenticator App 2FA secret required for a durable connection.
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - username
+              - email
+              - password
+              - totp_secret
+              properties:
+                username:
+                  type: string
+                  description: X username
+                  example: your_x_username
+                email:
+                  type: string
+                  description: Account email
+                  example: account@example.invalid
+                password:
+                  type: string
+                  description: Account password
+                  example: <ACCOUNT_PASSWORD>
+                totp_secret:
+                  type: string
+                  description: Authenticator App TOTP secret required for durable login
+                  example: <TOTP_SECRET>
+            example:
+              username: your_x_username
+              email: account@example.invalid
+              password: <ACCOUNT_PASSWORD>
+              totp_secret: <TOTP_SECRET>
+      responses:
+        '201':
+          description: X account connected after verification
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/SanitizedXAccount'
+                x-stainless-override-schema:
+                  x-stainless-naming:
+                    csharp:
+                      type_name: AccountCreateResponse
+                  oneOf:
+                  - $ref: '#/components/schemas/SanitizedXAccount'
+                  - $ref: '#/components/schemas/XAccountConnectionContinuation'
+        '202':
+          description: Connection continues or needs an email code
+          headers:
+            Cache-Control:
+              description: Prevents caching. Present when the response status is `pending`.
+              schema:
+                type: string
+                const: no-store
+            Location:
+              description: Status URL. Present when the response status is `pending`.
+              schema:
+                type: string
+                example: /api/v1/x/account-connection-attempts/xatt_0123456789abcdef0123456789abcdef
+            Retry-After:
+              description: Seconds before checking again. Present when the response status is `pending`.
+              schema:
+                type: integer
+                minimum: 0
+                example: 3
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/XAccountConnectionContinuation'
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '409':
+          $ref: '#/components/responses/ConnectAlreadyConnected'
+        '422':
+          $ref: '#/components/responses/ConnectLoginFailed'
+        '429':
+          $ref: '#/components/responses/ConnectRateLimitExceeded'
+        '502':
+          $ref: '#/components/responses/ConnectUserLookupFailed'
+        '503':
+          $ref: '#/components/responses/ConnectServiceUnavailable'
+        default:
+          content:
+            application/json:
+              example:
+                error: internal_error
+                message: Unexpected error. Try again.
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unexpected error.
+      description: Connect X account.
+  /api/v1/x/account-connection-attempts/{id}:
+    get:
+      operationId: getXAccountConnectionAttempt
+      summary: Get X account connection status
+      tags:
+      - X Accounts
+      security:
+      - apiKey: []
+      - oauthBearer: []
+      parameters:
+      - $ref: '#/components/parameters/ConnectionAttemptId'
+      responses:
+        '200':
+          description: Current X account connection status
+          headers:
+            Cache-Control:
+              description: Prevents caching of connection status.
+              schema:
+                type: string
+                const: no-store
+            Retry-After:
+              description: Seconds before checking again. Present when the response status is `pending`.
+              schema:
+                type: integer
+                minimum: 0
+                example: 3
+          content:
+            application/json:
+              schema:
+                x-stainless-naming:
+                  csharp:
+                    type_name: AccountConnectionAttemptRetrieveResponse
+                oneOf:
+                - $ref: '#/components/schemas/XAccountConnectionAttemptPending'
+                - $ref: '#/components/schemas/XAccountConnectionAttemptSuccess'
+                - $ref: '#/components/schemas/XAccountConnectionAttemptFailed'
+                - $ref: '#/components/schemas/XAccountConnectionChallenge'
+                discriminator:
+                  propertyName: status
+                  mapping:
+                    pending: '#/components/schemas/XAccountConnectionAttemptPending'
+                    success: '#/components/schemas/XAccountConnectionAttemptSuccess'
+                    failed: '#/components/schemas/XAccountConnectionAttemptFailed'
+                    requires_email_code: '#/components/schemas/XAccountConnectionChallenge'
+              example:
+                object: x_account_connection_attempt
+                id: xatt_0123456789abcdef0123456789abcdef
+                status: pending
+                pollAfterMs: 3000
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+        default:
+          content:
+            application/json:
+              example:
+                error: internal_error
+                message: Unexpected error. Try again.
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unexpected error.
+      description: Get X account connection status.
+  /api/v1/x/account-connection-challenges/{id}/submit:
+    post:
+      operationId: submitXAccountConnectionChallenge
+      summary: Submit X account email verification code
+      tags:
+      - X Accounts
+      security:
+      - apiKey: []
+      - oauthBearer: []
+      parameters:
+      - $ref: '#/components/parameters/ResourceId'
+      requestBody:
+        required: true
+        description: Email verification code requested during account connect.
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - email_code
+              properties:
+                email_code:
+                  type: string
+                  description: Code sent to the account email.
+                  example: <EMAIL_VERIFICATION_CODE>
+            example:
+              email_code: <EMAIL_VERIFICATION_CODE>
+      responses:
+        '201':
+          description: X account connected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SanitizedXAccount'
+        '202':
+          description: Email verification code required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/XAccountConnectionChallenge'
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Verification challenge is no longer active
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: connection_challenge_inactive
+                message: Connection challenge is no longer active.
+        '410':
+          description: Verification code expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: connection_challenge_expired
+                message: Verification code expired. Start again.
+        '422':
+          $ref: '#/components/responses/ConnectLoginFailed'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+        '503':
+          $ref: '#/components/responses/ConnectServiceUnavailable'
+        default:
+          content:
+            application/json:
+              example:
+                error: internal_error
+                message: Unexpected error. Try again.
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unexpected error.
+      description: Submit X account email verification code.
+  /api/v1/x/accounts/{id}:
+    get:
+      operationId: getXAccount
+      summary: Get X account details
+      tags:
+      - X Accounts
+      security:
+      - apiKey: []
+      - oauthBearer: []
+      parameters:
+      - $ref: '#/components/parameters/ResourceId'
+      responses:
+        '200':
+          description: X account details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/XAccountDetail'
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+        default:
+          content:
+            application/json:
+              example:
+                error: internal_error
+                message: Unexpected error. Try again.
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unexpected error.
+      description: Get X account details.
+    delete:
+      operationId: disconnectXAccount
+      summary: Disconnect X account
+      tags:
+      - X Accounts
+      security:
+      - apiKey: []
+      - oauthBearer: []
+      parameters:
+      - $ref: '#/components/parameters/ResourceId'
+      responses:
+        '200':
+          $ref: '#/components/responses/Success'
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+        default:
+          content:
+            application/json:
+              example:
+                error: internal_error
+                message: Unexpected error. Try again.
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unexpected error.
+      description: Disconnect X account.
+  /api/v1/x/accounts/{id}/reauth:
+    post:
+      operationId: reauthXAccount
+      summary: Re-authenticate X account
+      tags:
+      - X Accounts
+      security:
+      - apiKey: []
+      - oauthBearer: []
+      parameters:
+      - $ref: '#/components/parameters/ResourceId'
+      requestBody:
+        required: true
+        description: Updated password and optional fields for re-authentication.
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - password
+              properties:
+                password:
+                  type: string
+                  description: Updated account password
+                  example: <ACCOUNT_PASSWORD>
+                totp_secret:
+                  type: string
+                  description: Replacement Authenticator App TOTP secret. Omit it to reuse the saved secret.
+                  example: <TOTP_SECRET>
+                email:
+                  type: string
+                  description: Email for the X account (updates stored email)
+                  example: account@example.invalid
+            example:
+              password: <ACCOUNT_PASSWORD>
+              totp_secret: <TOTP_SECRET>
+              email: account@example.invalid
+      responses:
+        '200':
+          description: Re-authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SanitizedXAccount'
+        '400':
+          $ref: '#/components/responses/InvalidInput'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/ReauthAccountNotFound'
+        '422':
+          $ref: '#/components/responses/ConnectLoginFailed'
+        '429':
+          $ref: '#/components/responses/ConnectLoginCooldown'
+        '503':
+          $ref: '#/components/responses/ConnectServiceUnavailable'
+        default:
+          content:
+            application/json:
+              example:
+                error: internal_error
+                message: Unexpected error. Try again.
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unexpected error.
+      description: Re-authenticate X account.
+  /api/v1/x/accounts/bulk-retry:
+    post:
+      operationId: bulkRetryXAccounts
+      summary: Bulk retry temporarily failed X accounts
+      description: 'Clears loginFailedAt and loginFailureReason for all accounts with transient or automated failure reasons, making them eligible for retry on next use.
+
+        '
+      tags:
+      - X Accounts
+      security:
+      - apiKey: []
+      - oauthBearer: []
+      responses:
+        '200':
+          description: Accounts cleared for retry
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - cleared
+                properties:
+                  cleared:
+                    type: integer
+                    description: Number of accounts cleared
+                    example: 3
+              example:
+                cleared: 3
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '429':
+          $ref: '#/components/responses/RateLimitExceeded'
+        default:
+          content:
+            application/json:
+              example:
+                error: internal_error
+                message: Unexpected error. Try again.
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Unexpected error.
+components:
+  schemas:
+    XAccount:
+      description: Linked X account summary with connection status, health, and timestamp metadata.
+      type: object
+      required:
+      - id
+      - xUserId
+      - xUsername
+      - status
+      - health
+      - createdAt
+      - updatedAt
+      properties:
+        id:
+          type: string
+          example: '42'
+        xUserId:
+          type: string
+          example: '9876543210'
+        xUsername:
+          type: string
+          example: elonmusk
+        status:
+          type: string
+          example: active
+        health:
+          type: string
+          description: 'Derived connection health. `healthy` = ready to use. `needsReauth` = user must submit fresh credentials. `locked` = X locked the account; unlock on x.com first. `suspended` = X banned the account. `recovering` = cooldown ended; the account can reconnect on its next use. `temporaryIssue` = temporary connection problem; wait before the next use.
+
+            '
+          enum:
+          - healthy
+          - locked
+          - needsReauth
+          - recovering
+          - suspended
+          - temporaryIssue
+          example: healthy
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-01-15T12:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-03-10T08:30:00Z'
+        cookiesObtainedAt:
+          type: string
+          format: date-time
+          example: '2025-03-10T08:30:00Z'
+    SanitizedXAccount:
+      description: Sanitized X account summary returned by connect and reauth.
+      type: object
+      required:
+      - id
+      - xUserId
+      - xUsername
+      - status
+      - health
+      - createdAt
+      properties:
+        id:
+          type: string
+          example: '42'
+        xUserId:
+          type: string
+          example: '9876543210'
+        xUsername:
+          type: string
+          example: elonmusk
+        status:
+          type: string
+          const: active
+          example: active
+        health:
+          type: string
+          enum:
+          - healthy
+          - locked
+          - needsReauth
+          - recovering
+          - suspended
+          - temporaryIssue
+          example: healthy
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-01-15T12:00:00Z'
+    Error:
+      description: 'Error response. Default v1 returns a legacy string error code. Send `xquik-api-contract: 2026-04-29` to receive the structured best-practice error object.
+
+        '
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          x-stainless-naming:
+            python:
+              type_name: ErrorValue
+            java:
+              type_name: ErrorValue
+          example: invalid_input
+          oneOf:
+          - type: string
+            title: LegacyErrorCode
+            enum:
+            - internal_error
+            - account_already_connected
+            - account_needs_reauth
+            - account_not_found
+            - account_required
+            - account_restricted
+            - api_key_limit_reached
+            - article_not_found
+            - dm_not_permitted
+            - invalid_format
+            - invalid_id
+            - invalid_input
+            - invalid_params
+            - invalid_tool_type
+            - invalid_tweet_id
+            - invalid_tweet_url
+            - invalid_user_id
+            - invalid_user_ids
+            - invalid_username
+            - invalid_json
+            - insufficient_credits
+            - login_cooldown
+            - login_failed
+            - media_download_failed
+            - missing_params
+            - missing_query
+            - monitor_already_exists
+            - no_media
+            - no_credits
+            - no_subscription
+            - not_found
+            - payment_failed
+            - rate_limit_exceeded
+            - service_unavailable
+            - style_not_found
+            - subscription_inactive
+            - tweet_not_found
+            - unauthenticated
+            - unsupported_field
+            - user_not_found
+            - body_too_large
+            - checkout_unavailable
+            - connection_challenge_expired
+            - connection_challenge_inactive
+            - draft_not_found
+            - favoriters_unavailable
+            - forbidden
+            - guest_wallet_unavailable
+            - guest_wallets_disabled
+            - guest_wallets_unavailable
+            - idempotency_conflict
+            - idempotency_key_conflict
+            - invalid_community_id
+            - invalid_idempotency_key
+            - invalid_list_id
+            - invalid_payment_amount
+            - invalid_range
+            - login_rate_limited
+            - missing_idempotency_key
+            - missing_ids
+            - no_cached_style
+            - passkey_required
+            - rate_limited
+            - read_request_timeout
+            - replies_incomplete
+            - support_media_rate_limit
+            - support_request_rate_limit
+            - too_many_ids
+            - unknown_field
+            - unsupported_media_type
+            - webhook_inactive
+            - write_tracking_unavailable
+            - x_write_unconfirmed
+            - x_account_feature_required
+            - x_account_protected
+            - x_account_suspended
+            - x_api_rate_limited
+            - x_api_unavailable
+            - x_api_unauthorized
+            - x_auth_failure
+            - x_content_too_long
+            - x_daily_limit
+            - x_dm_not_allowed
+            - x_duplicate_action
+            - x_login_auth_failed
+            - x_login_challenge
+            - x_login_denied
+            - x_login_failed
+            - x_login_proxy_error
+            - x_login_rate_limited
+            - x_login_service_unavailable
+            - x_login_suspended
+            - x_rate_limited
+            - x_rejected
+            - x_target_not_found
+            - x_transient_error
+            - x_user_lookup_failed
+            - x_write_ambiguous
+            - x_write_failed
+            example: invalid_input
+          - type: object
+            title: StructuredError
+            required:
+            - message
+            - type
+            - code
+            properties:
+              message:
+                type: string
+                example: Invalid input. Check the request body.
+              type:
+                type: string
+                enum:
+                - api_error
+                - authentication_error
+                - billing_error
+                - dependency_error
+                - invalid_request_error
+                - permission_error
+                - rate_limit_error
+                example: invalid_request_error
+              code:
+                type: string
+                title: ErrorCode
+                enum:
+                - internal_error
+                - account_already_connected
+                - account_needs_reauth
+                - account_not_found
+                - account_required
+                - account_restricted
+                - api_key_limit_reached
+                - article_not_found
+                - dm_not_permitted
+                - invalid_format
+                - invalid_id
+                - invalid_input
+                - invalid_params
+                - invalid_tool_type
+                - invalid_tweet_id
+                - invalid_tweet_url
+                - invalid_user_id
+                - invalid_user_ids
+                - invalid_username
+                - invalid_json
+                - insufficient_credits
+                - login_cooldown
+                - login_failed
+                - media_download_failed
+                - missing_params
+                - missing_query
+                - monitor_already_exists
+                - no_media
+                - no_credits
+                - no_subscription
+                - not_found
+                - payment_failed
+                - rate_limit_exceeded
+                - service_unavailable
+                - style_not_found
+                - subscription_inactive
+                - tweet_not_found
+                - unauthenticated
+                - unsupported_field
+                - user_not_found
+                - body_too_large
+                - checkout_unavailable
+                - connection_challenge_expired
+                - connection_challenge_inactive
+                - draft_not_found
+                - favoriters_unavailable
+                - forbidden
+                - guest_wallet_unavailable
+                - guest_wallets_disabled
+                - guest_wallets_unavailable
+                - idempotency_conflict
+                - idempotency_key_conflict
+                - invalid_community_id
+                - invalid_idempotency_key
+                - invalid_list_id
+                - invalid_payment_amount
+                - invalid_range
+                - login_rate_limited
+                - missing_idempotency_key
+                - missing_ids
+                - no_cached_style
+                - passkey_required
+                - rate_limited
+                - read_request_timeout
+                - replies_incomplete
+                - support_media_rate_limit
+                - support_request_rate_limit
+                - too_many_ids
+                - unknown_field
+                - unsupported_media_type
+                - webhook_inactive
+                - write_tracking_unavailable
+                - x_write_unconfirmed
+                - x_account_feature_required
+                - x_account_protected
+                - x_account_suspended
+                - x_api_rate_limited
+                - x_api_unavailable
+                - x_api_unauthorized
+                - x_auth_failure
+                - x_content_too_long
+                - x_daily_limit
+                - x_dm_not_allowed
+                - x_duplicate_action
+                - x_login_auth_failed
+                - x_login_challenge
+                - x_login_denied
+                - x_login_failed
+                - x_login_proxy_error
+                - x_login_rate_limited
+                - x_login_service_unavailable
+                - x_login_suspended
+                - x_rate_limited
+                - x_rejected
+                - x_target_not_found
+                - x_transient_error
+                - x_user_lookup_failed
+                - x_write_ambiguous
+                - x_write_failed
+                example: invalid_input
+        message:
+          type: string
+          description: Human-readable error guidance.
+          example: Invalid input. Check the request body.
+        reason:
+          type: string
+          description: Machine-readable reason for a login cooldown.
+          example: temporary_issue
+        retryAfter:
+          type: integer
+          minimum: 1
+          description: Seconds until the next permitted request.
+          example: 60
+        retryAfterMs:
+          type: integer
+          minimum: 1
+          description: Required wait in milliseconds.
+          example: 60000
+    XAccountConnectionAttemptFailed:
+      description: The connection reached a final failure.
+      type: object
+      additionalProperties: false
+      required:
+      - object
+      - id
+      - status
+      - error
+      - retryable
+      properties:
+        object:
+          type: string
+          const: x_account_connection_attempt
+          example: x_account_connection_attempt
+        id:
+          type: string
+          example: xatt_0123456789abcdef0123456789abcdef
+        status:
+          type: string
+          const: failed
+          example: failed
+        error:
+          type: string
+          example: service_unavailable
+        reason:
+          type: string
+          example: wrong_password
+        retryable:
+          type: boolean
+          example: true
+    XAccountConnectionChallenge:
+      description: Resumable account connection challenge. Submit the email code to finish the same connection attempt.
+      type: object
+      required:
+      - object
+      - id
+      - status
+      - expiresAt
+      - message
+      - username
+      properties:
+        object:
+          type: string
+          const: x_account_connection_challenge
+          example: x_account_connection_challenge
+        id:
+          type: string
+          example: xch_8vGd8Y9JvH6dV0xA
+        status:
+          type: string
+          const: requires_email_code
+          example: requires_email_code
+        expiresAt:
+          type: string
+          format: date-time
+          example: '2026-05-08T12:10:00Z'
+        message:
+          type: string
+          example: Enter the email verification code to continue.
+        username:
+          type: string
+          example: elonmusk
+    XAccountConnectionAttemptPending:
+      description: The connection is still in progress.
+      type: object
+      additionalProperties: false
+      required:
+      - object
+      - id
+      - status
+      - pollAfterMs
+      properties:
+        object:
+          type: string
+          const: x_account_connection_attempt
+          example: x_account_connection_attempt
+        id:
+          type: string
+          example: xatt_0123456789abcdef0123456789abcdef
+        status:
+          type: string
+          const: pending
+          example: pending
+        pollAfterMs:
+          type: integer
+          minimum: 0
+          example: 3000
+    XAccountDetail:
+      description: Connected X account details with health and timestamp metadata.
+      type: object
+      required:
+      - id
+      - xUserId
+      - xUsername
+      - status
+      - health
+      - createdAt
+      properties:
+        id:
+          type: string
+          example: '42'
+        xUserId:
+          type: string
+          example: '9876543210'
+        xUsername:
+          type: string
+          example: elonmusk
+        status:
+          type: string
+          example: active
+        health:
+          type: string
+          enum:
+          - healthy
+          - locked
+          - needsReauth
+          - recovering
+          - suspended
+          - temporaryIssue
+          example: healthy
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-01-15T12:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-03-10T08:30:00Z'
+        cookiesObtainedAt:
+          type: string
+          format: date-time
+          example: '2025-03-10T08:30:00Z'
+    XAccountConnectionContinuation:
+      description: The connection is still running or needs an email code.
+      oneOf:
+      - $ref: '#/components/schemas/XAccountConnectionAttemptPending'
+      - $ref: '#/components/schemas/XAccountConnectionChallenge'
+      discriminator:
+        propertyName: status
+        mapping:
+          pending: '#/components/schemas/XAccountConnectionAttemptPending'
+          requires_email_code: '#/components/schemas/XAccountConnectionChallenge'
+    XAccountConnectionAttemptSuccess:
+      description: The account connected successfully.
+      type: object
+      additionalProperties: false
+      required:
+      - object
+      - id
+      - status
+      properties:
+        object:
+          type: string
+          const: x_account_connection_attempt
+          example: x_account_connection_attempt
+        id:
+          type: string
+          example: xatt_0123456789abcdef0123456789abcdef
+        status:
+          type: string
+          const: success
+          example: success
+  responses:
+    Success:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+            - success
+            properties:
+              success:
+                type: boolean
+                const: true
+                example: true
+          example:
+            success: true
+    ConnectServiceUnavailable:
+      description: 'The X connection service is temporarily unavailable. Retry after a short delay. Returns error code `service_unavailable`.
+
+        '
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: service_unavailable
+            message: Service temporarily unavailable. Try again later.
+    ConnectAlreadyConnected:
+      description: 'The specified X account is already connected to this Xquik account. Returns error code `account_already_connected`.
+
+        '
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: account_already_connected
+            message: This X account is already connected.
+    ConnectLoginCooldown:
+      description: 'A prior login attempt triggered a cooldown. Response includes `reason`, `retryAfterMs`, and a `Retry-After` header in seconds. Returns error code `login_cooldown`.
+
+        '
+      headers:
+        Retry-After:
+          description: Cooldown duration in seconds.
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: login_cooldown
+            message: Login is temporarily paused
+            reason: temporary_issue
+            retryAfterMs: 60000
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: not_found
+            message: Resource not found.
+    Unauthenticated:
+      description: Unauthenticated
+      headers:
+        Cache-Control:
+          description: Prevents storage of authentication responses.
+          schema:
+            type: string
+            const: no-store
+        WWW-Authenticate:
+          description: Bearer authentication challenge.
+          schema:
+            type: string
+            const: Bearer realm="xquik"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: unauthenticated
+            message: Authentication required. Provide a valid API key or bearer token.
+    RateLimitExceeded:
+      description: 'Xquik tier rate limit exceeded. The response includes a `Retry-After` header with the number of seconds to wait before retrying.
+
+        '
+      content:
+        application/json:
+          schema:
+            allOf:
+            - $ref: '#/components/schemas/Error'
+            - type: object
+              properties:
+                retryAfter:
+                  type: integer
+                  example: 60
+          example:
+            error: rate_limit_exceeded
+            message: Too many requests. Try again later.
+            retryAfter: 60
+      headers:
+        Retry-After:
+          description: Seconds until the next permitted request.
+          schema:
+            example: 60
+            minimum: 1
+            type: integer
+    ConnectRateLimitExceeded:
+      description: 'Too many requests. Either the generous connection safety limit was exceeded (`rate_limit_exceeded`, `retryAfter` seconds, `Retry-After: 900` header) or a prior login attempt triggered a cooldown (`login_cooldown`, `reason`, `retryAfterMs`, `Retry-After` header in seconds).
+
+        '
+      headers:
+        Retry-After:
+          description: Required wait in seconds.
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: rate_limit_exceeded
+            message: Too many requests. Retry later.
+    ReauthAccountNotFound:
+      description: 'No X account with this ID belongs to the authenticated user. Returns error code `account_not_found`.
+
+        '
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: account_not_found
+            message: X account not found.
+    ConnectUserLookupFailed:
+      description: 'The X username could not be resolved. Verify the handle is correct and the account exists. Default v1 returns 502. The best-practice response contract returns 424. Error code: `x_user_lookup_failed`.
+
+        '
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: x_user_lookup_failed
+            message: X username lookup failed. Try again later.
+    ConnectLoginFailed:
+      description: 'Login could not continue because credentials or account verification require user action. When a cooldown applies, the response includes `retryAfterMs` and a `Retry-After` header in seconds. Returns error code `login_failed` or `passkey_required`.
+
+        '
+      headers:
+        Retry-After:
+          description: Cooldown duration in seconds, when retrying must wait.
+          schema:
+            type: integer
+            minimum: 1
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: login_failed
+            message: Login failed. Check credentials and try again.
+            retryAfterMs: 300000
+    InvalidInput:
+      description: Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: invalid_input
+            message: Invalid input. Check the request body.
+  parameters:
+    ResourceId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Resource ID returned by the matching create or list endpoint.
+    ConnectionAttemptId:
+      name: id
+      in: path
+      required: true
+      description: Connection attempt ID returned by `POST /x/accounts`.
+      schema:
+        type: string
+        pattern: ^xatt_[0-9a-f]{32}$
+        example: xatt_0123456789abcdef0123456789abcdef
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: 'Xquik API key passed through the x-api-key header. Xquik-Api-Key is a vendor-prefixed alias. API keys beginning with xq_ can also use Authorization: Bearer.'
+    oauthBearer:
+      type: http
+      scheme: bearer
+      description: 'OAuth 2.1 access token passed through Authorization: Bearer. Values beginning with xq_ remain Xquik API-key credentials, not OAuth tokens.'
+    cookieSession:
+      type: apiKey
+      in: cookie
+      name: __Host-xquik_session
+      description: Secure Xquik browser session cookie.
+x-service-info:
+  categories:
+  - data
+  docs:
+    homepage: https://xquik.com
+    apiReference: https://docs.xquik.com
+    llms: https://docs.xquik.com/llms.txt
+x-discovery:
+  ownershipProofs:
+  - dns:xquik.com
