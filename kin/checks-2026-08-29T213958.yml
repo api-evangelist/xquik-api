@@ -1,33 +1,24 @@
 ---
 kin_checks:
   slug: xquik-api
-  schema_version: 0.15.1
-  scored_at: '2026-08-27'
-  run_ts: 2026-08-27T140727
+  schema_version: 0.16.0
+  scored_at: '2026-08-29'
+  run_ts: 2026-08-29T213958
   note: Actionable checks only (missed + partial). earned/na are every other check
-    in rubric/scoring-0.15.1.yml; counts below let you verify that.
+    in rubric/scoring-0.16.0.yml; counts below let you verify that.
   counts:
     total: 130
-    earned: 84
-    partial: 8
-    missed: 14
+    earned: 88
+    partial: 7
+    missed: 11
     na: 24
   checks:
   - id: openapi_3_2
     status: missed
-    detail: 0 of 1 openapi documents pass
+    detail: 0 of 20 openapi documents pass
   - id: openapi_3_0
     status: missed
-    detail: 0 of 1 openapi documents pass
-  - id: components_reuse
-    status: missed
-    detail: 0 of 1 openapi documents pass
-  - id: security_schemes_defined
-    status: missed
-    detail: 0 of 1 openapi documents pass
-  - id: webhooks_or_callbacks
-    status: missed
-    detail: 0 of 1 openapi documents pass
+    detail: 0 of 20 openapi documents pass
   - id: json_schema_present
     status: missed
   - id: json_schema_per_resource
@@ -36,19 +27,24 @@ kin_checks:
     status: missed
   - id: domain_standard_conformance
     status: missed
+  - id: overlay_published
+    status: missed
   - id: status_page_present
     status: missed
   - id: examples_published
     status: missed
   - id: reversibility_documented
     status: missed
-  - id: dry_run_mode
-    status: missed
   - id: agentic_commerce
     status: missed
-  - id: examples_present
+  - id: components_reuse
     status: partial
-    earned: 3.67
+    earned: 2.1
+    detail: 14 of 20 openapi documents pass
+  - id: webhooks_or_callbacks
+    status: partial
+    earned: 0.1
+    detail: 1 of 20 openapi documents pass
   - id: lifecycle_documented
     status: partial
     earned: 2.76
@@ -67,12 +63,4 @@ kin_checks:
   - id: idempotency
     status: partial
     earned: 4.5
-    detail: 'grade: documented'
-  - id: error_semantics
-    status: partial
-    earned: 4.0
-    detail: 'grade: documented'
-  - id: rate_limit_signal
-    status: partial
-    earned: 3.5
     detail: 'grade: documented'
