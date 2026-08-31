@@ -20,14 +20,14 @@ created: '2026-04-14'
 modified: '2026-08-13'
 specificationVersion: '0.23'
 tags:
-- social-media-data
+- social media data
 - X / Twitter
-- Social Listening
-- Data Extraction
-- Automation
+- social listening
+- data extraction
+- automation
 - Webhook
 - MCP
-- Developer API
+- developer API
 tags_raw:
 - social media data
 - X / Twitter
@@ -45,7 +45,7 @@ apis:
   tags:
   - MCP
   - Agents
-  - Automation
+  - automation
   tags_raw:
   - MCP
   - agents
@@ -102,6 +102,8 @@ apis:
   humanURL: https://docs.xquik.com/api-reference/overview
   baseURL: https://xquik.com/api/v1
   tags:
+  - APIKeys
+  tags_raw:
   - API Keys
   properties:
   - type: OpenAPI
@@ -192,6 +194,8 @@ apis:
   humanURL: https://docs.xquik.com/api-reference/overview
   baseURL: https://xquik.com/api/v1
   tags:
+  - Event
+  tags_raw:
   - Events
   properties:
   - type: OpenAPI
@@ -246,6 +250,8 @@ apis:
   humanURL: https://docs.xquik.com/api-reference/overview
   baseURL: https://xquik.com/api/v1
   tags:
+  - List
+  tags_raw:
   - Lists
   properties:
   - type: OpenAPI
@@ -372,6 +378,8 @@ apis:
   humanURL: https://docs.xquik.com/api-reference/overview
   baseURL: https://xquik.com/api/v1
   tags:
+  - User
+  tags_raw:
   - Users
   properties:
   - type: OpenAPI
@@ -390,6 +398,8 @@ apis:
   humanURL: https://docs.xquik.com/api-reference/overview
   baseURL: https://xquik.com/api/v1
   tags:
+  - Webhook
+  tags_raw:
   - Webhooks
   properties:
   - type: OpenAPI
@@ -497,8 +507,6 @@ common:
   url: skills/_index.yml
 - type: Support
   url: mailto:support@xquik.com
-- type: Blog
-  url: blogs/xquik-developer-updates.md
 - type: Plans
   url: plans/xquik-plans.yml
 - type: Pricing
