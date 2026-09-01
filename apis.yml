@@ -20,14 +20,14 @@ created: '2026-04-14'
 modified: '2026-08-13'
 specificationVersion: '0.23'
 tags:
-- social media data
+- social-media-data
 - X / Twitter
-- social listening
-- data extraction
-- automation
+- Social Listening
+- Data Extraction
+- Automation
 - Webhook
 - MCP
-- developer API
+- Developer API
 tags_raw:
 - social media data
 - X / Twitter
@@ -45,7 +45,7 @@ apis:
   tags:
   - MCP
   - Agents
-  - automation
+  - Automation
   tags_raw:
   - MCP
   - agents
