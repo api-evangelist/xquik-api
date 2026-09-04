@@ -1,17 +1,17 @@
 ---
 kin_checks:
   slug: xquik-api
-  schema_version: 0.17.2
-  scored_at: '2026-09-01'
-  run_ts: 2026-09-01T063623
+  schema_version: 0.18.2
+  scored_at: '2026-09-04'
+  run_ts: 2026-09-04T062714
   note: Actionable checks only (missed + partial). earned/na are every other check
-    in rubric/scoring-0.17.2.yml; counts below let you verify that.
+    in rubric/scoring-0.18.2.yml; counts below let you verify that.
   counts:
-    total: 130
-    earned: 86
-    partial: 7
-    missed: 13
-    na: 24
+    total: 132
+    earned: 88
+    partial: 5
+    missed: 14
+    na: 25
   checks:
   - id: multiple_apis
     status: missed
@@ -21,6 +21,8 @@ kin_checks:
   - id: openapi_3_0
     status: missed
     detail: 0 of 20 openapi documents pass
+  - id: inbound_contract_published
+    status: missed
   - id: json_schema_present
     status: missed
   - id: json_schema_per_resource
@@ -56,15 +58,7 @@ kin_checks:
     status: partial
     earned: 1.0
     detail: pointer liveness 0.5
-  - id: mcp_server
-    status: partial
-    earned: 4.8
-    detail: 'grade: documented'
   - id: auth_clarity
     status: partial
     earned: 9.0
     detail: 'grade: served'
-  - id: idempotency
-    status: partial
-    earned: 4.5
-    detail: 'grade: documented'
