@@ -1,0 +1,41 @@
+{
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "Xquik",
+    "identifier": "xquik.com",
+    "documentationUrl": "https://docs.xquik.com",
+    "logoUrl": "https://xquik.com/logo-square.png"
+  },
+  "entries": [
+    {
+      "@context": "https://agenticresourcediscovery.org/context/v1",
+      "identifier": "urn:air:xquik.com:server:mcp",
+      "displayName": "Xquik MCP server",
+      "type": "application/mcp-server-card+json",
+      "url": "https://xquik.com/mcp/server-card",
+      "representativeQueries": [
+        "Search public X posts and profiles",
+        "Manage connected X accounts"
+      ],
+      "trustManifest": {
+        "identity": "https://xquik.com",
+        "identityType": "https"
+      }
+    },
+    {
+      "@context": "https://agenticresourcediscovery.org/context/v1",
+      "identifier": "urn:air:xquik.com:api:rest",
+      "displayName": "Xquik REST API",
+      "type": "application/vnd.oai.openapi+json;version=3.1",
+      "url": "https://xquik.com/openapi.json",
+      "representativeQueries": [
+        "Build an X data integration",
+        "Add X search and publishing to an app"
+      ],
+      "trustManifest": {
+        "identity": "https://xquik.com",
+        "identityType": "https"
+      }
+    }
+  ]
+}
