@@ -175,6 +175,8 @@ apis:
   humanURL: https://docs.xquik.com/api-reference/overview
   baseURL: https://xquik.com/api/v1
   tags:
+  - COMPOSITION
+  tags_raw:
   - Composition
   properties:
   - type: OpenAPI
