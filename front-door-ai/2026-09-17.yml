@@ -1,0 +1,32 @@
+# Front Door AI Index — xquik-api — 2026-09-17
+# AI vocabulary counted on the provider's root page. Generated; do not edit.
+# `score` is null unless ownership is `own` — see front_door_ai.py.
+front_door_ai:
+  slug: xquik-api
+  lexicon_version: '1.0'
+  probed_at: '2026-09-17'
+  host: xquik.com
+  final_host: xquik.com
+  ownership: own
+  owner: xquik-api
+  shares_host_with: null
+  inherited_from: null
+  verdict: scored
+  score: 31
+  host_score: 31
+  density: 47.62
+  words: 651
+  tiers:
+    agentic: 18
+    core: 8
+    model: 5
+  ambiguous: 10
+  top_terms:
+    MCP: 9
+    agent: 9
+    AI: 8
+    AI agent: 7
+    Claude: 4
+    copilot: 2
+    ChatGPT: 1
+    automation: 1

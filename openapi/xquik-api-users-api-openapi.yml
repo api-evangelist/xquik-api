@@ -2,47 +2,50 @@ openapi: 3.2.0
 info:
   title: Xquik Users API
   version: '1.0'
-  description: "Xquik is an independent third-party service. Not affiliated with X Corp. \"Twitter\" and \"X\" are trademarks of X Corp. Look up tweets, users, and X trends. Search tweets, check follow relationships, download media, and monitor accounts. 33 paid-read endpoints accept prepaid credits without a subscription. 7 fixed-price lookups also accept direct MPP payments. Write and automation endpoints require an API key or OAuth 2.1 bearer token.\n\n## Xquik SDKs\n\nStainless generates each SDK from this OpenAPI schema. Pick a language:\n\n- TypeScript / Node.js: `npm i x-twitter-scraper` -\n  [Xquik-dev/x-twitter-scraper-typescript](https://github.com/Xquik-dev/x-twitter-scraper-typescript)\n\n- Python: `pip install x-twitter-scraper` -\n  [Xquik-dev/x-twitter-scraper-python](https://github.com/Xquik-dev/x-twitter-scraper-python)\n\n- Go: `go get github.com/Xquik-dev/x-twitter-scraper-go` -\n  [Xquik-dev/x-twitter-scraper-go](https://github.com/Xquik-dev/x-twitter-scraper-go)\n\n- Ruby: `gem install x-twitter-scraper` -\n  [Xquik-dev/x-twitter-scraper-ruby](https://github.com/Xquik-dev/x-twitter-scraper-ruby)\n\n- Java (source build; Maven Central pending) -\n  [Xquik-dev/x-twitter-scraper-java](https://github.com/Xquik-dev/x-twitter-scraper-java)\n\n- Kotlin (source build; Maven Central pending) -\n  [Xquik-dev/x-twitter-scraper-kotlin](https://github.com/Xquik-dev/x-twitter-scraper-kotlin)\n\n- C# / .NET: `dotnet add package XTwitterScraper` -\n  [Xquik-dev/x-twitter-scraper-csharp](https://github.com/Xquik-dev/x-twitter-scraper-csharp)\n\n- PHP: `composer require xquik/x-twitter-scraper` -\n  [Xquik-dev/x-twitter-scraper-php](https://github.com/Xquik-dev/x-twitter-scraper-php)\n\n- CLI: `go install github.com/Xquik-dev/x-twitter-scraper-cli/cmd/x-twitter-scraper@latest` -\n  [Xquik-dev/x-twitter-scraper-cli](https://github.com/Xquik-dev/x-twitter-scraper-cli)\n\n- Terraform Provider (Terraform Registry) -\n  [Xquik-dev/terraform-provider-x-twitter-scraper](https://github.com/Xquik-dev/terraform-provider-x-twitter-scraper)\n\n\nOpenClaw plugin: [Xquik-dev/tweetclaw](https://github.com/Xquik-dev/tweetclaw) (`openclaw plugins install clawhub:@xquik/tweetclaw`)."
+  description: Xquik is an independent third-party service.
   x-guidance: '## Common tasks
 
 
-    **Find a tweet** - GET /x/tweets/{id} with a numeric tweet ID. Returns full tweet data: text, author, metrics (likes, retweets, replies, views), media URLs, and creation timestamp. Cost: $0.00015 per lookup.
+    **Find a tweet** - GET /x/tweets/{id}. Returns text, author, metrics, media, and creation time. Cost: $0.00015 per lookup.
 
 
-    **Search tweets** - GET /x/tweets/search?q={query}&limit={n}. Supports X search operators, structured filters like fromUser, mediaType, minFaves, hashtags, and verifiedOnly, plus exact lookup for a pasted Tweet ID or X status URL. Plain from:user date windows are optimized for timeline completeness. Returns up to 200 tweets per page with cursor-based pagination. Cost: $0.00015 per tweet returned.
+    **Search tweets** - GET /x/tweets/search?q={query}&limit={n}. Supports X operators, structured filters, Tweet IDs, and status URLs. Omit mode for automatic coverage. Cost: $0.00015 per returned tweet.
 
 
-    **Find a user** - GET /x/users/{id} where {id} is a numeric user ID or @username. Returns profile data: name, bio, follower/following counts, verification status, join date. Cost: $0.00015 per lookup.
+    **Find a user** - GET /x/users/{id}. Accepts an ID or username. Cost: $0.00015 per lookup.
 
 
-    **Check if A follows B** - GET /x/followers/check?source={a}&target={b} where source and target are usernames, @usernames, or X or Twitter profile URLs. Cost: $0.00075.
+    **Check if A follows B** - GET /x/followers/check?source={a}&target={b}. Accepts usernames or profile URLs. Cost: $0.00075.
 
 
-    **Get trending topics** - GET /trends?woeid={region}&count={n}. WOEID 1 = worldwide, 23424977 = US, 23424975 = UK, 23424969 = Turkey. Cost: $0.00045.
+    **Get trends** - GET /trends?woeid={region}&count={n}. WOEID 1 is worldwide. Cost: $0.00045.
 
 
-    **Download media** - POST /x/media/download with {"tweetIds": ["123", "456"]} body. Returns download URLs for images and videos. Cost: 1 credit per fresh tweet processed with media; cached repeat downloads are free.
+    **Download media** - POST /x/media/download with `tweetIds`. Fresh Tweets cost 1 credit each. Cached repeats are free.
 
 
-    **Read an article** - GET /x/articles/{tweetId} for long-form X Articles. Returns full article HTML, cover image, and metadata. Cost: $0.00075.
+    **Read an article** - GET /x/articles/{tweetId}. Cost: $0.00075.
 
 
     ## Pagination
 
 
-    Default v1 responses keep their existing pagination fields for compatibility. Platform list endpoints return `hasMore` and `nextCursor`; X data endpoints return `has_next_page` and `next_cursor`. Send `xquik-api-contract: 2026-04-29` to receive the unified best-practice fields `has_more` and `next_cursor`. Pass the cursor back as `?cursor={cursor}`; legacy `?after={cursor}` still works. Dynamic-priced endpoints charge per item returned, not per request.
+    Default platform pages return `hasMore` and `nextCursor`. X pages return `has_next_page` and `next_cursor`. The 2026-04-29 contract returns `has_more` and `next_cursor`. Pass cursors through `cursor`; `after` remains compatible. Dynamic pricing counts returned items, not requests.
+
+
+    Omit `mode` for automatic reads. Pass cursors unchanged. `mode=standard` remains legacy. Retry 409 responses after `Retry-After`. Restart 410 responses without a cursor.
 
 
     ## Authentication
 
 
-    Eligible paid read endpoints accept accountless prepaid credit wallets. Fixed-price lookups also accept direct MPP payments. Media downloads, write endpoints, and automation features require authentication. Send an Xquik API key through `x-api-key`, `Xquik-Api-Key`, or `Authorization: Bearer xq_...`. Send an OAuth 2.1 access token through `Authorization: Bearer`.
+    Eligible reads accept guest wallets. Fixed-price lookups also accept MPP. Other features require an API key or OAuth 2.1 bearer token. API keys also support `Authorization: Bearer xq_...`.
 
 
     ## Best-Practice Response Contract
 
 
-    v1 keeps its original response contract by default so existing integrations do not break. Send `xquik-api-contract: 2026-04-29` to opt in to the best-practice contract: snake_case response fields, Unix timestamps in seconds, structured error objects, `has_more` and `next_cursor` pagination fields, `object` resource identifiers, and prefixed IDs where available. Dependency failures that returned 502 in default v1 return 424 in the opt-in contract. Future major API versions should make this contract the default.'
+    v1 remains the default. Send `xquik-api-contract: 2026-04-29` for snake_case, Unix timestamps, structured errors, unified pagination, resource objects, and prefixed IDs. Dependency failures use 424 instead of 502.'
   contact:
     name: Xquik
     url: https://xquik.com
@@ -106,14 +109,7 @@ paths:
         '502':
           $ref: '#/components/responses/XApiError'
         default:
-          content:
-            application/json:
-              example:
-                error: internal_error
-                message: Unexpected error. Try again.
-              schema:
-                $ref: '#/components/schemas/Error'
-          description: Unexpected error.
+          $ref: '#/components/responses/UnexpectedError'
       description: Look up multiple users by IDs in one call.
   /api/v1/x/users/search:
     get:
@@ -137,6 +133,21 @@ paths:
         schema:
           type: string
         description: Pagination cursor for user search
+      - $ref: '#/components/parameters/ResultPageSize'
+      - $ref: '#/components/parameters/UserFilterMinFollowers'
+      - $ref: '#/components/parameters/UserFilterMaxFollowers'
+      - $ref: '#/components/parameters/UserFilterMinFollowing'
+      - $ref: '#/components/parameters/UserFilterMaxFollowing'
+      - $ref: '#/components/parameters/UserFilterMinStatuses'
+      - $ref: '#/components/parameters/UserFilterMaxStatuses'
+      - $ref: '#/components/parameters/UserFilterMinAccountAgeDays'
+      - $ref: '#/components/parameters/UserFilterVerifiedOnly'
+      - $ref: '#/components/parameters/UserFilterVerifiedType'
+      - $ref: '#/components/parameters/UserFilterHasWebsite'
+      - $ref: '#/components/parameters/UserFilterHasLocation'
+      - $ref: '#/components/parameters/UserFilterBioContains'
+      - $ref: '#/components/parameters/UserFilterLocationContains'
+      - $ref: '#/components/parameters/UserFilterUsernameContains'
       responses:
         '200':
           description: User search results
@@ -157,14 +168,7 @@ paths:
         '502':
           $ref: '#/components/responses/XApiError'
         default:
-          content:
-            application/json:
-              example:
-                error: internal_error
-                message: Unexpected error. Try again.
-              schema:
-                $ref: '#/components/schemas/Error'
-          description: Unexpected error.
+          $ref: '#/components/responses/UnexpectedError'
       description: Search users by name or username.
   /api/v1/x/users/{id}:
     get:
@@ -211,14 +215,7 @@ paths:
         '402':
           $ref: '#/components/responses/PaymentRequired'
         '404':
-          description: User not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              example:
-                error: user_not_found
-                message: X user not found. Check the username.
+          $ref: '#/components/responses/UserNotFound'
         '424':
           $ref: '#/components/responses/XApiError'
         '429':
@@ -226,14 +223,7 @@ paths:
         '502':
           $ref: '#/components/responses/XApiError'
         default:
-          content:
-            application/json:
-              example:
-                error: internal_error
-                message: Unexpected error. Try again.
-              schema:
-                $ref: '#/components/schemas/Error'
-          description: Unexpected error.
+          $ref: '#/components/responses/UnexpectedError'
       description: Get user profile with follower counts and verification.
   /api/v1/x/followers/check:
     get:
@@ -313,19 +303,13 @@ paths:
         '502':
           $ref: '#/components/responses/XApiError'
         default:
-          content:
-            application/json:
-              example:
-                error: internal_error
-                message: Unexpected error. Try again.
-              schema:
-                $ref: '#/components/schemas/Error'
-          description: Unexpected error.
+          $ref: '#/components/responses/UnexpectedError'
       description: Check if one user follows another.
   /api/v1/x/users/{id}/tweets:
     get:
       operationId: getUserTweets
       summary: List recent tweets posted by a user
+      description: Omit mode for automatic maximum coverage. Pass next_cursor unchanged. Unprefixed cursors use legacy pagination. Shape and billing stay the same.
       tags:
       - Users
       security:
@@ -339,12 +323,8 @@ paths:
         schema:
           type: string
         description: X user ID or username
-      - name: cursor
-        in: query
-        schema:
-          type: string
-        description: Pagination cursor for user tweets
-      - $ref: '#/components/parameters/ResultPageSize'
+      - $ref: '#/components/parameters/AutomaticCoverageCursor'
+      - $ref: '#/components/parameters/AutomaticTweetPageSize'
       - name: includeReplies
         in: query
         schema:
@@ -368,6 +348,25 @@ paths:
       - $ref: '#/components/parameters/TweetFilterMinRetweets'
       - $ref: '#/components/parameters/TweetFilterMinReplies'
       - $ref: '#/components/parameters/TweetFilterMinQuotes'
+      - $ref: '#/components/parameters/TweetFilterMinViews'
+      - $ref: '#/components/parameters/TweetFilterMinBookmarks'
+      - $ref: '#/components/parameters/TweetFilterMaxFaves'
+      - $ref: '#/components/parameters/TweetFilterMaxRetweets'
+      - $ref: '#/components/parameters/TweetFilterMaxReplies'
+      - $ref: '#/components/parameters/TweetFilterMaxQuotes'
+      - $ref: '#/components/parameters/TweetFilterBlueVerifiedOnly'
+      - $ref: '#/components/parameters/TweetFilterCardName'
+      - $ref: '#/components/parameters/TweetFilterSource'
+      - $ref: '#/components/parameters/TweetFilterExcludeSource'
+      - $ref: '#/components/parameters/TweetFilterGeocode'
+      - $ref: '#/components/parameters/TweetFilterSinceId'
+      - $ref: '#/components/parameters/TweetFilterMaxId'
+      - $ref: '#/components/parameters/TweetFilterNear'
+      - $ref: '#/components/parameters/TweetFilterWithin'
+      - $ref: '#/components/parameters/TweetFilterWithinTime'
+      - $ref: '#/components/parameters/TweetFilterNativeRetweets'
+      - $ref: '#/components/parameters/TweetFilterSafe'
+      - $ref: '#/components/parameters/TweetFilterNews'
       - $ref: '#/components/parameters/TweetFilterVerifiedOnly'
       - $ref: '#/components/parameters/TweetFilterReplies'
       - $ref: '#/components/parameters/TweetFilterRetweets'
@@ -396,28 +395,26 @@ paths:
         '402':
           $ref: '#/components/responses/PaymentRequired'
         '404':
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/components/responses/UserNotFound'
+        '409':
+          $ref: '#/components/responses/CoverageCursorUnavailable'
+        '410':
+          $ref: '#/components/responses/CursorGone'
         '424':
           $ref: '#/components/responses/XApiError'
         '429':
           $ref: '#/components/responses/RateLimitExceeded'
         '502':
           $ref: '#/components/responses/XApiError'
+        '503':
+          $ref: '#/components/responses/MaximumCoverageBusy'
         default:
-          content:
-            application/json:
-              example:
-                error: internal_error
-                message: Unexpected error. Try again.
-              schema:
-                $ref: '#/components/schemas/Error'
-          description: Unexpected error.
-      description: List recent tweets posted by a user.
+          $ref: '#/components/responses/UnexpectedError'
   /api/v1/x/users/{id}/replies:
     get:
       operationId: getUserReplies
       summary: List a user's With Replies timeline
-      description: Returns the user's timeline with replies included by default.
+      description: Returns target-authored posts and replies. Omit mode for automatic maximum coverage. Pass next_cursor unchanged. Unprefixed cursors stay legacy. Excludes other-author context.
       tags:
       - Users
       security:
@@ -431,12 +428,8 @@ paths:
         schema:
           type: string
         description: Target user ID or username for the replies timeline.
-      - name: cursor
-        in: query
-        schema:
-          type: string
-        description: Pagination cursor for user replies
-      - $ref: '#/components/parameters/ResultPageSize'
+      - $ref: '#/components/parameters/AutomaticCoverageCursor'
+      - $ref: '#/components/parameters/AutomaticTweetPageSize'
       - name: includeParentTweet
         in: query
         schema:
@@ -454,6 +447,25 @@ paths:
       - $ref: '#/components/parameters/TweetFilterMinRetweets'
       - $ref: '#/components/parameters/TweetFilterMinReplies'
       - $ref: '#/components/parameters/TweetFilterMinQuotes'
+      - $ref: '#/components/parameters/TweetFilterMinViews'
+      - $ref: '#/components/parameters/TweetFilterMinBookmarks'
+      - $ref: '#/components/parameters/TweetFilterMaxFaves'
+      - $ref: '#/components/parameters/TweetFilterMaxRetweets'
+      - $ref: '#/components/parameters/TweetFilterMaxReplies'
+      - $ref: '#/components/parameters/TweetFilterMaxQuotes'
+      - $ref: '#/components/parameters/TweetFilterBlueVerifiedOnly'
+      - $ref: '#/components/parameters/TweetFilterCardName'
+      - $ref: '#/components/parameters/TweetFilterSource'
+      - $ref: '#/components/parameters/TweetFilterExcludeSource'
+      - $ref: '#/components/parameters/TweetFilterGeocode'
+      - $ref: '#/components/parameters/TweetFilterSinceId'
+      - $ref: '#/components/parameters/TweetFilterMaxId'
+      - $ref: '#/components/parameters/TweetFilterNear'
+      - $ref: '#/components/parameters/TweetFilterWithin'
+      - $ref: '#/components/parameters/TweetFilterWithinTime'
+      - $ref: '#/components/parameters/TweetFilterNativeRetweets'
+      - $ref: '#/components/parameters/TweetFilterSafe'
+      - $ref: '#/components/parameters/TweetFilterNews'
       - $ref: '#/components/parameters/TweetFilterVerifiedOnly'
       - $ref: '#/components/parameters/TweetFilterReplies'
       - $ref: '#/components/parameters/TweetFilterRetweets'
@@ -482,22 +494,21 @@ paths:
         '402':
           $ref: '#/components/responses/PaymentRequired'
         '404':
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/components/responses/UserNotFound'
+        '409':
+          $ref: '#/components/responses/CoverageCursorUnavailable'
+        '410':
+          $ref: '#/components/responses/CursorGone'
         '424':
           $ref: '#/components/responses/XApiError'
         '429':
           $ref: '#/components/responses/RateLimitExceeded'
         '502':
           $ref: '#/components/responses/XApiError'
+        '503':
+          $ref: '#/components/responses/MaximumCoverageBusy'
         default:
-          content:
-            application/json:
-              example:
-                error: internal_error
-                message: Unexpected error. Try again.
-              schema:
-                $ref: '#/components/schemas/Error'
-          description: Unexpected error.
+          $ref: '#/components/responses/UnexpectedError'
   /api/v1/x/users/{id}/likes:
     get:
       operationId: getUserLikes
@@ -532,6 +543,25 @@ paths:
       - $ref: '#/components/parameters/TweetFilterMinRetweets'
       - $ref: '#/components/parameters/TweetFilterMinReplies'
       - $ref: '#/components/parameters/TweetFilterMinQuotes'
+      - $ref: '#/components/parameters/TweetFilterMinViews'
+      - $ref: '#/components/parameters/TweetFilterMinBookmarks'
+      - $ref: '#/components/parameters/TweetFilterMaxFaves'
+      - $ref: '#/components/parameters/TweetFilterMaxRetweets'
+      - $ref: '#/components/parameters/TweetFilterMaxReplies'
+      - $ref: '#/components/parameters/TweetFilterMaxQuotes'
+      - $ref: '#/components/parameters/TweetFilterBlueVerifiedOnly'
+      - $ref: '#/components/parameters/TweetFilterCardName'
+      - $ref: '#/components/parameters/TweetFilterSource'
+      - $ref: '#/components/parameters/TweetFilterExcludeSource'
+      - $ref: '#/components/parameters/TweetFilterGeocode'
+      - $ref: '#/components/parameters/TweetFilterSinceId'
+      - $ref: '#/components/parameters/TweetFilterMaxId'
+      - $ref: '#/components/parameters/TweetFilterNear'
+      - $ref: '#/components/parameters/TweetFilterWithin'
+      - $ref: '#/components/parameters/TweetFilterWithinTime'
+      - $ref: '#/components/parameters/TweetFilterNativeRetweets'
+      - $ref: '#/components/parameters/TweetFilterSafe'
+      - $ref: '#/components/parameters/TweetFilterNews'
       - $ref: '#/components/parameters/TweetFilterVerifiedOnly'
       - $ref: '#/components/parameters/TweetFilterReplies'
       - $ref: '#/components/parameters/TweetFilterRetweets'
@@ -560,7 +590,7 @@ paths:
         '402':
           $ref: '#/components/responses/PaymentRequired'
         '404':
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/components/responses/UserNotFound'
         '424':
           $ref: '#/components/responses/XApiError'
         '429':
@@ -568,14 +598,7 @@ paths:
         '502':
           $ref: '#/components/responses/XApiError'
         default:
-          content:
-            application/json:
-              example:
-                error: internal_error
-                message: Unexpected error. Try again.
-              schema:
-                $ref: '#/components/schemas/Error'
-          description: Unexpected error.
+          $ref: '#/components/responses/UnexpectedError'
       description: List tweets liked by a user.
   /api/v1/x/users/{id}/media:
     get:
@@ -611,6 +634,25 @@ paths:
       - $ref: '#/components/parameters/TweetFilterMinRetweets'
       - $ref: '#/components/parameters/TweetFilterMinReplies'
       - $ref: '#/components/parameters/TweetFilterMinQuotes'
+      - $ref: '#/components/parameters/TweetFilterMinViews'
+      - $ref: '#/components/parameters/TweetFilterMinBookmarks'
+      - $ref: '#/components/parameters/TweetFilterMaxFaves'
+      - $ref: '#/components/parameters/TweetFilterMaxRetweets'
+      - $ref: '#/components/parameters/TweetFilterMaxReplies'
+      - $ref: '#/components/parameters/TweetFilterMaxQuotes'
+      - $ref: '#/components/parameters/TweetFilterBlueVerifiedOnly'
+      - $ref: '#/components/parameters/TweetFilterCardName'
+      - $ref: '#/components/parameters/TweetFilterSource'
+      - $ref: '#/components/parameters/TweetFilterExcludeSource'
+      - $ref: '#/components/parameters/TweetFilterGeocode'
+      - $ref: '#/components/parameters/TweetFilterSinceId'
+      - $ref: '#/components/parameters/TweetFilterMaxId'
+      - $ref: '#/components/parameters/TweetFilterNear'
+      - $ref: '#/components/parameters/TweetFilterWithin'
+      - $ref: '#/components/parameters/TweetFilterWithinTime'
+      - $ref: '#/components/parameters/TweetFilterNativeRetweets'
+      - $ref: '#/components/parameters/TweetFilterSafe'
+      - $ref: '#/components/parameters/TweetFilterNews'
       - $ref: '#/components/parameters/TweetFilterVerifiedOnly'
       - $ref: '#/components/parameters/TweetFilterReplies'
       - $ref: '#/components/parameters/TweetFilterRetweets'
@@ -639,7 +681,7 @@ paths:
         '402':
           $ref: '#/components/responses/PaymentRequired'
         '404':
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/components/responses/UserNotFound'
         '424':
           $ref: '#/components/responses/XApiError'
         '429':
@@ -647,14 +689,7 @@ paths:
         '502':
           $ref: '#/components/responses/XApiError'
         default:
-          content:
-            application/json:
-              example:
-                error: internal_error
-                message: Unexpected error. Try again.
-              schema:
-                $ref: '#/components/schemas/Error'
-          description: Unexpected error.
+          $ref: '#/components/responses/UnexpectedError'
       description: List media tweets posted by a user.
   /api/v1/x/users/{id}/followers-you-know:
     get:
@@ -679,6 +714,20 @@ paths:
           type: string
         description: Pagination cursor for followers-you-know
       - $ref: '#/components/parameters/FollowerPageSize'
+      - $ref: '#/components/parameters/UserFilterMinFollowers'
+      - $ref: '#/components/parameters/UserFilterMaxFollowers'
+      - $ref: '#/components/parameters/UserFilterMinFollowing'
+      - $ref: '#/components/parameters/UserFilterMaxFollowing'
+      - $ref: '#/components/parameters/UserFilterMinStatuses'
+      - $ref: '#/components/parameters/UserFilterMaxStatuses'
+      - $ref: '#/components/parameters/UserFilterMinAccountAgeDays'
+      - $ref: '#/components/parameters/UserFilterVerifiedOnly'
+      - $ref: '#/components/parameters/UserFilterVerifiedType'
+      - $ref: '#/components/parameters/UserFilterHasWebsite'
+      - $ref: '#/components/parameters/UserFilterHasLocation'
+      - $ref: '#/components/parameters/UserFilterBioContains'
+      - $ref: '#/components/parameters/UserFilterLocationContains'
+      - $ref: '#/components/parameters/UserFilterUsernameContains'
       responses:
         '200':
           description: List of mutual followers
@@ -699,14 +748,7 @@ paths:
         '502':
           $ref: '#/components/responses/XApiError'
         default:
-          content:
-            application/json:
-              example:
-                error: internal_error
-                message: Unexpected error. Try again.
-              schema:
-                $ref: '#/components/schemas/Error'
-          description: Unexpected error.
+          $ref: '#/components/responses/UnexpectedError'
       description: List mutual followers between you and a user.
   /api/v1/x/notifications:
     get:
@@ -794,14 +836,7 @@ paths:
         '502':
           $ref: '#/components/responses/XApiError'
         default:
-          content:
-            application/json:
-              example:
-                error: internal_error
-                message: Unexpected error. Try again.
-              schema:
-                $ref: '#/components/schemas/Error'
-          description: Unexpected error.
+          $ref: '#/components/responses/UnexpectedError'
       description: Get notifications.
   /api/v1/x/dm/{userId}/history:
     get:
@@ -958,14 +993,7 @@ paths:
         '502':
           $ref: '#/components/responses/XApiError'
         default:
-          content:
-            application/json:
-              example:
-                error: internal_error
-                message: Unexpected error. Try again.
-              schema:
-                $ref: '#/components/schemas/Error'
-          description: Unexpected error.
+          $ref: '#/components/responses/UnexpectedError'
       description: Get DM conversation history.
   /api/v1/x/users/{id}/followers:
     get:
@@ -984,31 +1012,47 @@ paths:
         schema:
           type: string
         description: Target user ID or username for follower lookup.
-      - name: cursor
-        in: query
-        schema:
-          type: string
-        description: Pagination cursor for followers list
+      - $ref: '#/components/parameters/AutomaticCoverageCursor'
+      - $ref: '#/components/parameters/AutomaticCoverageMode'
       - name: after
         in: query
         deprecated: true
         schema:
           type: string
         description: Legacy cursor alias. Prefer cursor.
-      - $ref: '#/components/parameters/FollowerPageSize'
+      - $ref: '#/components/parameters/AutomaticFollowerPageSize'
+      - $ref: '#/components/parameters/UserFilterMinFollowers'
+      - $ref: '#/components/parameters/UserFilterMaxFollowers'
+      - $ref: '#/components/parameters/UserFilterMinFollowing'
+      - $ref: '#/components/parameters/UserFilterMaxFollowing'
+      - $ref: '#/components/parameters/UserFilterMinStatuses'
+      - $ref: '#/components/parameters/UserFilterMaxStatuses'
+      - $ref: '#/components/parameters/UserFilterMinAccountAgeDays'
+      - $ref: '#/components/parameters/UserFilterVerifiedOnly'
+      - $ref: '#/components/parameters/UserFilterVerifiedType'
+      - $ref: '#/components/parameters/UserFilterHasWebsite'
+      - $ref: '#/components/parameters/UserFilterHasLocation'
+      - $ref: '#/components/parameters/UserFilterBioContains'
+      - $ref: '#/components/parameters/UserFilterLocationContains'
+      - $ref: '#/components/parameters/UserFilterUsernameContains'
       - name: limit
         in: query
-        deprecated: true
         schema:
           type: integer
-        description: Legacy integer page size alias for following lists. Prefer pageSize.
+          minimum: 1
+          maximum: 10000
+        description: 'Legacy page-size alias outside explicit coverage mode. Coverage accepts 1-10000. Prefer pageSize.
+
+          '
       responses:
         '200':
           description: List of user followers
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedUsers'
+                oneOf:
+                - $ref: '#/components/schemas/PaginatedUsers'
+                - $ref: '#/components/schemas/UserListCoverageResponse'
         '400':
           $ref: '#/components/responses/InvalidInput'
         '401':
@@ -1016,22 +1060,21 @@ paths:
         '402':
           $ref: '#/components/responses/PaymentRequired'
         '404':
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/components/responses/UserNotFound'
+        '409':
+          $ref: '#/components/responses/CoverageCursorUnavailable'
+        '410':
+          $ref: '#/components/responses/CursorGone'
         '424':
           $ref: '#/components/responses/XApiError'
         '429':
           $ref: '#/components/responses/RateLimitExceeded'
         '502':
           $ref: '#/components/responses/XApiError'
+        '503':
+          $ref: '#/components/responses/MaximumCoverageBusy'
         default:
-          content:
-            application/json:
-              example:
-                error: internal_error
-                message: Unexpected error. Try again.
-              schema:
-                $ref: '#/components/schemas/Error'
-          description: Unexpected error.
+          $ref: '#/components/responses/UnexpectedError'
       description: List followers of a user.
   /api/v1/x/users/{id}/following:
     get:
@@ -1050,31 +1093,47 @@ paths:
         schema:
           type: string
         description: User ID or username for following lookup
-      - name: cursor
-        in: query
-        schema:
-          type: string
-        description: Pagination cursor for following list
+      - $ref: '#/components/parameters/AutomaticCoverageCursor'
+      - $ref: '#/components/parameters/AutomaticCoverageMode'
       - name: after
         in: query
         deprecated: true
         schema:
           type: string
         description: Deprecated following cursor alias. Prefer cursor.
-      - $ref: '#/components/parameters/FollowerPageSize'
+      - $ref: '#/components/parameters/AutomaticFollowerPageSize'
+      - $ref: '#/components/parameters/UserFilterMinFollowers'
+      - $ref: '#/components/parameters/UserFilterMaxFollowers'
+      - $ref: '#/components/parameters/UserFilterMinFollowing'
+      - $ref: '#/components/parameters/UserFilterMaxFollowing'
+      - $ref: '#/components/parameters/UserFilterMinStatuses'
+      - $ref: '#/components/parameters/UserFilterMaxStatuses'
+      - $ref: '#/components/parameters/UserFilterMinAccountAgeDays'
+      - $ref: '#/components/parameters/UserFilterVerifiedOnly'
+      - $ref: '#/components/parameters/UserFilterVerifiedType'
+      - $ref: '#/components/parameters/UserFilterHasWebsite'
+      - $ref: '#/components/parameters/UserFilterHasLocation'
+      - $ref: '#/components/parameters/UserFilterBioContains'
+      - $ref: '#/components/parameters/UserFilterLocationContains'
+      - $ref: '#/components/parameters/UserFilterUsernameContains'
       - name: limit
         in: query
-        deprecated: true
         schema:
           type: integer
-        description: Legacy page size alias. Prefer pageSize.
+          minimum: 1
+          maximum: 10000
+        description: 'Legacy page-size alias outside explicit coverage mode. Coverage accepts 1-10000. Prefer pageSize.
+
+          '
       responses:
         '200':
           description: List of following
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedUsers'
+                oneOf:
+                - $ref: '#/components/schemas/PaginatedUsers'
+                - $ref: '#/components/schemas/UserListCoverageResponse'
         '400':
           $ref: '#/components/responses/InvalidInput'
         '401':
@@ -1082,22 +1141,21 @@ paths:
         '402':
           $ref: '#/components/responses/PaymentRequired'
         '404':
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/components/responses/UserNotFound'
+        '409':
+          $ref: '#/components/responses/CoverageCursorUnavailable'
+        '410':
+          $ref: '#/components/responses/CursorGone'
         '424':
           $ref: '#/components/responses/XApiError'
         '429':
           $ref: '#/components/responses/RateLimitExceeded'
         '502':
           $ref: '#/components/responses/XApiError'
+        '503':
+          $ref: '#/components/responses/MaximumCoverageBusy'
         default:
-          content:
-            application/json:
-              example:
-                error: internal_error
-                message: Unexpected error. Try again.
-              schema:
-                $ref: '#/components/schemas/Error'
-          description: Unexpected error.
+          $ref: '#/components/responses/UnexpectedError'
       description: List accounts a user follows.
   /api/v1/x/users/{id}/mentions:
     get:
@@ -1143,6 +1201,25 @@ paths:
       - $ref: '#/components/parameters/TweetFilterMinRetweets'
       - $ref: '#/components/parameters/TweetFilterMinReplies'
       - $ref: '#/components/parameters/TweetFilterMinQuotes'
+      - $ref: '#/components/parameters/TweetFilterMinViews'
+      - $ref: '#/components/parameters/TweetFilterMinBookmarks'
+      - $ref: '#/components/parameters/TweetFilterMaxFaves'
+      - $ref: '#/components/parameters/TweetFilterMaxRetweets'
+      - $ref: '#/components/parameters/TweetFilterMaxReplies'
+      - $ref: '#/components/parameters/TweetFilterMaxQuotes'
+      - $ref: '#/components/parameters/TweetFilterBlueVerifiedOnly'
+      - $ref: '#/components/parameters/TweetFilterCardName'
+      - $ref: '#/components/parameters/TweetFilterSource'
+      - $ref: '#/components/parameters/TweetFilterExcludeSource'
+      - $ref: '#/components/parameters/TweetFilterGeocode'
+      - $ref: '#/components/parameters/TweetFilterSinceId'
+      - $ref: '#/components/parameters/TweetFilterMaxId'
+      - $ref: '#/components/parameters/TweetFilterNear'
+      - $ref: '#/components/parameters/TweetFilterWithin'
+      - $ref: '#/components/parameters/TweetFilterWithinTime'
+      - $ref: '#/components/parameters/TweetFilterNativeRetweets'
+      - $ref: '#/components/parameters/TweetFilterSafe'
+      - $ref: '#/components/parameters/TweetFilterNews'
       - $ref: '#/components/parameters/TweetFilterVerifiedOnly'
       - $ref: '#/components/parameters/TweetFilterReplies'
       - $ref: '#/components/parameters/TweetFilterRetweets'
@@ -1171,7 +1248,7 @@ paths:
         '402':
           $ref: '#/components/responses/PaymentRequired'
         '404':
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/components/responses/UserNotFound'
         '424':
           $ref: '#/components/responses/XApiError'
         '429':
@@ -1179,14 +1256,7 @@ paths:
         '502':
           $ref: '#/components/responses/XApiError'
         default:
-          content:
-            application/json:
-              example:
-                error: internal_error
-                message: Unexpected error. Try again.
-              schema:
-                $ref: '#/components/schemas/Error'
-          description: Unexpected error.
+          $ref: '#/components/responses/UnexpectedError'
       description: List tweets mentioning a user.
   /api/v1/x/users/{id}/verified-followers:
     get:
@@ -1205,19 +1275,47 @@ paths:
         schema:
           type: string
         description: User ID or username for verified followers
-      - name: cursor
+      - $ref: '#/components/parameters/AutomaticCoverageCursor'
+      - $ref: '#/components/parameters/AutomaticCoverageMode'
+      - name: after
         in: query
+        deprecated: true
         schema:
           type: string
-        description: Pagination cursor for verified followers
-      - $ref: '#/components/parameters/FollowerPageSize'
+        description: Legacy cursor alias. Prefer cursor.
+      - $ref: '#/components/parameters/AutomaticFollowerPageSize'
+      - $ref: '#/components/parameters/UserFilterMinFollowers'
+      - $ref: '#/components/parameters/UserFilterMaxFollowers'
+      - $ref: '#/components/parameters/UserFilterMinFollowing'
+      - $ref: '#/components/parameters/UserFilterMaxFollowing'
+      - $ref: '#/components/parameters/UserFilterMinStatuses'
+      - $ref: '#/components/parameters/UserFilterMaxStatuses'
+      - $ref: '#/components/parameters/UserFilterMinAccountAgeDays'
+      - $ref: '#/components/parameters/UserFilterVerifiedOnly'
+      - $ref: '#/components/parameters/UserFilterVerifiedType'
+      - $ref: '#/components/parameters/UserFilterHasWebsite'
+      - $ref: '#/components/parameters/UserFilterHasLocation'
+      - $ref: '#/components/parameters/UserFilterBioContains'
+      - $ref: '#/components/parameters/UserFilterLocationContains'
+      - $ref: '#/components/parameters/UserFilterUsernameContains'
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 10000
+        description: 'Legacy page-size alias outside explicit coverage mode. Coverage accepts 1-10000. Prefer pageSize.
+
+          '
       responses:
         '200':
           description: List of verified followers
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedUsers'
+                oneOf:
+                - $ref: '#/components/schemas/PaginatedUsers'
+                - $ref: '#/components/schemas/UserListCoverageResponse'
         '400':
           $ref: '#/components/responses/InvalidInput'
         '401':
@@ -1225,22 +1323,21 @@ paths:
         '402':
           $ref: '#/components/responses/PaymentRequired'
         '404':
-          $ref: '#/components/responses/NotFound'
+          $ref: '#/components/responses/UserNotFound'
+        '409':
+          $ref: '#/components/responses/CoverageCursorUnavailable'
+        '410':
+          $ref: '#/components/responses/CursorGone'
         '424':
           $ref: '#/components/responses/XApiError'
         '429':
           $ref: '#/components/responses/RateLimitExceeded'
         '502':
           $ref: '#/components/responses/XApiError'
+        '503':
+          $ref: '#/components/responses/MaximumCoverageBusy'
         default:
-          content:
-            application/json:
-              example:
-                error: internal_error
-                message: Unexpected error. Try again.
-              schema:
-                $ref: '#/components/schemas/Error'
-          description: Unexpected error.
+          $ref: '#/components/responses/UnexpectedError'
       description: List verified followers of a user.
 components:
   parameters:
@@ -1250,6 +1347,178 @@ components:
       schema:
         type: string
       description: Exact phrase to match.
+    UserFilterMinStatuses:
+      name: minStatuses
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+      description: Minimum post count. minPosts is also accepted.
+    TweetFilterSource:
+      name: source
+      in: query
+      schema:
+        type: string
+      description: Match the source application.
+    UserFilterUsernameContains:
+      name: usernameContains
+      in: query
+      schema:
+        type: string
+      description: Match a username substring, ignoring case.
+    TweetFilterWithin:
+      name: within
+      in: query
+      schema:
+        type: string
+      description: Set the radius for the near filter.
+    TweetFilterMaxReplies:
+      name: maxReplies
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+      description: Maximum replies threshold.
+    TweetFilterMinFaves:
+      name: minFaves
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+      description: Minimum likes threshold. minLikes is also accepted.
+    AutomaticCoverageMode:
+      name: mode
+      in: query
+      schema:
+        type: string
+        enum:
+        - standard
+        - coverage
+      description: 'Omit mode for resumable maximum coverage. Standard keeps legacy pagination. Coverage returns diagnostics once and rejects cursors.
+
+        '
+    TweetFilterToUser:
+      name: toUser
+      in: query
+      schema:
+        type: string
+      description: Filter replies sent to a username.
+    TweetFilterMaxQuotes:
+      name: maxQuotes
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+      description: Maximum quotes threshold.
+    UserFilterHasLocation:
+      name: hasLocation
+      in: query
+      schema:
+        type: boolean
+      description: Only return profiles with a location.
+    TweetFilterUrl:
+      name: url
+      in: query
+      schema:
+        type: string
+      description: URL substring or domain filter.
+    TweetFilterMinReplies:
+      name: minReplies
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+      description: Minimum replies threshold.
+    UserFilterMaxFollowers:
+      name: maxFollowers
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+      description: Maximum follower count. Missing counts pass this maximum.
+    TweetFilterNews:
+      name: news
+      in: query
+      schema:
+        type: boolean
+      description: Only return news results.
+    TweetFilterExcludeWords:
+      name: excludeWords
+      in: query
+      schema:
+        type: string
+      description: Words or quoted phrases to exclude. Separate with spaces, commas, or lines.
+    TweetFilterHashtags:
+      name: hashtags
+      in: query
+      schema:
+        type: string
+      description: Hashtags separated by spaces, commas, or lines.
+    TweetFilterRetweets:
+      name: retweets
+      in: query
+      schema:
+        type: string
+        enum:
+        - include
+        - exclude
+        - only
+      description: Retweet mode.
+    TweetFilterMinRetweets:
+      name: minRetweets
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+      description: Minimum retweets threshold.
+    UserFilterMinAccountAgeDays:
+      name: minAccountAgeDays
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+      description: Minimum account age in whole days.
+    TweetFilterBlueVerifiedOnly:
+      name: blueVerifiedOnly
+      in: query
+      schema:
+        type: boolean
+      description: Only return tweets from Blue-verified authors.
+    TweetFilterQuotesOfTweetId:
+      name: quotesOfTweetId
+      in: query
+      schema:
+        type: string
+      description: Only quotes of this tweet ID.
+    TweetFilterSinceId:
+      name: sinceId
+      in: query
+      schema:
+        type: string
+      description: Return Tweets newer than this Tweet ID.
+    AutomaticTweetPageSize:
+      name: pageSize
+      in: query
+      description: 'Automatic pages accept 1-300 Tweets. Standard pages keep 1-100. Default 20. Continue while has_next_page is true. Deprecated aliases remain accepted.
+
+        '
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 300
+        default: 20
+    TweetFilterRetweetsOfTweetId:
+      name: retweetsOfTweetId
+      in: query
+      schema:
+        type: string
+      description: Only retweets of this tweet ID.
+    TweetFilterConversationId:
+      name: conversationId
+      in: query
+      schema:
+        type: string
+      description: Conversation ID filter.
     ResultPageSize:
       name: pageSize
       in: query
@@ -1261,84 +1530,50 @@ components:
         minimum: 1
         maximum: 100
         default: 20
-    TweetFilterRetweets:
-      name: retweets
-      in: query
-      schema:
-        type: string
-        enum:
-        - include
-        - exclude
-        - only
-      description: Retweet mode.
-    TweetFilterFromUser:
-      name: fromUser
-      in: query
-      schema:
-        type: string
-      description: Filter by author username.
-    TweetFilterUrl:
-      name: url
-      in: query
-      schema:
-        type: string
-      description: URL substring or domain filter.
-    TweetFilterReplies:
-      name: replies
-      in: query
-      schema:
-        type: string
-        enum:
-        - include
-        - exclude
-        - only
-      description: Reply mode.
-    TweetFilterMinRetweets:
-      name: minRetweets
+    UserFilterMaxStatuses:
+      name: maxStatuses
       in: query
       schema:
         type: integer
         minimum: 0
-      description: Minimum retweets threshold.
-    TweetFilterVerifiedOnly:
-      name: verifiedOnly
-      in: query
-      schema:
-        type: boolean
-      description: Only return tweets from verified authors.
-    TweetFilterExcludeWords:
-      name: excludeWords
+      description: Maximum post count. maxPosts is also accepted.
+    TweetFilterInReplyToTweetId:
+      name: inReplyToTweetId
       in: query
       schema:
         type: string
-      description: Words or quoted phrases to exclude. Separate with spaces, commas, or lines.
-    TweetFilterMinReplies:
-      name: minReplies
+      description: Only replies to this tweet ID.
+    TweetFilterMaxFaves:
+      name: maxFaves
       in: query
       schema:
         type: integer
         minimum: 0
-      description: Minimum replies threshold.
-    TweetFilterMinFaves:
-      name: minFaves
+      description: Maximum likes threshold. maxLikes is also accepted.
+    FollowerPageSize:
+      name: pageSize
       in: query
+      description: 'Maximum user profiles requested from this page (20-200, default 200). Source, filters, or credits can return fewer profiles. Keep requesting next_cursor while has_next_page is true. Deprecated aliases remain accepted.
+
+        '
       schema:
         type: integer
-        minimum: 0
-      description: Minimum likes threshold.
-    TweetFilterSinceDate:
-      name: sinceDate
+        minimum: 20
+        maximum: 200
+        default: 200
+    TweetFilterExcludeSource:
+      name: excludeSource
+      in: query
+      schema:
+        type: string
+      description: Exclude a source application.
+    TweetFilterUntilDate:
+      name: untilDate
       in: query
       schema:
         type: string
         format: date
-      description: Start date in YYYY-MM-DD format.
-    TweetFilterCashtags:
-      name: cashtags
-      in: query
-      schema:
-        type: string
-      description: Cashtags separated by spaces, commas, or lines.
+      description: End date in YYYY-MM-DD format.
     TweetFilterMinQuotes:
       name: minQuotes
       in: query
@@ -1346,36 +1581,33 @@ components:
         type: integer
         minimum: 0
       description: Minimum quote count threshold.
-    TweetFilterQuotesOfTweetId:
-      name: quotesOfTweetId
+    TweetFilterCardName:
+      name: cardName
       in: query
       schema:
         type: string
-      description: Only quotes of this tweet ID.
-    TweetFilterHashtags:
-      name: hashtags
+      description: Match the Tweet card name.
+    UserFilterMinFollowing:
+      name: minFollowing
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+      description: Minimum following count.
+    TweetFilterGeocode:
+      name: geocode
       in: query
       schema:
         type: string
-      description: Hashtags separated by spaces, commas, or lines.
-    TweetFilterConversationId:
-      name: conversationId
+      description: Match latitude, longitude, and radius.
+    UserFilterBioContains:
+      name: bioContains
       in: query
       schema:
         type: string
-      description: Conversation ID filter.
-    TweetFilterAnyWords:
-      name: anyWords
-      in: query
-      schema:
-        type: string
-      description: Words or quoted phrases where any one can match. Separate with spaces, commas, or lines.
-    TweetFilterMentioning:
-      name: mentioning
-      in: query
-      schema:
-        type: string
-      description: Filter tweets mentioning a username.
+      description: 'Match any comma-separated or line-separated bio term, ignoring case.
+
+        '
     TweetFilterQuotes:
       name: quotes
       in: query
@@ -1386,37 +1618,157 @@ components:
         - exclude
         - only
       description: Quote mode.
-    TweetFilterUntilDate:
-      name: untilDate
+    TweetFilterNativeRetweets:
+      name: nativeRetweets
+      in: query
+      schema:
+        type: boolean
+      description: Only return native reposts.
+    TweetFilterMinBookmarks:
+      name: minBookmarks
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+      description: Minimum bookmark count threshold.
+    TweetFilterCashtags:
+      name: cashtags
+      in: query
+      schema:
+        type: string
+      description: Cashtags separated by spaces, commas, or lines.
+    TweetFilterWithinTime:
+      name: withinTime
+      in: query
+      schema:
+        type: string
+      description: Match Tweets inside a recent time window.
+    TweetFilterSafe:
+      name: safe
+      in: query
+      schema:
+        type: boolean
+      description: Enable the safe-search filter.
+    AutomaticCoverageCursor:
+      name: cursor
+      in: query
+      schema:
+        type: string
+      description: 'Cursor from the previous response. Xquik cursors resume automatic coverage. Existing unprefixed cursors keep legacy standard behavior.
+
+        '
+    TweetFilterAnyWords:
+      name: anyWords
+      in: query
+      schema:
+        type: string
+      description: Words or quoted phrases where any one can match. Separate with spaces, commas, or lines.
+    UserFilterMinFollowers:
+      name: minFollowers
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+      description: Minimum follower count. Filtering happens before billing.
+    TweetFilterSinceDate:
+      name: sinceDate
       in: query
       schema:
         type: string
         format: date
-      description: End date in YYYY-MM-DD format.
+      description: Start date in YYYY-MM-DD format.
+    TweetFilterVerifiedOnly:
+      name: verifiedOnly
+      in: query
+      schema:
+        type: boolean
+      description: Only return tweets from verified authors.
+    TweetFilterFromUser:
+      name: fromUser
+      in: query
+      schema:
+        type: string
+      description: Filter by author username.
+    UserFilterLocationContains:
+      name: locationContains
+      in: query
+      schema:
+        type: string
+      description: Match a location substring, ignoring case.
+    AutomaticFollowerPageSize:
+      name: pageSize
+      in: query
+      description: 'Maximum user profiles: automatic 300; standard 200. Sources return fewer profiles. Continue with has_next_page.
+
+        '
+      schema:
+        type: integer
+        minimum: 20
+        maximum: 300
+        default: 200
+    TweetFilterMentioning:
+      name: mentioning
+      in: query
+      schema:
+        type: string
+      description: Filter tweets mentioning a username.
+    TweetFilterMaxId:
+      name: maxId
+      in: query
+      schema:
+        type: string
+      description: Return Tweets older than this Tweet ID.
+    TweetFilterNear:
+      name: near
+      in: query
+      schema:
+        type: string
+      description: Match a place name.
+    UserFilterVerifiedType:
+      name: verifiedType
+      in: query
+      schema:
+        type: string
+      description: Match the verification type exactly, ignoring case.
+    UserFilterHasWebsite:
+      name: hasWebsite
+      in: query
+      schema:
+        type: boolean
+      description: Only return profiles with a website.
+    TweetFilterMaxRetweets:
+      name: maxRetweets
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+      description: Maximum retweets threshold.
+    TweetFilterMinViews:
+      name: minViews
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+      description: Minimum view count threshold.
     TweetFilterLanguage:
       name: language
       in: query
       schema:
         type: string
       description: Language code filter, e.g. en or tr.
-    TweetFilterToUser:
-      name: toUser
+    UserFilterVerifiedOnly:
+      name: verifiedOnly
       in: query
       schema:
-        type: string
-      description: Filter replies sent to a username.
-    TweetFilterRetweetsOfTweetId:
-      name: retweetsOfTweetId
+        type: boolean
+      description: Only return verified profiles.
+    UserFilterMaxFollowing:
+      name: maxFollowing
       in: query
       schema:
-        type: string
-      description: Only retweets of this tweet ID.
-    TweetFilterInReplyToTweetId:
-      name: inReplyToTweetId
-      in: query
-      schema:
-        type: string
-      description: Only replies to this tweet ID.
+        type: integer
+        minimum: 0
+      description: Maximum following count.
     TweetFilterMediaType:
       name: mediaType
       in: query
@@ -1430,20 +1782,118 @@ components:
         - links
         - none
       description: Filter by media type.
-    FollowerPageSize:
-      name: pageSize
+    TweetFilterReplies:
+      name: replies
       in: query
-      description: 'Maximum user profiles requested from this page (20-200, default 200). The response can contain fewer profiles because the source returned fewer or remaining credits cover fewer results. Keep requesting next_cursor while has_next_page is true. The deprecated limit and count aliases remain accepted.
+      schema:
+        type: string
+        enum:
+        - include
+        - exclude
+        - only
+      description: Reply mode.
+  responses:
+    AnonymousGuestAuthenticationRequired:
+      description: 'Authentication required for a non-MPP paid read. The challenge requests Bearer authentication, not payment. Missing credentials advertise guest checkout without creating it. Invalid credentials return a plain error. Require user confirmation before calling an advertised action.
 
         '
-      schema:
-        type: integer
-        minimum: 20
-        maximum: 200
-        default: 200
-  responses:
+      headers:
+        Cache-Control:
+          description: Prevents storage of the guest checkout action.
+          schema:
+            type: string
+            const: no-store
+        WWW-Authenticate:
+          description: Bearer authentication challenge, not a Payment challenge.
+          schema:
+            type: string
+            const: Bearer realm="xquik"
+      content:
+        application/json:
+          schema:
+            oneOf:
+            - $ref: '#/components/schemas/AnonymousGuestAuthenticationRequired'
+            - allOf:
+              - $ref: '#/components/schemas/Error'
+              - not:
+                  required:
+                  - payment_options
+          example:
+            account_required: false
+            error: unauthenticated
+            message: Authentication required.
+            next_step: Ask the user to confirm a USD amount before creating checkout.
+            payment_options:
+              guest_wallet:
+                create_checkout:
+                  account_required: false
+                  amount_bounds:
+                    currency: usd
+                    maximum_minor: 25000
+                    minimum_minor: 1000
+                  body:
+                    amount_minor: 1000
+                    currency: usd
+                  creates: checkout_url
+                  method: POST
+                  path: /api/v1/guest-wallets
+                  provider: stripe
+                  required_headers:
+                    Idempotency-Key: <cryptographically random UUID v4>
+                  requires_authentication: false
+                  requires_user_confirmation: true
+                  requires_user_interaction: true
+                  response_fields:
+                  - checkout_url
+                  - api_key
+                  - status_url
+                  response_url_field: checkout_url
+    MaximumCoverageBusy:
+      description: Automatic or explicit maximum coverage is temporarily busy.
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+            minimum: 1
+          description: Seconds to wait before retrying.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: x_api_unavailable
+            message: Maximum coverage is busy. Retry shortly.
+    XApiError:
+      description: 'Dependency unavailable, unauthorized, or rate limited. Default v1 returns 502. The best-practice response contract returns 424 for transparent dependency failures.
+
+        '
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: x_api_unavailable
+            message: X data source temporarily unavailable. Try again later.
+    UnexpectedError:
+      content:
+        application/json:
+          example:
+            error: internal_error
+            message: Unexpected error. Try again.
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Unexpected error.
+    InvalidInput:
+      description: Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: invalid_input
+            message: Invalid input. Check the request body.
     PaymentRequired:
-      description: 'Payment required. Fixed-price direct MPP requests return a Machine Payments Protocol problem document and a WWW-Authenticate challenge. Authenticated X data requests return balances and explicit Stripe checkout-creation actions. Guest paid-read keys receive only the accountless guest top-up action. Direct MPP challenges also advertise the Stripe wallet action. Other authenticated endpoints return a legacy error shape. A failed request never creates checkout. Create checkout only after the user confirms a payment option.
+      description: 'Payment required. MPP reads return a problem document and `WWW-Authenticate`. Authenticated reads return balances and checkout actions. Guest keys receive only the guest top-up action. Other endpoints may use legacy errors. A failed request never creates checkout. Require user confirmation before creating one.
 
         '
       headers:
@@ -1533,24 +1983,15 @@ components:
                   - api_key
                   - status_url
                   response_url_field: checkout_url
-    InvalidInput:
-      description: Invalid input
+    CursorGone:
+      description: Restart without the `coverage_cursor_gone` cursor.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
           example:
-            error: invalid_input
-            message: Invalid input. Check the request body.
-    NotFound:
-      description: Not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: not_found
-            message: Resource not found.
+            error: coverage_cursor_gone
+            message: Cursor finished, expired, or superseded. Restart pagination without cursor.
     Unauthenticated:
       description: Unauthenticated
       headers:
@@ -1571,61 +2012,31 @@ components:
           example:
             error: unauthenticated
             message: Authentication required. Provide a valid API key or bearer token.
-    AnonymousGuestAuthenticationRequired:
-      description: 'Authentication required for a non-MPP paid read. The Bearer challenge requests authentication and is not a Payment challenge. Requests without credentials advertise accountless Stripe checkout, but create no checkout. Explicit invalid credentials return the plain error shape. Call an advertised action only after explicit user confirmation.
-
-        '
-      headers:
-        Cache-Control:
-          description: Prevents storage of the guest checkout action.
-          schema:
-            type: string
-            const: no-store
-        WWW-Authenticate:
-          description: Bearer authentication challenge, not a Payment challenge.
-          schema:
-            type: string
-            const: Bearer realm="xquik"
+    UserNotFound:
+      description: X user not found
       content:
         application/json:
           schema:
-            oneOf:
-            - $ref: '#/components/schemas/AnonymousGuestAuthenticationRequired'
-            - allOf:
-              - $ref: '#/components/schemas/Error'
-              - not:
-                  required:
-                  - payment_options
+            $ref: '#/components/schemas/Error'
           example:
-            account_required: false
-            error: unauthenticated
-            message: Authentication required.
-            next_step: Ask the user to confirm a USD amount before creating checkout.
-            payment_options:
-              guest_wallet:
-                create_checkout:
-                  account_required: false
-                  amount_bounds:
-                    currency: usd
-                    maximum_minor: 25000
-                    minimum_minor: 1000
-                  body:
-                    amount_minor: 1000
-                    currency: usd
-                  creates: checkout_url
-                  method: POST
-                  path: /api/v1/guest-wallets
-                  provider: stripe
-                  required_headers:
-                    Idempotency-Key: <cryptographically random UUID v4>
-                  requires_authentication: false
-                  requires_user_confirmation: true
-                  requires_user_interaction: true
-                  response_fields:
-                  - checkout_url
-                  - api_key
-                  - status_url
-                  response_url_field: checkout_url
+            error: user_not_found
+            message: X user not found. Check the username.
+    CoverageCursorUnavailable:
+      description: Cursor is in use. Retry `coverage_cursor_unavailable` later.
+      headers:
+        Retry-After:
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Seconds to wait.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: coverage_cursor_unavailable
+            message: Cursor busy. Retry after the indicated delay.
     RateLimitExceeded:
       description: 'Xquik tier rate limit exceeded. The response includes a `Retry-After` header with the number of seconds to wait before retrying.
 
@@ -1651,96 +2062,257 @@ components:
             example: 60
             minimum: 1
             type: integer
-    XApiError:
-      description: 'Dependency unavailable, unauthorized, or rate limited. Default v1 returns 502. The best-practice response contract returns 424 for transparent dependency failures.
-
-        '
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: x_api_unavailable
-            message: X data source temporarily unavailable. Try again later.
   schemas:
-    XWritePaymentRequired:
-      allOf:
-      - $ref: '#/components/schemas/XWriteAction'
-      - type: object
-        required:
-        - error
-        - message
-      description: 'Durable failed write action with the applicable payment guidance.
-
-        '
-    XWriteActionAccount:
+    GuestWalletTopupCheckoutAction:
+      description: Explicit direct REST action for a guest wallet top-up.
+      type: object
+      additionalProperties: false
+      required:
+      - account_required
+      - amount_bounds
+      - body
+      - creates
+      - method
+      - path
+      - provider
+      - required_headers
+      - requires_authentication
+      - requires_user_confirmation
+      - requires_user_interaction
+      - response_fields
+      - response_url_field
+      properties:
+        account_required:
+          type: boolean
+          const: false
+        amount_bounds:
+          $ref: '#/components/schemas/GuestWalletAmountBounds'
+        body:
+          $ref: '#/components/schemas/GuestWalletPurchaseRequest'
+        creates:
+          type: string
+          const: checkout_url
+        method:
+          type: string
+          const: POST
+        path:
+          type: string
+          const: /api/v1/guest-wallets/topups
+        provider:
+          type: string
+          deprecated: true
+          const: stripe
+        required_headers:
+          type: object
+          additionalProperties: false
+          required:
+          - Idempotency-Key
+          properties:
+            Idempotency-Key:
+              type: string
+              const: <cryptographically random UUID v4>
+        requires_authentication:
+          type: boolean
+          const: true
+        requires_user_confirmation:
+          type: boolean
+          const: true
+        requires_user_interaction:
+          type: boolean
+          const: true
+        response_fields:
+          type: array
+          minItems: 2
+          maxItems: 2
+          prefixItems:
+          - type: string
+            const: checkout_url
+          - type: string
+            const: status_url
+          items:
+            type: string
+            enum:
+            - checkout_url
+            - status_url
+        response_url_field:
+          type: string
+          const: checkout_url
+    XWriteActionResult:
       type:
       - object
       - 'null'
-      description: Connected account selected for the write.
+      description: Confirmed result produced by the write, when available.
       additionalProperties: false
-      required:
-      - id
-      - username
       properties:
+        type:
+          type: string
+          enum:
+          - tweet
+          - direct_message
+          - media
+          - community
+          - state_change
         id:
           type: string
-        username:
+        state:
           type: string
-      example:
-        id: '42'
-        username: example
-    GuestWalletPurchaseRequest:
-      description: User-confirmed guest wallet checkout request.
+    AnonymousGuestAuthenticationRequired:
+      description: 'Authentication error for a non-MPP anonymous paid read. The response also offers an optional accountless checkout after confirmation.
+
+        '
       type: object
       additionalProperties: false
       required:
-      - amount_minor
-      - currency
+      - account_required
+      - error
+      - message
+      - next_step
+      - payment_options
       properties:
-        amount_minor:
+        account_required:
+          type: boolean
+          const: false
+        error:
+          type: string
+          const: unauthenticated
+        message:
+          type: string
+        next_step:
+          type: string
+          const: Ask the user to confirm a USD amount before creating checkout.
+        payment_options:
+          type: object
+          additionalProperties: false
+          required:
+          - guest_wallet
+          properties:
+            guest_wallet:
+              type: object
+              additionalProperties: false
+              required:
+              - create_checkout
+              properties:
+                create_checkout:
+                  $ref: '#/components/schemas/GuestWalletCreateCheckoutAction'
+    BatchUsers:
+      description: 'Batch user lookup results. Duplicate requested IDs are ignored while preserving first-seen order. unavailable_ids identifies processed IDs with no returned profile. unprocessed_ids identifies IDs skipped when available credits limit processing.
+
+        '
+      type: object
+      required:
+      - users
+      - has_next_page
+      - next_cursor
+      - requested_count
+      - processed_count
+      - returned_count
+      - unavailable_ids
+      - unprocessed_ids
+      properties:
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserProfile'
+        has_next_page:
+          type: boolean
+          const: false
+          description: Batch lookups never paginate.
+        next_cursor:
+          type: string
+          description: Empty because batch lookups never paginate.
+          maxLength: 0
+        requested_count:
           type: integer
-          minimum: 1000
-          maximum: 25000
-          description: USD cents accepted for this checkout.
-          example: 1000
-        currency:
-          type: string
-          const: usd
-    TweetArticleMetadata:
-      description: Article metadata attached to a tweet.
+          minimum: 0
+          maximum: 100
+          description: Number of unique IDs requested.
+        processed_count:
+          type: integer
+          minimum: 0
+          maximum: 100
+          description: Number of requested IDs included in the lookup.
+        returned_count:
+          type: integer
+          minimum: 0
+          maximum: 100
+          description: Number of user profiles returned and charged.
+        unavailable_ids:
+          type: array
+          description: Processed IDs with no returned profile, in first-seen request order.
+          items:
+            type: string
+            pattern: ^\d+$
+        unprocessed_ids:
+          type: array
+          description: Requested IDs skipped because available credits limited processing. Retry these IDs after adding credits.
+          items:
+            type: string
+            pattern: ^\d+$
+    UserListCoverageResponse:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedUsers'
+      - type: object
+        required:
+        - diagnostic
+        properties:
+          has_next_page:
+            type: boolean
+            const: false
+          next_cursor:
+            type: string
+            const: ''
+          diagnostic:
+            $ref: '#/components/schemas/UserListCoverageDiagnostic'
+    MppPaymentRequired:
+      description: Anonymous payment requirement for a direct MPP operation. The response includes an MPP challenge and an accountless checkout action.
       type: object
+      required:
+      - account_required
+      - detail
+      - next_step
+      - payment_options
+      - status
+      - title
+      - type
       properties:
-        id:
+        account_required:
+          type: boolean
+          const: false
+        challengeId:
           type: string
+          description: Opaque identifier for the MPP payment challenge.
+        detail:
+          type: string
+        hint:
+          type: string
+          description: Instructions for selecting and paying an MPP offer.
+        next_step:
+          type: string
+          const: Ask the user to confirm a USD amount before creating checkout.
+        payment_options:
+          type: object
+          additionalProperties: false
+          required:
+          - guest_wallet
+          properties:
+            guest_wallet:
+              type: object
+              additionalProperties: false
+              required:
+              - create_checkout
+              properties:
+                create_checkout:
+                  $ref: '#/components/schemas/GuestWalletCreateCheckoutAction'
+        status:
+          type: integer
+          const: 402
         title:
           type: string
-        previewText:
+          const: Payment Required
+        type:
           type: string
-        coverMediaUrl:
-          type: string
-    ContentDisclosure:
-      description: Content disclosure metadata shown by X when a tweet is labeled as paid partnership content or AI-generated media.
-      type: object
-      properties:
-        advertising:
-          type: object
-          properties:
-            isPaidPromotion:
-              type: boolean
-              description: True when X labels the tweet as paid promotion content.
-              example: true
-        aiGenerated:
-          type: object
-          properties:
-            detectionSource:
-              type: string
-              description: Source of the AI-generated media disclosure.
-              example: UserDeclared
-            hasAiGeneratedMedia:
-              type: boolean
-              description: True when X labels the tweet as containing AI-generated media.
-              example: true
+          format: uri
+          const: https://paymentauth.org/problems/payment-required
     Error:
       description: 'Error response. Default v1 returns a legacy string error code. Send `xquik-api-contract: 2026-04-29` to receive the structured best-practice error object.
 
@@ -1755,7 +2327,6 @@ components:
               type_name: ErrorValue
             java:
               type_name: ErrorValue
-          example: invalid_input
           oneOf:
           - type: string
             title: LegacyErrorCode
@@ -1768,6 +2339,7 @@ components:
             - account_restricted
             - api_key_limit_reached
             - article_not_found
+            - closed
             - dm_not_permitted
             - invalid_format
             - invalid_id
@@ -1787,6 +2359,7 @@ components:
             - missing_params
             - missing_query
             - monitor_already_exists
+            - monitor_profile_unavailable
             - no_media
             - no_credits
             - no_subscription
@@ -1804,7 +2377,10 @@ components:
             - checkout_unavailable
             - connection_challenge_expired
             - connection_challenge_inactive
+            - coverage_cursor_gone
+            - coverage_cursor_unavailable
             - draft_not_found
+            - expired
             - favoriters_unavailable
             - forbidden
             - guest_wallet_unavailable
@@ -1813,13 +2389,20 @@ components:
             - idempotency_conflict
             - idempotency_key_conflict
             - invalid_community_id
+            - invalid_complete_replies_request
+            - invalid_coverage_cursor
+            - invalid_coverage_request
             - invalid_idempotency_key
             - invalid_list_id
+            - invalid_output_options
             - invalid_payment_amount
             - invalid_range
+            - invalid_reply_options
             - login_rate_limited
+            - login_service_unavailable
             - missing_idempotency_key
             - missing_ids
+            - missing_url
             - no_cached_style
             - passkey_required
             - rate_limited
@@ -1828,6 +2411,7 @@ components:
             - support_media_rate_limit
             - support_request_rate_limit
             - too_many_ids
+            - too_many_tweets
             - unknown_field
             - unsupported_media_type
             - webhook_inactive
@@ -1859,7 +2443,6 @@ components:
             - x_user_lookup_failed
             - x_write_ambiguous
             - x_write_failed
-            example: invalid_input
           - type: object
             title: StructuredError
             required:
@@ -1869,7 +2452,6 @@ components:
             properties:
               message:
                 type: string
-                example: Invalid input. Check the request body.
               type:
                 type: string
                 enum:
@@ -1880,7 +2462,6 @@ components:
                 - invalid_request_error
                 - permission_error
                 - rate_limit_error
-                example: invalid_request_error
               code:
                 type: string
                 title: ErrorCode
@@ -1893,6 +2474,7 @@ components:
                 - account_restricted
                 - api_key_limit_reached
                 - article_not_found
+                - closed
                 - dm_not_permitted
                 - invalid_format
                 - invalid_id
@@ -1912,6 +2494,7 @@ components:
                 - missing_params
                 - missing_query
                 - monitor_already_exists
+                - monitor_profile_unavailable
                 - no_media
                 - no_credits
                 - no_subscription
@@ -1929,7 +2512,10 @@ components:
                 - checkout_unavailable
                 - connection_challenge_expired
                 - connection_challenge_inactive
+                - coverage_cursor_gone
+                - coverage_cursor_unavailable
                 - draft_not_found
+                - expired
                 - favoriters_unavailable
                 - forbidden
                 - guest_wallet_unavailable
@@ -1938,13 +2524,20 @@ components:
                 - idempotency_conflict
                 - idempotency_key_conflict
                 - invalid_community_id
+                - invalid_complete_replies_request
+                - invalid_coverage_cursor
+                - invalid_coverage_request
                 - invalid_idempotency_key
                 - invalid_list_id
+                - invalid_output_options
                 - invalid_payment_amount
                 - invalid_range
+                - invalid_reply_options
                 - login_rate_limited
+                - login_service_unavailable
                 - missing_idempotency_key
                 - missing_ids
+                - missing_url
                 - no_cached_style
                 - passkey_required
                 - rate_limited
@@ -1953,6 +2546,7 @@ components:
                 - support_media_rate_limit
                 - support_request_rate_limit
                 - too_many_ids
+                - too_many_tweets
                 - unknown_field
                 - unsupported_media_type
                 - webhook_inactive
@@ -1984,25 +2578,20 @@ components:
                 - x_user_lookup_failed
                 - x_write_ambiguous
                 - x_write_failed
-                example: invalid_input
         message:
           type: string
           description: Human-readable error guidance.
-          example: Invalid input. Check the request body.
         reason:
           type: string
           description: Machine-readable reason for a login cooldown.
-          example: temporary_issue
         retryAfter:
           type: integer
           minimum: 1
           description: Seconds until the next permitted request.
-          example: 60
         retryAfterMs:
           type: integer
           minimum: 1
           description: Required wait in milliseconds.
-          example: 60000
     TweetMedia:
       description: Normalized media attached to a tweet.
       type: object
@@ -2137,411 +2726,6 @@ components:
         width:
           type: integer
           description: Original media width.
-    BatchUsers:
-      description: 'Batch user lookup results. Duplicate requested IDs are ignored while preserving first-seen order. unavailable_ids identifies processed IDs with no returned profile. unprocessed_ids identifies IDs skipped when available credits limit processing.
-
-        '
-      type: object
-      required:
-      - users
-      - has_next_page
-      - next_cursor
-      - requested_count
-      - processed_count
-      - returned_count
-      - unavailable_ids
-      - unprocessed_ids
-      properties:
-        users:
-          type: array
-          example:
-          - id: '9876543210'
-            username: elonmusk
-            name: Elon Musk
-          items:
-            $ref: '#/components/schemas/UserProfile'
-        has_next_page:
-          type: boolean
-          const: false
-          description: Batch lookups never paginate.
-        next_cursor:
-          type: string
-          description: Empty because batch lookups never paginate.
-          maxLength: 0
-          example: ''
-        requested_count:
-          type: integer
-          minimum: 0
-          maximum: 100
-          description: Number of unique IDs requested.
-          example: 2
-        processed_count:
-          type: integer
-          minimum: 0
-          maximum: 100
-          description: Number of requested IDs included in the lookup.
-          example: 2
-        returned_count:
-          type: integer
-          minimum: 0
-          maximum: 100
-          description: Number of user profiles returned and charged.
-          example: 1
-        unavailable_ids:
-          type: array
-          description: Processed IDs with no returned profile, in first-seen request order.
-          items:
-            type: string
-            pattern: ^\d+$
-          example:
-          - '1234567890'
-        unprocessed_ids:
-          type: array
-          description: Requested IDs skipped because available credits limited processing. Retry these IDs after adding credits.
-          items:
-            type: string
-            pattern: ^\d+$
-          example: []
-    GuestPaymentRequired:
-      description: 'Credit error for a paid-read guest key with only its accountless guest top-up action.
-
-        '
-      type: object
-      additionalProperties: false
-      required:
-      - balance
-      - error
-      - message
-      - next_step
-      - payment_options
-      - required
-      - top_up_endpoint
-      - top_up_url
-      properties:
-        balance:
-          type: string
-          pattern: ^\d+$
-          example: '0'
-        error:
-          type: string
-          enum:
-          - insufficient_credits
-          - no_credits
-          - no_subscription
-          - subscription_inactive
-          example: insufficient_credits
-        message:
-          type: string
-          example: Insufficient credits. Top up or subscribe to continue.
-        next_step:
-          type: string
-          const: Ask the user to confirm a USD amount before creating checkout.
-        payment_options:
-          type: object
-          additionalProperties: false
-          required:
-          - credits
-          properties:
-            credits:
-              type: object
-              additionalProperties: false
-              required:
-              - create_checkout
-              properties:
-                create_checkout:
-                  $ref: '#/components/schemas/GuestWalletTopupCheckoutAction'
-        required:
-          type: string
-          pattern: ^\d+$
-          example: '1'
-        top_up_endpoint:
-          type: string
-          const: /api/v1/guest-wallets/topups
-        top_up_url:
-          type: string
-          const: POST /api/v1/guest-wallets/topups
-    PaginatedUsers:
-      description: 'Paginated user profiles. The item count can be lower than pageSize when the source returns fewer profiles or remaining credits cover fewer results. Follow next_cursor while has_next_page is true. A relationship can naturally contain fewer profiles than requested. Zero affordable results returns 402 insufficient_credits.
-
-        '
-      type: object
-      required:
-      - users
-      - has_next_page
-      - next_cursor
-      properties:
-        users:
-          type: array
-          items:
-            $ref: '#/components/schemas/UserProfile'
-          example:
-          - id: '9876543210'
-            username: elonmusk
-            name: Elon Musk
-        has_next_page:
-          type: boolean
-          example: true
-        next_cursor:
-          type: string
-          example: DAACCgACGRElMJcAAA
-    GuestWalletCreateCheckoutAction:
-      description: Explicit direct REST action for a new guest wallet checkout.
-      type: object
-      additionalProperties: false
-      required:
-      - account_required
-      - amount_bounds
-      - body
-      - creates
-      - method
-      - path
-      - provider
-      - required_headers
-      - requires_authentication
-      - requires_user_confirmation
-      - requires_user_interaction
-      - response_fields
-      - response_url_field
-      properties:
-        account_required:
-          type: boolean
-          const: false
-        amount_bounds:
-          $ref: '#/components/schemas/GuestWalletAmountBounds'
-        body:
-          $ref: '#/components/schemas/GuestWalletPurchaseRequest'
-        creates:
-          type: string
-          const: checkout_url
-        method:
-          type: string
-          const: POST
-        path:
-          type: string
-          const: /api/v1/guest-wallets
-        provider:
-          type: string
-          const: stripe
-        required_headers:
-          type: object
-          additionalProperties: false
-          required:
-          - Idempotency-Key
-          properties:
-            Idempotency-Key:
-              type: string
-              const: <cryptographically random UUID v4>
-        requires_authentication:
-          type: boolean
-          const: false
-        requires_user_confirmation:
-          type: boolean
-          const: true
-        requires_user_interaction:
-          type: boolean
-          const: true
-        response_fields:
-          type: array
-          minItems: 3
-          maxItems: 3
-          prefixItems:
-          - type: string
-            const: checkout_url
-          - type: string
-            const: api_key
-          - type: string
-            const: status_url
-          items:
-            type: string
-            enum:
-            - checkout_url
-            - api_key
-            - status_url
-        response_url_field:
-          type: string
-          const: checkout_url
-    TweetNote:
-      description: Complete Note Tweet content and rich-text metadata.
-      type: object
-      required:
-      - text
-      properties:
-        id:
-          type: string
-        text:
-          type: string
-        isExpandable:
-          type: boolean
-        entities:
-          type: object
-          additionalProperties: true
-          x-stainless-any: true
-          x-stainless-terraform-type: string
-        richtextTags:
-          type: array
-          items:
-            type: object
-            required:
-            - fromIndex
-            - toIndex
-            - types
-            properties:
-              fromIndex:
-                type: integer
-              toIndex:
-                type: integer
-              types:
-                type: array
-                items:
-                  type: string
-    UserAffiliateLabel:
-      description: Organization affiliation label shown on an X profile.
-      type: object
-      properties:
-        badgeUrl:
-          type: string
-        description:
-          type: string
-        url:
-          type: string
-        urlType:
-          type: string
-        userLabelDisplayType:
-          type: string
-        userLabelType:
-          type: string
-    SearchTweet:
-      description: Tweet returned from search results with inline author info. A zero metric can mean X did not report the count.
-      type: object
-      required:
-      - id
-      - text
-      - retweetCount
-      - replyCount
-      - likeCount
-      - quoteCount
-      - viewCount
-      - bookmarkCount
-      properties:
-        id:
-          type: string
-          example: '1234567890'
-        text:
-          type: string
-          example: Just launched our new feature!
-        type:
-          type: string
-          example: tweet
-        createdAt:
-          type: string
-          example: '2025-01-15T12:00:00Z'
-        isNoteTweet:
-          type: boolean
-          description: True for Note Tweets (long-form content, up to 25,000 characters)
-          example: false
-        isReply:
-          type: boolean
-          description: True when this search result is a reply
-          example: false
-        isQuoteStatus:
-          type: boolean
-          description: True when this search result quotes another tweet
-          example: false
-        isLimitedReply:
-          type: boolean
-          description: Whether the tweet has limited reply permissions
-          example: false
-        inReplyToId:
-          type: string
-          description: ID of the tweet this result replies to.
-          example: '1234567890'
-        inReplyToUserId:
-          type: string
-          description: ID of the user this result replies to.
-          example: '9876543210'
-        inReplyToUsername:
-          type: string
-          description: Username this result replies to.
-          example: example_user
-        conversationId:
-          type: string
-          description: Root tweet ID for the search result conversation
-          example: '1234567890'
-        source:
-          type: string
-          description: Client application used to post the tweet
-          example: Twitter Web App
-        displayTextRange:
-          type: array
-          items:
-            type: integer
-          description: Rendered text's start and end offsets.
-          example:
-          - 0
-          - 31
-        contentDisclosure:
-          $ref: '#/components/schemas/ContentDisclosure'
-        article:
-          $ref: '#/components/schemas/TweetArticleMetadata'
-        card:
-          $ref: '#/components/schemas/TweetCard'
-        communityNote:
-          $ref: '#/components/schemas/TweetCommunityNote'
-        edit:
-          $ref: '#/components/schemas/TweetEdit'
-        isTranslatable:
-          type: boolean
-        noteTweet:
-          $ref: '#/components/schemas/TweetNote'
-        place:
-          $ref: '#/components/schemas/TweetPlace'
-        possiblySensitive:
-          type: boolean
-        previousCounts:
-          $ref: '#/components/schemas/TweetPreviousCounts'
-        viewState:
-          type: string
-        entities:
-          type: object
-          additionalProperties: true
-          description: Parsed search-result entities including URLs, mentions, hashtags, and media markers
-        quoted_tweet:
-          $ref: '#/components/schemas/EmbeddedTweet'
-        retweeted_tweet:
-          $ref: '#/components/schemas/EmbeddedTweet'
-        media:
-          type: array
-          items:
-            $ref: '#/components/schemas/TweetMedia'
-          description: Search-result media attachments, omitted when no media is present
-        url:
-          type: string
-          description: Search result permalink.
-          example: https://x.com/example_user/status/1234567890
-        lang:
-          type: string
-          description: Search result language code.
-          example: en
-        likeCount:
-          type: integer
-          example: 42
-        retweetCount:
-          type: integer
-          example: 5
-        replyCount:
-          type: integer
-          example: 3
-        quoteCount:
-          type: integer
-          example: 1
-        viewCount:
-          type: integer
-          example: 1500
-        bookmarkCount:
-          type: integer
-          example: 2
-        author:
-          $ref: '#/components/schemas/UserProfile'
     UserHighlightsInfo:
       description: Profile highlight availability and count metadata.
       type: object
@@ -2550,81 +2734,320 @@ components:
           type: boolean
         highlightedTweets:
           type: string
-    GuestWalletTopupCheckoutAction:
-      description: Explicit direct REST action for a guest wallet top-up.
+    UserProfile:
+      description: X user profile with bio, follower counts, and verification status.
       type: object
-      additionalProperties: false
       required:
-      - account_required
-      - amount_bounds
-      - body
-      - creates
-      - method
-      - path
-      - provider
-      - required_headers
-      - requires_authentication
-      - requires_user_confirmation
-      - requires_user_interaction
-      - response_fields
-      - response_url_field
+      - id
+      - username
+      - name
       properties:
-        account_required:
-          type: boolean
-          const: false
-        amount_bounds:
-          $ref: '#/components/schemas/GuestWalletAmountBounds'
-        body:
-          $ref: '#/components/schemas/GuestWalletPurchaseRequest'
-        creates:
+        id:
           type: string
-          const: checkout_url
-        method:
+        username:
           type: string
-          const: POST
-        path:
+        name:
           type: string
-          const: /api/v1/guest-wallets/topups
-        provider:
+        description:
           type: string
-          const: stripe
-        required_headers:
-          type: object
-          additionalProperties: false
-          required:
-          - Idempotency-Key
-          properties:
-            Idempotency-Key:
-              type: string
-              const: <cryptographically random UUID v4>
-        requires_authentication:
+        followers:
+          type: integer
+        following:
+          type: integer
+        verified:
           type: boolean
-          const: true
-        requires_user_confirmation:
+        isBlueVerified:
           type: boolean
-          const: true
-        requires_user_interaction:
+          description: Whether X shows a blue verification badge
+        isVerified:
           type: boolean
-          const: true
-        response_fields:
+          description: Whether X marks the profile as verified
+        profilePicture:
+          type: string
+        coverPicture:
+          type: string
+        profileBannerUrl:
+          type: string
+          description: Original X profile banner field when available
+        location:
+          type: string
+        createdAt:
+          type: string
+        statusesCount:
+          type: integer
+        mediaCount:
+          type: integer
+        protected:
+          type: boolean
+          description: Whether the profile protects its posts
+        url:
+          type: string
+        favouritesCount:
+          type: integer
+        hasCustomTimelines:
+          type: boolean
+        isTranslator:
+          type: boolean
+        withheldInCountries:
           type: array
-          minItems: 2
-          maxItems: 2
-          prefixItems:
-          - type: string
-            const: checkout_url
-          - type: string
-            const: status_url
           items:
             type: string
-            enum:
-            - checkout_url
-            - status_url
-        response_url_field:
+        possiblySensitive:
+          type: boolean
+        pinnedTweetIds:
+          type: array
+          items:
+            type: string
+        isAutomated:
+          type: boolean
+        automatedBy:
           type: string
-          const: checkout_url
+        unavailable:
+          type: boolean
+        unavailableReason:
+          type: string
+        verifiedType:
+          type: string
+        affiliatesHighlightedLabel:
+          $ref: '#/components/schemas/UserAffiliateLabel'
+        businessAccountAffiliatesCount:
+          type: integer
+        creatorSubscriptionsCount:
+          type: integer
+        hasGraduatedAccess:
+          type: boolean
+        hasHiddenSubscriptionsOnProfile:
+          type: boolean
+        highlightsInfo:
+          $ref: '#/components/schemas/UserHighlightsInfo'
+        identityVerification:
+          $ref: '#/components/schemas/UserIdentityVerification'
+        isProfileTranslatable:
+          type: boolean
+        parodyCommentaryFanLabel:
+          type: string
+        profileDescriptionLanguage:
+          type: string
+        profileImageShape:
+          type: string
+        profileInterstitialType:
+          type: string
+        profileSortEnabled:
+          type: boolean
+        profileTranslatorType:
+          type: string
+        superFollowEligible:
+          type: boolean
+        communityRole:
+          type: string
+          description: Community role when returned by community member reads
+        profile_bio:
+          type: object
+          additionalProperties: true
+          x-stainless-any: true
+          x-stainless-terraform-type: string
+          description: Structured profile bio with entity annotations
+    TweetPlace:
+      description: Public place metadata attached to a tweet.
+      type: object
+      properties:
+        boundingBox:
+          type: object
+          additionalProperties: true
+          x-stainless-any: true
+          x-stainless-terraform-type: string
+        country:
+          type: string
+        countryCode:
+          type: string
+        fullName:
+          type: string
+        id:
+          type: string
+        name:
+          type: string
+        placeType:
+          type: string
+        url:
+          type: string
+    XWriteAction:
+      type: object
+      required:
+      - object
+      - id
+      - writeActionId
+      - action
+      - status
+      - terminal
+      - retryable
+      - safeToRetry
+      - statusUrl
+      - pollAfterMs
+      - charged
+      - chargedCredits
+      - billing
+      - request
+      - account
+      - target
+      - targetId
+      - result
+      - nextAction
+      - sendDispatched
+      - success
+      properties:
+        object:
+          type: string
+          const: x_write_action
+        id:
+          type: string
+        writeActionId:
+          type: string
+        action:
+          type: string
+          enum:
+          - create_tweet
+          - delete_tweet
+          - like
+          - unlike
+          - retweet
+          - unretweet
+          - follow
+          - unfollow
+          - remove_follower
+          - send_dm
+          - upload_media
+          - update_profile
+          - update_avatar
+          - update_banner
+          - create_community
+          - delete_community
+          - join_community
+          - leave_community
+        status:
+          type: string
+          enum:
+          - accepted
+          - dispatching
+          - pending_confirmation
+          - success
+          - failed
+          - expired
+        terminal:
+          type: boolean
+        retryable:
+          type: boolean
+          description: True only when a new attempt can reasonably succeed.
+        safeToRetry:
+          type: boolean
+          description: 'True only when no write was dispatched and a new idempotency key may be used.
+
+            '
+        statusUrl:
+          type: string
+        pollAfterMs:
+          type:
+          - integer
+          - 'null'
+          minimum: 0
+        charged:
+          type: boolean
+        chargedCredits:
+          type: string
+          pattern: ^\d+$
+        billing:
+          $ref: '#/components/schemas/XWriteActionBilling'
+        request:
+          $ref: '#/components/schemas/XWriteActionRequest'
+        account:
+          $ref: '#/components/schemas/XWriteActionAccount'
+        target:
+          $ref: '#/components/schemas/XWriteActionTarget'
+        targetId:
+          type:
+          - string
+          - 'null'
+        result:
+          $ref: '#/components/schemas/XWriteActionResult'
+        nextAction:
+          $ref: '#/components/schemas/XWriteActionNextAction'
+        requestHash:
+          type: string
+          pattern: ^[0-9a-f]{64}$
+        requestId:
+          type: string
+        idempotent:
+          type: boolean
+        error:
+          type: string
+        message:
+          type: string
+        sendDispatched:
+          type: boolean
+        sendDispatchedAt:
+          type: string
+          format: date-time
+          description: Dispatch timestamp when the write reached execution.
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+          description: 'Deadline for resolving a non-terminal write. This is not the Idempotency-Key retention deadline.
+
+            '
+        confirmedAt:
+          type: string
+          format: date-time
+        confirmationCheckedAt:
+          type: string
+          format: date-time
+        confirmationAttempts:
+          type: integer
+          minimum: 0
+        tweetId:
+          type: string
+          description: Compatibility field for a confirmed tweet result ID.
+        messageId:
+          type: string
+          description: Compatibility field for a confirmed direct message ID.
+        mediaId:
+          type: string
+          description: Compatibility field for a confirmed media upload ID.
+        mediaUrl:
+          type: string
+          format: uri
+          description: Public media URL when the upload creates one.
+        communityId:
+          type: string
+          description: Compatibility field for a confirmed community ID.
+        communityName:
+          type: string
+          description: Confirmed community name when available.
+        resultId:
+          type: string
+          description: Compatibility result ID for other write actions.
+        media:
+          type: object
+          additionalProperties: true
+          description: Media count, kind, size, and billing details when used.
+        details:
+          type: object
+          additionalProperties: true
+          description: Structured recovery context for a failed write.
+        success:
+          type: boolean
+      description: 'Durable write lifecycle record. Poll statusUrl until terminal is true. Reusing the original Idempotency-Key returns this same record. Submit a new write only when safeToRetry is true, using a new key.
+
+        '
     PaginatedTweets:
-      description: 'Paginated tweets. Source visibility, filters, or remaining credits can reduce results. An empty filtered page can still have has_next_page true. Follow next_cursor while has_next_page is true. Zero affordable results returns 402 insufficient_credits.
+      description: 'No-mode search, user Tweet, user reply, and direct reply reads use automatic coverage. Shape, filters, aliases, and billing stay compatible. Unprefixed cursors remain legacy. Follow next_cursor while has_next_page is true. An empty filtered page can still have has_next_page true.
 
         '
       type: object
@@ -2637,23 +3060,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/SearchTweet'
-          example:
-          - id: '1234567890'
-            text: Just launched our new feature!
-            retweetCount: 5
-            replyCount: 3
-            likeCount: 42
-            quoteCount: 1
-            viewCount: 1500
-            bookmarkCount: 2
         has_next_page:
           type: boolean
-          example: true
         next_cursor:
           type: string
-          example: DAACCgACGRElMJcAAA
     AuthenticatedPaymentRequired:
-      description: Authenticated credit or subscription error with confirmation-gated Stripe checkout actions.
+      description: Authenticated credit or subscription error with confirmation-gated hosted checkout actions.
       type: object
       additionalProperties: false
       required:
@@ -2671,7 +3083,6 @@ components:
           type: string
           pattern: ^\d+$
           description: Available credits as a decimal string.
-          example: '0'
         dashboard:
           type: string
           const: /dashboard/account
@@ -2683,10 +3094,8 @@ components:
           - no_credits
           - no_subscription
           - subscription_inactive
-          example: insufficient_credits
         message:
           type: string
-          example: Insufficient credits. Top up or subscribe to continue.
         next_step:
           type: string
           const: Ask the user to confirm a payment option before creating checkout.
@@ -2740,6 +3149,7 @@ components:
                       const: /api/v1/credits/topup
                     provider:
                       type: string
+                      deprecated: true
                       const: stripe
                     requires_authentication:
                       type: boolean
@@ -2789,6 +3199,7 @@ components:
                       const: /api/v1/subscribe
                     provider:
                       type: string
+                      deprecated: true
                       const: stripe
                     requires_authentication:
                       type: boolean
@@ -2803,13 +3214,58 @@ components:
           type: string
           pattern: ^\d+$
           description: Credits required for the blocked request.
-          example: '1'
         top_up_endpoint:
           type: string
           const: /api/v1/credits/topup
         top_up_url:
           type: string
           const: POST /api/v1/credits/topup
+    GuestWalletAmountBounds:
+      description: Accepted guest wallet purchase range in USD cents.
+      type: object
+      additionalProperties: false
+      required:
+      - currency
+      - maximum_minor
+      - minimum_minor
+      properties:
+        currency:
+          type: string
+          const: usd
+        maximum_minor:
+          type: integer
+          const: 25000
+        minimum_minor:
+          type: integer
+          const: 1000
+    CoverageStopReason:
+      type: string
+      enum:
+      - cursor_failure
+      - deadline
+      - exhausted
+      - failed
+      - page_limit
+      - result_limit
+      - stalled
+    TweetCommunityNote:
+      description: Community Note presentation metadata returned by X.
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        shortTitle:
+          type: string
+        subtitle:
+          type: string
+        footer:
+          type: string
+        destinationUrl:
+          type: string
+        visualStyle:
+          type: string
     XWriteActionRequest:
       type: object
       description: Stable fingerprint and sanitized payload for replay checks.
@@ -2830,204 +3286,396 @@ components:
           - 'null'
           additionalProperties: true
           description: Exact sanitized payload dispatched for this action.
-      example:
-        hash: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
-        payload:
-          tweet_id: '9876543210'
-    XWriteActionNextAction:
-      type:
-      - object
-      - 'null'
-      description: Exact follow-up an API client or agent should perform.
-      additionalProperties: false
+    TweetNote:
+      description: Complete Note Tweet content and rich-text metadata.
+      type: object
       required:
-      - type
+      - text
       properties:
-        type:
+        id:
           type: string
-          enum:
-          - poll
-          - retry
-          - verify_result
-          - fix_request
-        url:
+        text:
           type: string
-        afterMs:
-          type: integer
-          minimum: 0
-        requiresNewIdempotencyKey:
+        isExpandable:
           type: boolean
-      example:
-        type: poll
-        url: /api/v1/x/write-actions/12345
-        afterMs: 2000
-    TweetCommunityNote:
-      description: Community Note presentation metadata returned by X.
+        entities:
+          type: object
+          additionalProperties: true
+          x-stainless-any: true
+          x-stainless-terraform-type: string
+        richtextTags:
+          type: array
+          items:
+            type: object
+            required:
+            - fromIndex
+            - toIndex
+            - types
+            properties:
+              fromIndex:
+                type: integer
+              toIndex:
+                type: integer
+              types:
+                type: array
+                items:
+                  type: string
+    TweetArticleMetadata:
+      description: Article metadata attached to a tweet.
       type: object
       properties:
         id:
           type: string
         title:
           type: string
-        shortTitle:
+        previewText:
           type: string
-        subtitle:
+        coverMediaUrl:
           type: string
-        footer:
-          type: string
-        destinationUrl:
-          type: string
-        visualStyle:
-          type: string
-    UserProfile:
-      description: X user profile with bio, follower counts, and verification status.
+    SearchTweet:
+      description: Tweet returned from search results with inline author info. A zero metric can mean X did not report the count.
       type: object
       required:
       - id
-      - username
-      - name
+      - text
+      - retweetCount
+      - replyCount
+      - likeCount
+      - quoteCount
+      - viewCount
+      - bookmarkCount
       properties:
         id:
           type: string
-          example: '9876543210'
-        username:
+        text:
           type: string
-          example: elonmusk
-        name:
+        type:
           type: string
-          example: Elon Musk
-        description:
-          type: string
-          example: CEO of Tesla, SpaceX, and X
-        followers:
-          type: integer
-          example: 150000000
-        following:
-          type: integer
-          example: 500
-        verified:
-          type: boolean
-          example: true
-        isBlueVerified:
-          type: boolean
-          description: Whether X shows a blue verification badge
-          example: true
-        isVerified:
-          type: boolean
-          description: Whether X marks the profile as verified
-          example: true
-        profilePicture:
-          type: string
-          example: https://pbs.twimg.com/profile_images/example.jpg
-        coverPicture:
-          type: string
-          example: https://pbs.twimg.com/profile_banners/example.jpg
-        profileBannerUrl:
-          type: string
-          description: Original X profile banner field when available
-          example: https://pbs.twimg.com/profile_banners/example.jpg
-        location:
-          type: string
-          example: Austin, TX
         createdAt:
           type: string
-          example: '2009-06-02T20:12:29Z'
-        statusesCount:
-          type: integer
-          example: 35000
-        mediaCount:
-          type: integer
-          example: 1200
-        protected:
+        isNoteTweet:
           type: boolean
-          description: Whether the profile protects its posts
-          example: false
-        url:
+          description: True for Note Tweets (long-form content, up to 25,000 characters)
+        isReply:
+          type: boolean
+          description: True when this search result is a reply
+        isQuoteStatus:
+          type: boolean
+          description: True when this search result quotes another tweet
+        isLimitedReply:
+          type: boolean
+          description: Whether the tweet has limited reply permissions
+        inReplyToId:
           type: string
-          example: https://xquik.com
-        favouritesCount:
-          type: integer
-          example: 18000
-        hasCustomTimelines:
-          type: boolean
-          example: true
-        isTranslator:
-          type: boolean
-          example: false
-        withheldInCountries:
+          description: ID of the tweet this result replies to.
+        inReplyToUserId:
+          type: string
+          description: ID of the user this result replies to.
+        inReplyToUsername:
+          type: string
+          description: Username this result replies to.
+        conversationId:
+          type: string
+          description: Root tweet ID for the search result conversation
+        source:
+          type: string
+          description: Client application used to post the tweet
+        displayTextRange:
           type: array
           items:
-            type: string
-          example:
-          - DE
+            type: integer
+          description: Rendered text's start and end offsets.
+        contentDisclosure:
+          $ref: '#/components/schemas/ContentDisclosure'
+        article:
+          $ref: '#/components/schemas/TweetArticleMetadata'
+        card:
+          $ref: '#/components/schemas/TweetCard'
+        communityNote:
+          $ref: '#/components/schemas/TweetCommunityNote'
+        edit:
+          $ref: '#/components/schemas/TweetEdit'
+        isTranslatable:
+          type: boolean
+        noteTweet:
+          $ref: '#/components/schemas/TweetNote'
+        place:
+          $ref: '#/components/schemas/TweetPlace'
         possiblySensitive:
           type: boolean
-          example: false
-        pinnedTweetIds:
-          type: array
-          items:
-            type: string
-          example:
-          - '1234567890'
-        isAutomated:
-          type: boolean
-          example: false
-        automatedBy:
+        previousCounts:
+          $ref: '#/components/schemas/TweetPreviousCounts'
+        viewState:
           type: string
-          example: example_user
-        unavailable:
-          type: boolean
-          example: false
-        unavailableReason:
-          type: string
-          example: suspended
-        verifiedType:
-          type: string
-          example: Business
-        affiliatesHighlightedLabel:
-          $ref: '#/components/schemas/UserAffiliateLabel'
-        businessAccountAffiliatesCount:
-          type: integer
-        creatorSubscriptionsCount:
-          type: integer
-        hasGraduatedAccess:
-          type: boolean
-        hasHiddenSubscriptionsOnProfile:
-          type: boolean
-        highlightsInfo:
-          $ref: '#/components/schemas/UserHighlightsInfo'
-        identityVerification:
-          $ref: '#/components/schemas/UserIdentityVerification'
-        isProfileTranslatable:
-          type: boolean
-        parodyCommentaryFanLabel:
-          type: string
-        profileDescriptionLanguage:
-          type: string
-        profileImageShape:
-          type: string
-        profileInterstitialType:
-          type: string
-        profileSortEnabled:
-          type: boolean
-        profileTranslatorType:
-          type: string
-        superFollowEligible:
-          type: boolean
-        communityRole:
-          type: string
-          description: Community role when returned by community member reads
-          example: Member
-        profile_bio:
+        entities:
           type: object
           additionalProperties: true
-          x-stainless-any: true
-          x-stainless-terraform-type: string
-          description: Structured profile bio with entity annotations
-          example:
-            description: CEO of Tesla, SpaceX, and X
-            entities:
-              urls: []
+          description: Parsed search-result entities including URLs, mentions, hashtags, and media markers
+        quoted_tweet:
+          $ref: '#/components/schemas/EmbeddedTweet'
+        retweeted_tweet:
+          $ref: '#/components/schemas/EmbeddedTweet'
+        media:
+          type: array
+          items:
+            $ref: '#/components/schemas/TweetMedia'
+          description: Search-result media attachments, omitted when no media is present
+        url:
+          type: string
+          description: Search result permalink.
+        lang:
+          type: string
+          description: Search result language code.
+        likeCount:
+          type: integer
+        retweetCount:
+          type: integer
+        replyCount:
+          type: integer
+        quoteCount:
+          type: integer
+        viewCount:
+          type: integer
+        bookmarkCount:
+          type: integer
+        author:
+          $ref: '#/components/schemas/UserProfile'
+    UserIdentityVerification:
+      description: Identity verification metadata displayed by X.
+      type: object
+      properties:
+        description:
+          type: string
+        isIdentityVerified:
+          type: boolean
+        verifiedSinceMsec:
+          type: string
+    UserListCoverageDiagnostic:
+      description: Coverage evidence across parallel relationship strategies.
+      type: object
+      required:
+      - complete
+      - cursorFailureCount
+      - deadlineReached
+      - duplicateCount
+      - failedStrategyCount
+      - malformedCount
+      - pagesFetched
+      - responseTruncated
+      - resultLimitReached
+      - returnedUsers
+      - stalledStrategyCount
+      - strategies
+      - strategyCount
+      - uniqueUsers
+      properties:
+        complete:
+          type: boolean
+          description: True when every strategy exhausted its source.
+        cursorFailureCount:
+          type: integer
+          minimum: 0
+        deadlineReached:
+          type: boolean
+        duplicateCount:
+          type: integer
+          minimum: 0
+        failedStrategyCount:
+          type: integer
+          minimum: 0
+        malformedCount:
+          type: integer
+          minimum: 0
+        pagesFetched:
+          type: integer
+          minimum: 0
+        responseTruncated:
+          type: boolean
+          description: Whether credits or the requested limit reduced output.
+        resultLimitReached:
+          type: boolean
+        returnedUsers:
+          type: integer
+          minimum: 0
+          maximum: 10000
+        stalledStrategyCount:
+          type: integer
+          minimum: 0
+        strategies:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserListCoverageStrategy'
+        strategyCount:
+          type: integer
+          minimum: 1
+          maximum: 8
+        uniqueUsers:
+          type: integer
+          minimum: 0
+          maximum: 10000
+    XWritePaymentRequired:
+      allOf:
+      - $ref: '#/components/schemas/XWriteAction'
+      - type: object
+        required:
+        - error
+        - message
+      description: 'Durable failed write action with the applicable payment guidance.
+
+        '
+    PaginatedUsers:
+      description: 'Paginated user profiles. No-mode follower, following, and verified follower requests merge independent views automatically. Response fields, page size, aliases, filters, and per-returned-profile billing stay unchanged. Existing unprefixed cursors retain legacy behavior. Follow next_cursor while has_next_page is true.
+
+        '
+      type: object
+      required:
+      - users
+      - has_next_page
+      - next_cursor
+      properties:
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserProfile'
+        has_next_page:
+          type: boolean
+        next_cursor:
+          type: string
+    UserListCoverageStrategy:
+      type: object
+      required:
+      - duplicateCount
+      - pagesFetched
+      - stopReason
+      - strategy
+      - uniqueAdded
+      properties:
+        duplicateCount:
+          type: integer
+          minimum: 0
+        pagesFetched:
+          type: integer
+          minimum: 0
+        stopReason:
+          $ref: '#/components/schemas/CoverageStopReason'
+        strategy:
+          type: integer
+          minimum: 1
+          maximum: 8
+        uniqueAdded:
+          type: integer
+          minimum: 0
+    UserAffiliateLabel:
+      description: Organization affiliation label shown on an X profile.
+      type: object
+      properties:
+        badgeUrl:
+          type: string
+        description:
+          type: string
+        url:
+          type: string
+        urlType:
+          type: string
+        userLabelDisplayType:
+          type: string
+        userLabelType:
+          type: string
+    GuestWalletCreateCheckoutAction:
+      description: Explicit direct REST action for a new guest wallet checkout.
+      type: object
+      additionalProperties: false
+      required:
+      - account_required
+      - amount_bounds
+      - body
+      - creates
+      - method
+      - path
+      - provider
+      - required_headers
+      - requires_authentication
+      - requires_user_confirmation
+      - requires_user_interaction
+      - response_fields
+      - response_url_field
+      properties:
+        account_required:
+          type: boolean
+          const: false
+        amount_bounds:
+          $ref: '#/components/schemas/GuestWalletAmountBounds'
+        body:
+          $ref: '#/components/schemas/GuestWalletPurchaseRequest'
+        creates:
+          type: string
+          const: checkout_url
+        method:
+          type: string
+          const: POST
+        path:
+          type: string
+          const: /api/v1/guest-wallets
+        provider:
+          type: string
+          deprecated: true
+          const: stripe
+        required_headers:
+          type: object
+          additionalProperties: false
+          required:
+          - Idempotency-Key
+          properties:
+            Idempotency-Key:
+              type: string
+              const: <cryptographically random UUID v4>
+        requires_authentication:
+          type: boolean
+          const: false
+        requires_user_confirmation:
+          type: boolean
+          const: true
+        requires_user_interaction:
+          type: boolean
+          const: true
+        response_fields:
+          type: array
+          minItems: 3
+          maxItems: 3
+          prefixItems:
+          - type: string
+            const: checkout_url
+          - type: string
+            const: api_key
+          - type: string
+            const: status_url
+          items:
+            type: string
+            enum:
+            - checkout_url
+            - api_key
+            - status_url
+        response_url_field:
+          type: string
+          const: checkout_url
+    XWriteActionTarget:
+      type:
+      - object
+      - 'null'
+      description: Existing X resource targeted by the write, when applicable.
+      additionalProperties: false
+      required:
+      - type
+      - id
+      properties:
+        type:
+          type: string
+          enum:
+          - tweet
+          - user
+          - community
+        id:
+          type: string
     TweetPreviousCounts:
       description: Engagement counts retained from a prior tweet edit.
       type: object
@@ -3042,354 +3690,39 @@ components:
           type: integer
         retweetCount:
           type: integer
-    XWriteAction:
+    ContentDisclosure:
+      description: Content disclosure metadata shown by X when a tweet is labeled as paid partnership content or AI-generated media.
       type: object
-      required:
-      - object
-      - id
-      - writeActionId
-      - action
-      - status
-      - terminal
-      - retryable
-      - safeToRetry
-      - statusUrl
-      - pollAfterMs
-      - charged
-      - chargedCredits
-      - billing
-      - request
-      - account
-      - target
-      - targetId
-      - result
-      - nextAction
-      - sendDispatched
-      - success
       properties:
-        object:
-          type: string
-          const: x_write_action
-        id:
-          type: string
-          example: '12345'
-        writeActionId:
-          type: string
-          example: '12345'
-        action:
-          type: string
-          example: like
-          enum:
-          - create_tweet
-          - delete_tweet
-          - like
-          - unlike
-          - retweet
-          - unretweet
-          - follow
-          - unfollow
-          - remove_follower
-          - send_dm
-          - upload_media
-          - update_profile
-          - update_avatar
-          - update_banner
-          - create_community
-          - delete_community
-          - join_community
-          - leave_community
-        status:
-          type: string
-          example: success
-          enum:
-          - accepted
-          - dispatching
-          - pending_confirmation
-          - success
-          - failed
-          - expired
-        terminal:
-          type: boolean
-          example: true
-        retryable:
-          type: boolean
-          description: True only when a new attempt can reasonably succeed.
-          example: false
-        safeToRetry:
-          type: boolean
-          description: 'True only when no write was dispatched and a new idempotency key may be used.
-
-            '
-          example: false
-        statusUrl:
-          type: string
-          example: /api/v1/x/write-actions/12345
-        pollAfterMs:
-          type:
-          - integer
-          - 'null'
-          minimum: 0
-          example: null
-        charged:
-          type: boolean
-          example: true
-        chargedCredits:
-          type: string
-          pattern: ^\d+$
-          example: '10'
-        billing:
-          $ref: '#/components/schemas/XWriteActionBilling'
-        request:
-          $ref: '#/components/schemas/XWriteActionRequest'
-        account:
-          $ref: '#/components/schemas/XWriteActionAccount'
-        target:
-          $ref: '#/components/schemas/XWriteActionTarget'
-        targetId:
-          type:
-          - string
-          - 'null'
-          example: '9876543210'
-        result:
-          $ref: '#/components/schemas/XWriteActionResult'
-        nextAction:
-          $ref: '#/components/schemas/XWriteActionNextAction'
-        requestHash:
-          type: string
-          pattern: ^[0-9a-f]{64}$
-          example: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
-        requestId:
-          type: string
-          example: 01JZ8R7QSC9QKT0V7JX4M2A6B8
-        idempotent:
-          type: boolean
-          example: false
-        error:
-          type: string
-          example: x_write_ambiguous
-        message:
-          type: string
-          example: Invalid input. Check request fields.
-        sendDispatched:
-          type: boolean
-          example: true
-        sendDispatchedAt:
-          type: string
-          format: date-time
-          description: Dispatch timestamp when the write reached execution.
-          example: '2026-07-21T05:00:00Z'
-        createdAt:
-          type: string
-          format: date-time
-          example: '2026-07-21T05:00:00Z'
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2026-07-21T05:00:02Z'
-        completedAt:
-          type: string
-          format: date-time
-          example: '2026-07-21T05:00:02Z'
-        expiresAt:
-          type: string
-          format: date-time
-          description: 'Deadline for resolving a non-terminal write. This is not the Idempotency-Key retention deadline.
-
-            '
-          example: '2026-07-22T05:00:00Z'
-        confirmedAt:
-          type: string
-          format: date-time
-          example: '2026-07-21T05:00:02Z'
-        confirmationCheckedAt:
-          type: string
-          format: date-time
-          example: '2026-07-21T05:00:02Z'
-        confirmationAttempts:
-          type: integer
-          minimum: 0
-          example: 1
-        tweetId:
-          type: string
-          description: Compatibility field for a confirmed tweet result ID.
-          example: '9876543210'
-        messageId:
-          type: string
-          description: Compatibility field for a confirmed direct message ID.
-          example: '1234567890'
-        mediaId:
-          type: string
-          description: Compatibility field for a confirmed media upload ID.
-          example: '2345678901'
-        mediaUrl:
-          type: string
-          format: uri
-          description: Public media URL when the upload creates one.
-          example: https://media.xquik.com/example.jpg
-        communityId:
-          type: string
-          description: Compatibility field for a confirmed community ID.
-          example: '3456789012'
-        communityName:
-          type: string
-          description: Confirmed community name when available.
-          example: Builders
-        resultId:
-          type: string
-          description: Compatibility result ID for other write actions.
-          example: '9876543210'
-        media:
+        advertising:
           type: object
-          additionalProperties: true
-          description: Media count, kind, size, and billing details when used.
-          example:
-            count: 1
-            kind: image
-        details:
-          type: object
-          additionalProperties: true
-          description: Structured recovery context for a failed write.
-          example:
-            suggestion: Poll the action status URL.
-        success:
-          type: boolean
-          example: true
-      description: 'Durable write lifecycle record. Poll statusUrl until terminal is true. Reusing the original Idempotency-Key returns this same record. Submit a new write only when safeToRetry is true, using a new key.
-
-        '
-    XWriteActionBilling:
-      type: object
-      additionalProperties: false
-      required:
-      - status
-      - charged
-      - plannedCredits
-      - chargedCredits
-      properties:
-        status:
-          type: string
-          enum:
-          - not_charged
-          - pending
-          - charged
-          - charge_failed
-          - refunded
-          example: charged
-        charged:
-          type: boolean
-          example: true
-        plannedCredits:
-          type: string
-          pattern: ^\d+$
-          example: '10'
-        chargedCredits:
-          type: string
-          pattern: ^\d+$
-          example: '10'
-      description: 'plannedCredits is the approved maximum. chargedCredits comes from the settled credit ledger. Pending or failed writes are not charged.
-
-        '
-      example:
-        status: charged
-        charged: true
-        plannedCredits: '10'
-        chargedCredits: '10'
-    TweetEdit:
-      description: Edit history metadata returned by X.
-      type: object
-      properties:
-        editTweetIds:
-          type: array
-          items:
-            type: string
-        editableUntilMsecs:
-          type: string
-    TweetCard:
-      description: Public card metadata attached to a tweet.
-      type: object
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        url:
-          type: string
-        bindingValues:
-          type: object
-          additionalProperties: true
-          x-stainless-any: true
-          x-stainless-terraform-type: string
-    MppPaymentRequired:
-      description: Anonymous payment requirement for a direct MPP operation. The response includes an MPP challenge and an accountless Stripe action.
-      type: object
-      required:
-      - account_required
-      - detail
-      - next_step
-      - payment_options
-      - status
-      - title
-      - type
-      properties:
-        account_required:
-          type: boolean
-          const: false
-        challengeId:
-          type: string
-          description: Opaque identifier for the MPP payment challenge.
-          example: mpp_challenge_example
-        detail:
-          type: string
-          example: Payment is required.
-        hint:
-          type: string
-          description: Instructions for selecting and paying an MPP offer.
-          example: Use a supported wallet with an offer from the WWW-Authenticate header.
-        next_step:
-          type: string
-          const: Ask the user to confirm a USD amount before creating checkout.
-        payment_options:
-          type: object
-          additionalProperties: false
-          required:
-          - guest_wallet
           properties:
-            guest_wallet:
-              type: object
-              additionalProperties: false
-              required:
-              - create_checkout
-              properties:
-                create_checkout:
-                  $ref: '#/components/schemas/GuestWalletCreateCheckoutAction'
-        status:
-          type: integer
-          const: 402
-        title:
-          type: string
-          const: Payment Required
-        type:
-          type: string
-          format: uri
-          const: https://paymentauth.org/problems/payment-required
-    GuestWalletAmountBounds:
-      description: Accepted guest wallet purchase range in USD cents.
-      type: object
+            isPaidPromotion:
+              type: boolean
+              description: True when X labels the tweet as paid promotion content.
+        aiGenerated:
+          type: object
+          properties:
+            detectionSource:
+              type: string
+              description: Source of the AI-generated media disclosure.
+            hasAiGeneratedMedia:
+              type: boolean
+              description: True when X labels the tweet as containing AI-generated media.
+    XWriteActionAccount:
+      type:
+      - object
+      - 'null'
+      description: Connected account selected for the write.
       additionalProperties: false
       required:
-      - currency
-      - maximum_minor
-      - minimum_minor
+      - id
+      - username
       properties:
-        currency:
+        id:
           type: string
-          const: usd
-        maximum_minor:
-          type: integer
-          const: 25000
-        minimum_minor:
-          type: integer
-          const: 1000
+        username:
+          type: string
     EmbeddedTweet:
       description: 'Quoted or retweeted tweet context. Every object includes id, text, and engagement metrics. A zero metric can mean X did not report the count. Author, media, and conversation fields appear when available.
 
@@ -3488,49 +3821,67 @@ components:
             $ref: '#/components/schemas/TweetMedia'
         author:
           $ref: '#/components/schemas/UserProfile'
-    XWriteActionTarget:
+    XWriteActionNextAction:
       type:
       - object
       - 'null'
-      description: Existing X resource targeted by the write, when applicable.
+      description: Exact follow-up an API client or agent should perform.
       additionalProperties: false
       required:
       - type
-      - id
       properties:
         type:
           type: string
           enum:
-          - tweet
-          - user
-          - community
-        id:
+          - poll
+          - retry
+          - verify_result
+          - fix_request
+        url:
           type: string
-      example:
-        type: tweet
-        id: '9876543210'
-    AnonymousGuestAuthenticationRequired:
-      description: 'Authentication error for a non-MPP anonymous paid read. The response also advertises optional accountless Stripe checkout after confirmation.
+        afterMs:
+          type: integer
+          minimum: 0
+        requiresNewIdempotencyKey:
+          type: boolean
+    TweetEdit:
+      description: Edit history metadata returned by X.
+      type: object
+      properties:
+        editTweetIds:
+          type: array
+          items:
+            type: string
+        editableUntilMsecs:
+          type: string
+    GuestPaymentRequired:
+      description: 'Credit error for a paid-read guest key with only its accountless guest top-up action.
 
         '
       type: object
       additionalProperties: false
       required:
-      - account_required
+      - balance
       - error
       - message
       - next_step
       - payment_options
+      - required
+      - top_up_endpoint
+      - top_up_url
       properties:
-        account_required:
-          type: boolean
-          const: false
+        balance:
+          type: string
+          pattern: ^\d+$
         error:
           type: string
-          const: unauthenticated
+          enum:
+          - insufficient_credits
+          - no_credits
+          - no_subscription
+          - subscription_inactive
         message:
           type: string
-          example: Authentication required.
         next_step:
           type: string
           const: Ask the user to confirm a USD amount before creating checkout.
@@ -3538,72 +3889,84 @@ components:
           type: object
           additionalProperties: false
           required:
-          - guest_wallet
+          - credits
           properties:
-            guest_wallet:
+            credits:
               type: object
               additionalProperties: false
               required:
               - create_checkout
               properties:
                 create_checkout:
-                  $ref: '#/components/schemas/GuestWalletCreateCheckoutAction'
-    XWriteActionResult:
-      type:
-      - object
-      - 'null'
-      description: Confirmed result produced by the write, when available.
+                  $ref: '#/components/schemas/GuestWalletTopupCheckoutAction'
+        required:
+          type: string
+          pattern: ^\d+$
+        top_up_endpoint:
+          type: string
+          const: /api/v1/guest-wallets/topups
+        top_up_url:
+          type: string
+          const: POST /api/v1/guest-wallets/topups
+    XWriteActionBilling:
+      type: object
       additionalProperties: false
+      required:
+      - status
+      - charged
+      - plannedCredits
+      - chargedCredits
       properties:
-        type:
+        status:
           type: string
           enum:
-          - tweet
-          - direct_message
-          - media
-          - community
-          - state_change
-        id:
-          type: string
-        state:
-          type: string
-      example:
-        type: state_change
-        id: '9876543210'
-        state: liked
-    UserIdentityVerification:
-      description: Identity verification metadata displayed by X.
-      type: object
-      properties:
-        description:
-          type: string
-        isIdentityVerified:
+          - not_charged
+          - pending
+          - charged
+          - charge_failed
+          - refunded
+        charged:
           type: boolean
-        verifiedSinceMsec:
+        plannedCredits:
           type: string
-    TweetPlace:
-      description: Public place metadata attached to a tweet.
+          pattern: ^\d+$
+        chargedCredits:
+          type: string
+          pattern: ^\d+$
+      description: 'plannedCredits is the approved maximum. chargedCredits comes from the settled credit ledger. Pending or failed writes are not charged.
+
+        '
+    GuestWalletPurchaseRequest:
+      description: User-confirmed guest wallet checkout request.
+      type: object
+      additionalProperties: false
+      required:
+      - amount_minor
+      - currency
+      properties:
+        amount_minor:
+          type: integer
+          minimum: 1000
+          maximum: 25000
+          description: USD cents accepted for this checkout.
+        currency:
+          type: string
+          const: usd
+    TweetCard:
+      description: Public card metadata attached to a tweet.
       type: object
       properties:
-        boundingBox:
-          type: object
-          additionalProperties: true
-          x-stainless-any: true
-          x-stainless-terraform-type: string
-        country:
-          type: string
-        countryCode:
-          type: string
-        fullName:
-          type: string
         id:
           type: string
         name:
           type: string
-        placeType:
-          type: string
         url:
           type: string
+        bindingValues:
+          type: object
+          additionalProperties: true
+          x-stainless-any: true
+          x-stainless-terraform-type: string
   securitySchemes:
     apiKey:
       type: apiKey

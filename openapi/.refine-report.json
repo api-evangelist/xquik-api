@@ -1,0 +1,60 @@
+{
+  "provider": "xquik-api",
+  "sources": [
+    "_original/xquik-rest-api-openapi.json"
+  ],
+  "outputs": [
+    "xquik-api-api-keys-api-openapi.yml",
+    "xquik-api-account-api-openapi.yml",
+    "xquik-api-articles-api-openapi.yml",
+    "xquik-api-communities-api-openapi.yml",
+    "xquik-api-composition-api-openapi.yml",
+    "xquik-api-draws-api-openapi.yml",
+    "xquik-api-events-api-openapi.yml",
+    "xquik-api-extractions-api-openapi.yml",
+    "xquik-api-guest-wallets-api-openapi.yml",
+    "xquik-api-lists-api-openapi.yml",
+    "xquik-api-media-api-openapi.yml",
+    "xquik-api-monitors-api-openapi.yml",
+    "xquik-api-subscribe-api-openapi.yml",
+    "xquik-api-support-api-openapi.yml",
+    "xquik-api-trends-api-openapi.yml",
+    "xquik-api-tweets-api-openapi.yml",
+    "xquik-api-users-api-openapi.yml",
+    "xquik-api-webhooks-api-openapi.yml",
+    "xquik-api-x-accounts-api-openapi.yml",
+    "xquik-api-x-write-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [
+    "1 archived document(s) dropped as subsets of other archived documents",
+    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "xquik-rest-api-openapi.json: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "apis.yml register: already-registered"
+  ],
+  "skipped": [
+    "_original/xquik-rest-api-openapi.yml: archived document superseded by a larger archived document",
+    "xquik-api-account-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "xquik-api-api-keys-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "xquik-api-articles-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "xquik-api-communities-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "xquik-api-composition-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "xquik-api-draws-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "xquik-api-events-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "xquik-api-extractions-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "xquik-api-guest-wallets-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "xquik-api-lists-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "xquik-api-media-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "xquik-api-monitors-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "xquik-api-subscribe-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "xquik-api-support-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "xquik-api-trends-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "xquik-api-tweets-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "xquik-api-users-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "xquik-api-webhooks-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "xquik-api-x-accounts-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "xquik-api-x-write-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
+}
