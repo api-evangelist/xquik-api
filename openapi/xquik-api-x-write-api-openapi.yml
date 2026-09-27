@@ -1203,6 +1203,96 @@ paths:
       description: Leave community.
 components:
   responses:
+    Unauthenticated:
+      description: Unauthenticated
+      headers:
+        Cache-Control:
+          description: Prevents storage of authentication responses.
+          schema:
+            type: string
+            const: no-store
+        WWW-Authenticate:
+          description: Bearer authentication challenge.
+          schema:
+            type: string
+            const: Bearer realm="xquik"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: unauthenticated
+            message: Authentication required. Provide a valid API key or bearer token.
+    WriteError:
+      description: 'Write operation failed. Possible error codes include x_write_failed, x_write_ambiguous, x_duplicate_action, and x_daily_limit. Inspect the durable action, safeToRetry, and nextAction fields before retrying.
+
+        '
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: x_write_failed
+            message: Write action failed unexpectedly. Contact support if this persists.
+    WriteActionAccepted:
+      description: 'Write was accepted or dispatched. Poll Location after Retry-After. Never submit another write while this action remains nonterminal.
+
+        '
+      headers:
+        X-Request-Id:
+          required: true
+          description: Correlation ID for this accepted write response.
+          schema:
+            type: string
+        Location:
+          required: true
+          description: Relative URL for polling the durable action record.
+          schema:
+            type: string
+        Retry-After:
+          required: true
+          description: Recommended polling delay in seconds.
+          schema:
+            type: integer
+            minimum: 1
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/XWriteAction'
+          example:
+            object: x_write_action
+            id: '12346'
+            writeActionId: '12346'
+            action: create_tweet
+            status: dispatching
+            terminal: false
+            retryable: false
+            safeToRetry: false
+            statusUrl: /api/v1/x/write-actions/12346
+            pollAfterMs: 2000
+            charged: false
+            chargedCredits: '0'
+            billing:
+              status: pending
+              charged: false
+              plannedCredits: '30'
+              chargedCredits: '0'
+            request:
+              hash: abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789
+              payload:
+                text: Hello from Xquik
+            account:
+              id: '42'
+              username: example
+            target: null
+            targetId: null
+            result: null
+            nextAction:
+              type: poll
+              url: /api/v1/x/write-actions/12346
+              afterMs: 2000
+            sendDispatched: true
+            success: false
     PaymentRequired:
       description: 'Payment required. MPP reads return a problem document and `WWW-Authenticate`. Authenticated reads return balances and checkout actions. Guest keys receive only the guest top-up action. Other endpoints may use legacy errors. A failed request never creates checkout. Require user confirmation before creating one.
 
@@ -1294,17 +1384,62 @@ components:
                   - api_key
                   - status_url
                   response_url_field: checkout_url
-    AccountAuthError:
-      description: 'The connected X account needs reauthentication or is currently restricted (locked, suspended, or recovering). Returns an error code of `account_needs_reauth` or `account_restricted`.
-
-        '
+    NotFound:
+      description: Not found
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
           example:
-            error: account_needs_reauth
-            message: X account needs re-authentication. Re-add the account.
+            error: not_found
+            message: Resource not found.
+    WriteInvalidInput:
+      description: The write request is invalid and no action was dispatched.
+      headers:
+        X-Request-Id:
+          required: true
+          description: Correlation ID for this invalid write request.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/XWriteActionError'
+          example:
+            error: invalid_input
+            message: Invalid input. Check request fields.
+            charged: false
+            chargedCredits: '0'
+            retryable: false
+            safeToRetry: true
+            success: false
+            nextAction:
+              type: fix_request
+    RateLimitExceeded:
+      description: 'Xquik tier rate limit exceeded. The response includes a `Retry-After` header with the number of seconds to wait before retrying.
+
+        '
+      content:
+        application/json:
+          schema:
+            allOf:
+            - $ref: '#/components/schemas/Error'
+            - type: object
+              properties:
+                retryAfter:
+                  type: integer
+                  example: 60
+          example:
+            error: rate_limit_exceeded
+            message: Too many requests. Try again later.
+            retryAfter: 60
+      headers:
+        Retry-After:
+          description: Seconds until the next permitted request.
+          schema:
+            example: 60
+            minimum: 1
+            type: integer
     RateLimitedByX:
       description: 'X throttled the write. Possible codes: `x_rate_limited` (short-term throttle) or `x_daily_limit` (daily cap hit). Back off and retry later. Distinct from Xquik tier-based 429.
 
@@ -1323,26 +1458,37 @@ components:
             example: 60
             minimum: 1
             type: integer
-    XAccountNotFound:
-      description: Connected X account not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: account_not_found
-            message: X account not found. Connect it first at /dashboard/account?tab=x-accounts.
-    WriteRejected:
-      description: 'X rejected the write or media download. Codes include `x_content_too_long`, `x_duplicate_action`, `x_account_suspended`, `x_account_protected`, `x_dm_not_allowed`, `x_target_not_found`, `x_account_feature_required`, `x_rejected`, and `media_download_failed`. The media code covers URL, size, origin, and timeout failures.
+    WriteTrackingUnavailable:
+      description: 'Durable tracking or the write service is temporarily unavailable. Inspect safeToRetry before creating another action.
 
         '
+      headers:
+        X-Request-Id:
+          required: true
+          description: Correlation ID for this tracking failure.
+          schema:
+            type: string
+        Retry-After:
+          description: Recommended retry delay in seconds.
+          schema:
+            type: integer
+            minimum: 1
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            oneOf:
+            - $ref: '#/components/schemas/XWriteActionError'
+            - $ref: '#/components/schemas/XWriteAction'
           example:
-            error: x_rejected
-            message: X rejected this request. Wait a few minutes and try again.
+            error: write_tracking_unavailable
+            message: Write tracking unavailable. Try again.
+            charged: false
+            chargedCredits: '0'
+            retryable: true
+            safeToRetry: true
+            success: false
+            nextAction:
+              type: retry
     WriteActionCompleted:
       description: Write reached a terminal state.
       headers:
@@ -1395,8 +1541,8 @@ components:
             nextAction: null
             sendDispatched: true
             success: true
-    WriteError:
-      description: 'Write operation failed. Possible error codes include x_write_failed, x_write_ambiguous, x_duplicate_action, and x_daily_limit. Inspect the durable action, safeToRetry, and nextAction fields before retrying.
+    AccountAuthError:
+      description: 'The connected X account needs reauthentication or is currently restricted (locked, suspended, or recovering). Returns an error code of `account_needs_reauth` or `account_restricted`.
 
         '
       content:
@@ -1404,73 +1550,23 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
           example:
-            error: x_write_failed
-            message: Write action failed unexpectedly. Contact support if this persists.
-    WriteActionAccepted:
-      description: 'Write was accepted or dispatched. Poll Location after Retry-After. Never submit another write while this action remains nonterminal.
-
-        '
-      headers:
-        X-Request-Id:
-          required: true
-          description: Correlation ID for this accepted write response.
-          schema:
-            type: string
-        Location:
-          required: true
-          description: Relative URL for polling the durable action record.
-          schema:
-            type: string
-        Retry-After:
-          required: true
-          description: Recommended polling delay in seconds.
-          schema:
-            type: integer
-            minimum: 1
+            error: account_needs_reauth
+            message: X account needs re-authentication. Re-add the account.
+    UnexpectedError:
       content:
         application/json:
-          schema:
-            $ref: '#/components/schemas/XWriteAction'
           example:
-            object: x_write_action
-            id: '12346'
-            writeActionId: '12346'
-            action: create_tweet
-            status: dispatching
-            terminal: false
-            retryable: false
-            safeToRetry: false
-            statusUrl: /api/v1/x/write-actions/12346
-            pollAfterMs: 2000
-            charged: false
-            chargedCredits: '0'
-            billing:
-              status: pending
-              charged: false
-              plannedCredits: '30'
-              chargedCredits: '0'
-            request:
-              hash: abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789
-              payload:
-                text: Hello from Xquik
-            account:
-              id: '42'
-              username: example
-            target: null
-            targetId: null
-            result: null
-            nextAction:
-              type: poll
-              url: /api/v1/x/write-actions/12346
-              afterMs: 2000
-            sendDispatched: true
-            success: false
-    WriteInvalidInput:
-      description: The write request is invalid and no action was dispatched.
+            error: internal_error
+            message: Unexpected error. Try again.
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Unexpected error.
+    WriteIdempotencyConflict:
+      description: The idempotency key belongs to a different write request.
       headers:
         X-Request-Id:
           required: true
-          description: Correlation ID for this invalid write request.
+          description: Correlation ID for this idempotency conflict.
           schema:
             type: string
       content:
@@ -1478,46 +1574,16 @@ components:
           schema:
             $ref: '#/components/schemas/XWriteActionError'
           example:
-            error: invalid_input
-            message: Invalid input. Check request fields.
             charged: false
             chargedCredits: '0'
+            error: idempotency_conflict
+            message: Idempotency-Key was already used with a different request.
+            safeToRetry: true
             retryable: false
-            safeToRetry: true
-            success: false
-            nextAction:
-              type: fix_request
-    WriteTrackingUnavailable:
-      description: 'Durable tracking or the write service is temporarily unavailable. Inspect safeToRetry before creating another action.
-
-        '
-      headers:
-        X-Request-Id:
-          required: true
-          description: Correlation ID for this tracking failure.
-          schema:
-            type: string
-        Retry-After:
-          description: Recommended retry delay in seconds.
-          schema:
-            type: integer
-            minimum: 1
-      content:
-        application/json:
-          schema:
-            oneOf:
-            - $ref: '#/components/schemas/XWriteActionError'
-            - $ref: '#/components/schemas/XWriteAction'
-          example:
-            error: write_tracking_unavailable
-            message: Write tracking unavailable. Try again.
-            charged: false
-            chargedCredits: '0'
-            retryable: true
-            safeToRetry: true
             success: false
             nextAction:
               type: retry
+              requiresNewIdempotencyKey: true
     WriteRateLimited:
       description: 'A write was throttled by Xquik''s tier or action limits (`rate_limit_exceeded`) or by X (`x_rate_limited`, `x_daily_limit`). Respect the `Retry-After` header when present, otherwise back off before retrying.
 
@@ -1555,390 +1621,27 @@ components:
             example: 60
             minimum: 1
             type: integer
-    NotFound:
-      description: Not found
+    XAccountNotFound:
+      description: Connected X account not found
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
           example:
-            error: not_found
-            message: Resource not found.
-    Unauthenticated:
-      description: Unauthenticated
-      headers:
-        Cache-Control:
-          description: Prevents storage of authentication responses.
-          schema:
-            type: string
-            const: no-store
-        WWW-Authenticate:
-          description: Bearer authentication challenge.
-          schema:
-            type: string
-            const: Bearer realm="xquik"
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: unauthenticated
-            message: Authentication required. Provide a valid API key or bearer token.
-    RateLimitExceeded:
-      description: 'Xquik tier rate limit exceeded. The response includes a `Retry-After` header with the number of seconds to wait before retrying.
+            error: account_not_found
+            message: X account not found. Connect it first at /dashboard/account?tab=x-accounts.
+    WriteRejected:
+      description: 'X rejected the write or media download. Codes include `x_content_too_long`, `x_duplicate_action`, `x_account_suspended`, `x_account_protected`, `x_dm_not_allowed`, `x_target_not_found`, `x_account_feature_required`, `x_rejected`, and `media_download_failed`. The media code covers URL, size, origin, and timeout failures.
 
         '
       content:
         application/json:
           schema:
-            allOf:
-            - $ref: '#/components/schemas/Error'
-            - type: object
-              properties:
-                retryAfter:
-                  type: integer
-                  example: 60
-          example:
-            error: rate_limit_exceeded
-            message: Too many requests. Try again later.
-            retryAfter: 60
-      headers:
-        Retry-After:
-          description: Seconds until the next permitted request.
-          schema:
-            example: 60
-            minimum: 1
-            type: integer
-    WriteIdempotencyConflict:
-      description: The idempotency key belongs to a different write request.
-      headers:
-        X-Request-Id:
-          required: true
-          description: Correlation ID for this idempotency conflict.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/XWriteActionError'
-          example:
-            charged: false
-            chargedCredits: '0'
-            error: idempotency_conflict
-            message: Idempotency-Key was already used with a different request.
-            safeToRetry: true
-            retryable: false
-            success: false
-            nextAction:
-              type: retry
-              requiresNewIdempotencyKey: true
-    UnexpectedError:
-      content:
-        application/json:
-          example:
-            error: internal_error
-            message: Unexpected error. Try again.
-          schema:
             $ref: '#/components/schemas/Error'
-      description: Unexpected error.
+          example:
+            error: x_rejected
+            message: X rejected this request. Wait a few minutes and try again.
   schemas:
-    XWriteActionTarget:
-      type:
-      - object
-      - 'null'
-      description: Existing X resource targeted by the write, when applicable.
-      additionalProperties: false
-      required:
-      - type
-      - id
-      properties:
-        type:
-          type: string
-          enum:
-          - tweet
-          - user
-          - community
-        id:
-          type: string
-    GuestWalletTopupCheckoutAction:
-      description: Explicit direct REST action for a guest wallet top-up.
-      type: object
-      additionalProperties: false
-      required:
-      - account_required
-      - amount_bounds
-      - body
-      - creates
-      - method
-      - path
-      - provider
-      - required_headers
-      - requires_authentication
-      - requires_user_confirmation
-      - requires_user_interaction
-      - response_fields
-      - response_url_field
-      properties:
-        account_required:
-          type: boolean
-          const: false
-        amount_bounds:
-          $ref: '#/components/schemas/GuestWalletAmountBounds'
-        body:
-          $ref: '#/components/schemas/GuestWalletPurchaseRequest'
-        creates:
-          type: string
-          const: checkout_url
-        method:
-          type: string
-          const: POST
-        path:
-          type: string
-          const: /api/v1/guest-wallets/topups
-        provider:
-          type: string
-          deprecated: true
-          const: stripe
-        required_headers:
-          type: object
-          additionalProperties: false
-          required:
-          - Idempotency-Key
-          properties:
-            Idempotency-Key:
-              type: string
-              const: <cryptographically random UUID v4>
-        requires_authentication:
-          type: boolean
-          const: true
-        requires_user_confirmation:
-          type: boolean
-          const: true
-        requires_user_interaction:
-          type: boolean
-          const: true
-        response_fields:
-          type: array
-          minItems: 2
-          maxItems: 2
-          prefixItems:
-          - type: string
-            const: checkout_url
-          - type: string
-            const: status_url
-          items:
-            type: string
-            enum:
-            - checkout_url
-            - status_url
-        response_url_field:
-          type: string
-          const: checkout_url
-    XWriteActionResult:
-      type:
-      - object
-      - 'null'
-      description: Confirmed result produced by the write, when available.
-      additionalProperties: false
-      properties:
-        type:
-          type: string
-          enum:
-          - tweet
-          - direct_message
-          - media
-          - community
-          - state_change
-        id:
-          type: string
-        state:
-          type: string
-    XWritePaymentRequired:
-      allOf:
-      - $ref: '#/components/schemas/XWriteAction'
-      - type: object
-        required:
-        - error
-        - message
-      description: 'Durable failed write action with the applicable payment guidance.
-
-        '
-    XWriteAction:
-      type: object
-      required:
-      - object
-      - id
-      - writeActionId
-      - action
-      - status
-      - terminal
-      - retryable
-      - safeToRetry
-      - statusUrl
-      - pollAfterMs
-      - charged
-      - chargedCredits
-      - billing
-      - request
-      - account
-      - target
-      - targetId
-      - result
-      - nextAction
-      - sendDispatched
-      - success
-      properties:
-        object:
-          type: string
-          const: x_write_action
-        id:
-          type: string
-        writeActionId:
-          type: string
-        action:
-          type: string
-          enum:
-          - create_tweet
-          - delete_tweet
-          - like
-          - unlike
-          - retweet
-          - unretweet
-          - follow
-          - unfollow
-          - remove_follower
-          - send_dm
-          - upload_media
-          - update_profile
-          - update_avatar
-          - update_banner
-          - create_community
-          - delete_community
-          - join_community
-          - leave_community
-        status:
-          type: string
-          enum:
-          - accepted
-          - dispatching
-          - pending_confirmation
-          - success
-          - failed
-          - expired
-        terminal:
-          type: boolean
-        retryable:
-          type: boolean
-          description: True only when a new attempt can reasonably succeed.
-        safeToRetry:
-          type: boolean
-          description: 'True only when no write was dispatched and a new idempotency key may be used.
-
-            '
-        statusUrl:
-          type: string
-        pollAfterMs:
-          type:
-          - integer
-          - 'null'
-          minimum: 0
-        charged:
-          type: boolean
-        chargedCredits:
-          type: string
-          pattern: ^\d+$
-        billing:
-          $ref: '#/components/schemas/XWriteActionBilling'
-        request:
-          $ref: '#/components/schemas/XWriteActionRequest'
-        account:
-          $ref: '#/components/schemas/XWriteActionAccount'
-        target:
-          $ref: '#/components/schemas/XWriteActionTarget'
-        targetId:
-          type:
-          - string
-          - 'null'
-        result:
-          $ref: '#/components/schemas/XWriteActionResult'
-        nextAction:
-          $ref: '#/components/schemas/XWriteActionNextAction'
-        requestHash:
-          type: string
-          pattern: ^[0-9a-f]{64}$
-        requestId:
-          type: string
-        idempotent:
-          type: boolean
-        error:
-          type: string
-        message:
-          type: string
-        sendDispatched:
-          type: boolean
-        sendDispatchedAt:
-          type: string
-          format: date-time
-          description: Dispatch timestamp when the write reached execution.
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-        completedAt:
-          type: string
-          format: date-time
-        expiresAt:
-          type: string
-          format: date-time
-          description: 'Deadline for resolving a non-terminal write. This is not the Idempotency-Key retention deadline.
-
-            '
-        confirmedAt:
-          type: string
-          format: date-time
-        confirmationCheckedAt:
-          type: string
-          format: date-time
-        confirmationAttempts:
-          type: integer
-          minimum: 0
-        tweetId:
-          type: string
-          description: Compatibility field for a confirmed tweet result ID.
-        messageId:
-          type: string
-          description: Compatibility field for a confirmed direct message ID.
-        mediaId:
-          type: string
-          description: Compatibility field for a confirmed media upload ID.
-        mediaUrl:
-          type: string
-          format: uri
-          description: Public media URL when the upload creates one.
-        communityId:
-          type: string
-          description: Compatibility field for a confirmed community ID.
-        communityName:
-          type: string
-          description: Confirmed community name when available.
-        resultId:
-          type: string
-          description: Compatibility result ID for other write actions.
-        media:
-          type: object
-          additionalProperties: true
-          description: Media count, kind, size, and billing details when used.
-        details:
-          type: object
-          additionalProperties: true
-          description: Structured recovery context for a failed write.
-        success:
-          type: boolean
-      description: 'Durable write lifecycle record. Poll statusUrl until terminal is true. Reusing the original Idempotency-Key returns this same record. Submit a new write only when safeToRetry is true, using a new key.
-
-        '
     XAccountBody:
       description: Request body identifying an X account by username or ID.
       type: object
@@ -1948,226 +1651,44 @@ components:
         account:
           type: string
           description: X account identifier (@username or account ID)
-    MppPaymentRequired:
-      description: Anonymous payment requirement for a direct MPP operation. The response includes an MPP challenge and an accountless checkout action.
+    XWriteActionRequest:
       type: object
+      description: Stable fingerprint and sanitized payload for replay checks.
+      additionalProperties: false
       required:
-      - account_required
-      - detail
-      - next_step
-      - payment_options
-      - status
-      - title
-      - type
+      - hash
+      - payload
       properties:
-        account_required:
-          type: boolean
-          const: false
-        challengeId:
+        hash:
+          type:
+          - string
+          - 'null'
+          pattern: ^[0-9a-f]{64}$
+          description: Stable hash of account, action, target, and payload.
+        payload:
+          type:
+          - object
+          - 'null'
+          additionalProperties: true
+          description: Exact sanitized payload dispatched for this action.
+    GuestWalletAmountBounds:
+      description: Accepted guest wallet purchase range in USD cents.
+      type: object
+      additionalProperties: false
+      required:
+      - currency
+      - maximum_minor
+      - minimum_minor
+      properties:
+        currency:
           type: string
-          description: Opaque identifier for the MPP payment challenge.
-        detail:
-          type: string
-        hint:
-          type: string
-          description: Instructions for selecting and paying an MPP offer.
-        next_step:
-          type: string
-          const: Ask the user to confirm a USD amount before creating checkout.
-        payment_options:
-          type: object
-          additionalProperties: false
-          required:
-          - guest_wallet
-          properties:
-            guest_wallet:
-              type: object
-              additionalProperties: false
-              required:
-              - create_checkout
-              properties:
-                create_checkout:
-                  $ref: '#/components/schemas/GuestWalletCreateCheckoutAction'
-        status:
+          const: usd
+        maximum_minor:
           type: integer
-          const: 402
-        title:
-          type: string
-          const: Payment Required
-        type:
-          type: string
-          format: uri
-          const: https://paymentauth.org/problems/payment-required
-    XWriteActionAccount:
-      type:
-      - object
-      - 'null'
-      description: Connected account selected for the write.
-      additionalProperties: false
-      required:
-      - id
-      - username
-      properties:
-        id:
-          type: string
-        username:
-          type: string
-    AuthenticatedPaymentRequired:
-      description: Authenticated credit or subscription error with confirmation-gated hosted checkout actions.
-      type: object
-      additionalProperties: false
-      required:
-      - balance
-      - dashboard
-      - error
-      - message
-      - next_step
-      - payment_options
-      - required
-      - top_up_endpoint
-      - top_up_url
-      properties:
-        balance:
-          type: string
-          pattern: ^\d+$
-          description: Available credits as a decimal string.
-        dashboard:
-          type: string
-          const: /dashboard/account
-          description: Account page for manual billing management.
-        error:
-          type: string
-          enum:
-          - insufficient_credits
-          - no_credits
-          - no_subscription
-          - subscription_inactive
-        message:
-          type: string
-        next_step:
-          type: string
-          const: Ask the user to confirm a payment option before creating checkout.
-        payment_options:
-          type: object
-          additionalProperties: false
-          required:
-          - credits
-          - subscription
-          properties:
-            credits:
-              type: object
-              additionalProperties: false
-              required:
-              - create_checkout
-              properties:
-                create_checkout:
-                  type: object
-                  additionalProperties: false
-                  required:
-                  - body
-                  - creates
-                  - method
-                  - path
-                  - provider
-                  - requires_authentication
-                  - requires_user_confirmation
-                  - response_url_field
-                  properties:
-                    body:
-                      type: object
-                      additionalProperties: false
-                      required:
-                      - dollars
-                      - locale
-                      properties:
-                        dollars:
-                          type: integer
-                          const: 10
-                        locale:
-                          type: string
-                          const: en
-                    creates:
-                      type: string
-                      const: checkout_url
-                    method:
-                      type: string
-                      const: POST
-                    path:
-                      type: string
-                      const: /api/v1/credits/topup
-                    provider:
-                      type: string
-                      deprecated: true
-                      const: stripe
-                    requires_authentication:
-                      type: boolean
-                      const: true
-                    requires_user_confirmation:
-                      type: boolean
-                      const: true
-                    response_url_field:
-                      type: string
-                      const: url
-            subscription:
-              type: object
-              additionalProperties: false
-              required:
-              - create_checkout
-              properties:
-                create_checkout:
-                  type: object
-                  additionalProperties: false
-                  required:
-                  - body
-                  - creates
-                  - method
-                  - path
-                  - provider
-                  - requires_authentication
-                  - requires_user_confirmation
-                  - response_url_field
-                  properties:
-                    body:
-                      type: object
-                      additionalProperties: false
-                      required:
-                      - tier
-                      properties:
-                        tier:
-                          type: string
-                          const: starter
-                    creates:
-                      type: string
-                      const: checkout_url
-                    method:
-                      type: string
-                      const: POST
-                    path:
-                      type: string
-                      const: /api/v1/subscribe
-                    provider:
-                      type: string
-                      deprecated: true
-                      const: stripe
-                    requires_authentication:
-                      type: boolean
-                      const: true
-                    requires_user_confirmation:
-                      type: boolean
-                      const: true
-                    response_url_field:
-                      type: string
-                      const: url
-        required:
-          type: string
-          pattern: ^\d+$
-          description: Credits required for the blocked request.
-        top_up_endpoint:
-          type: string
-          const: /api/v1/credits/topup
-        top_up_url:
-          type: string
-          const: POST /api/v1/credits/topup
+          const: 25000
+        minimum_minor:
+          type: integer
+          const: 1000
     Error:
       description: 'Error response. Default v1 returns a legacy string error code. Send `xquik-api-contract: 2026-04-29` to receive the structured best-practice error object.
 
@@ -2447,205 +1968,231 @@ components:
           type: integer
           minimum: 1
           description: Required wait in milliseconds.
-    GuestWalletAmountBounds:
-      description: Accepted guest wallet purchase range in USD cents.
-      type: object
-      additionalProperties: false
-      required:
-      - currency
-      - maximum_minor
-      - minimum_minor
-      properties:
-        currency:
-          type: string
-          const: usd
-        maximum_minor:
-          type: integer
-          const: 25000
-        minimum_minor:
-          type: integer
-          const: 1000
-    XWriteActionRequest:
-      type: object
-      description: Stable fingerprint and sanitized payload for replay checks.
-      additionalProperties: false
-      required:
-      - hash
-      - payload
-      properties:
-        hash:
-          type:
-          - string
-          - 'null'
-          pattern: ^[0-9a-f]{64}$
-          description: Stable hash of account, action, target, and payload.
-        payload:
-          type:
-          - object
-          - 'null'
-          additionalProperties: true
-          description: Exact sanitized payload dispatched for this action.
-    XWriteActionNextAction:
+    XWriteActionAccount:
       type:
       - object
       - 'null'
-      description: Exact follow-up an API client or agent should perform.
+      description: Connected account selected for the write.
       additionalProperties: false
       required:
-      - type
+      - id
+      - username
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+    XWriteActionResult:
+      type:
+      - object
+      - 'null'
+      description: Confirmed result produced by the write, when available.
+      additionalProperties: false
       properties:
         type:
           type: string
           enum:
-          - poll
-          - retry
-          - verify_result
-          - fix_request
-        url:
+          - tweet
+          - direct_message
+          - media
+          - community
+          - state_change
+        id:
           type: string
-        afterMs:
-          type: integer
-          minimum: 0
-        requiresNewIdempotencyKey:
-          type: boolean
-    XWriteActionError:
+        state:
+          type: string
+    XWriteAction:
       type: object
-      description: Canonical pre-dispatch error with safe recovery guidance.
-      additionalProperties: true
       required:
-      - error
-      - message
+      - object
+      - id
+      - writeActionId
+      - action
+      - status
+      - terminal
       - retryable
       - safeToRetry
+      - statusUrl
+      - pollAfterMs
       - charged
       - chargedCredits
-      - success
+      - billing
+      - request
+      - account
+      - target
+      - targetId
+      - result
       - nextAction
+      - sendDispatched
+      - success
       properties:
-        error:
+        object:
           type: string
-        message:
+          const: x_write_action
+        id:
           type: string
-        retryable:
-          type: boolean
-        safeToRetry:
-          type: boolean
-        charged:
-          type: boolean
-          const: false
-        chargedCredits:
-          type: string
-          const: '0'
-        success:
-          type: boolean
-          const: false
         writeActionId:
           type: string
-        statusUrl:
-          type: string
-        nextAction:
-          $ref: '#/components/schemas/XWriteActionNextAction'
-        allowedFields:
-          type: array
-          items:
-            type: string
-        fieldErrors:
-          type: array
-          items:
-            type: object
-            required:
-            - code
-            - message
-            - path
-            properties:
-              code:
-                type: string
-              message:
-                type: string
-              path:
-                type: string
-    GuestPaymentRequired:
-      description: 'Credit error for a paid-read guest key with only its accountless guest top-up action.
-
-        '
-      type: object
-      additionalProperties: false
-      required:
-      - balance
-      - error
-      - message
-      - next_step
-      - payment_options
-      - required
-      - top_up_endpoint
-      - top_up_url
-      properties:
-        balance:
-          type: string
-          pattern: ^\d+$
-        error:
+        action:
           type: string
           enum:
-          - insufficient_credits
-          - no_credits
-          - no_subscription
-          - subscription_inactive
-        message:
-          type: string
-        next_step:
-          type: string
-          const: Ask the user to confirm a USD amount before creating checkout.
-        payment_options:
-          type: object
-          additionalProperties: false
-          required:
-          - credits
-          properties:
-            credits:
-              type: object
-              additionalProperties: false
-              required:
-              - create_checkout
-              properties:
-                create_checkout:
-                  $ref: '#/components/schemas/GuestWalletTopupCheckoutAction'
-        required:
-          type: string
-          pattern: ^\d+$
-        top_up_endpoint:
-          type: string
-          const: /api/v1/guest-wallets/topups
-        top_up_url:
-          type: string
-          const: POST /api/v1/guest-wallets/topups
-    XWriteActionBilling:
-      type: object
-      additionalProperties: false
-      required:
-      - status
-      - charged
-      - plannedCredits
-      - chargedCredits
-      properties:
+          - create_tweet
+          - delete_tweet
+          - like
+          - unlike
+          - retweet
+          - unretweet
+          - follow
+          - unfollow
+          - remove_follower
+          - send_dm
+          - upload_media
+          - update_profile
+          - update_avatar
+          - update_banner
+          - create_community
+          - delete_community
+          - join_community
+          - leave_community
         status:
           type: string
           enum:
-          - not_charged
-          - pending
-          - charged
-          - charge_failed
-          - refunded
+          - accepted
+          - dispatching
+          - pending_confirmation
+          - success
+          - failed
+          - expired
+        terminal:
+          type: boolean
+        retryable:
+          type: boolean
+          description: True only when a new attempt can reasonably succeed.
+        safeToRetry:
+          type: boolean
+          description: 'True only when no write was dispatched and a new idempotency key may be used.
+
+            '
+        statusUrl:
+          type: string
+        pollAfterMs:
+          type:
+          - integer
+          - 'null'
+          minimum: 0
         charged:
           type: boolean
-        plannedCredits:
-          type: string
-          pattern: ^\d+$
         chargedCredits:
           type: string
           pattern: ^\d+$
-      description: 'plannedCredits is the approved maximum. chargedCredits comes from the settled credit ledger. Pending or failed writes are not charged.
+        billing:
+          $ref: '#/components/schemas/XWriteActionBilling'
+        request:
+          $ref: '#/components/schemas/XWriteActionRequest'
+        account:
+          $ref: '#/components/schemas/XWriteActionAccount'
+        target:
+          $ref: '#/components/schemas/XWriteActionTarget'
+        targetId:
+          type:
+          - string
+          - 'null'
+        result:
+          $ref: '#/components/schemas/XWriteActionResult'
+        nextAction:
+          $ref: '#/components/schemas/XWriteActionNextAction'
+        requestHash:
+          type: string
+          pattern: ^[0-9a-f]{64}$
+        requestId:
+          type: string
+        idempotent:
+          type: boolean
+        error:
+          type: string
+        message:
+          type: string
+        sendDispatched:
+          type: boolean
+        sendDispatchedAt:
+          type: string
+          format: date-time
+          description: Dispatch timestamp when the write reached execution.
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+          description: 'Deadline for resolving a non-terminal write. This is not the Idempotency-Key retention deadline.
+
+            '
+        confirmedAt:
+          type: string
+          format: date-time
+        confirmationCheckedAt:
+          type: string
+          format: date-time
+        confirmationAttempts:
+          type: integer
+          minimum: 0
+        tweetId:
+          type: string
+          description: Compatibility field for a confirmed tweet result ID.
+        messageId:
+          type: string
+          description: Compatibility field for a confirmed direct message ID.
+        mediaId:
+          type: string
+          description: Compatibility field for a confirmed media upload ID.
+        mediaUrl:
+          type: string
+          format: uri
+          description: Public media URL when the upload creates one.
+        communityId:
+          type: string
+          description: Compatibility field for a confirmed community ID.
+        communityName:
+          type: string
+          description: Confirmed community name when available.
+        resultId:
+          type: string
+          description: Compatibility result ID for other write actions.
+        media:
+          type: object
+          additionalProperties: true
+          description: Media count, kind, size, and billing details when used.
+        details:
+          type: object
+          additionalProperties: true
+          description: Structured recovery context for a failed write.
+        success:
+          type: boolean
+      description: 'Durable write lifecycle record. Poll statusUrl until terminal is true. Reusing the original Idempotency-Key returns this same record. Submit a new write only when safeToRetry is true, using a new key.
 
         '
+    GuestWalletPurchaseRequest:
+      description: User-confirmed guest wallet checkout request.
+      type: object
+      additionalProperties: false
+      required:
+      - amount_minor
+      - currency
+      properties:
+        amount_minor:
+          type: integer
+          minimum: 1000
+          maximum: 25000
+          description: USD cents accepted for this checkout.
+        currency:
+          type: string
+          const: usd
     GuestWalletCreateCheckoutAction:
       description: Explicit direct REST action for a new guest wallet checkout.
       type: object
@@ -2723,23 +2270,483 @@ components:
         response_url_field:
           type: string
           const: checkout_url
-    GuestWalletPurchaseRequest:
-      description: User-confirmed guest wallet checkout request.
+    XWriteActionTarget:
+      type:
+      - object
+      - 'null'
+      description: Existing X resource targeted by the write, when applicable.
+      additionalProperties: false
+      required:
+      - type
+      - id
+      properties:
+        type:
+          type: string
+          enum:
+          - tweet
+          - user
+          - community
+        id:
+          type: string
+    AuthenticatedPaymentRequired:
+      description: Authenticated credit or subscription error with confirmation-gated hosted checkout actions.
       type: object
       additionalProperties: false
       required:
-      - amount_minor
-      - currency
+      - balance
+      - dashboard
+      - error
+      - message
+      - next_step
+      - payment_options
+      - required
+      - top_up_endpoint
+      - top_up_url
       properties:
-        amount_minor:
-          type: integer
-          minimum: 1000
-          maximum: 25000
-          description: USD cents accepted for this checkout.
-        currency:
+        balance:
           type: string
-          const: usd
+          pattern: ^\d+$
+          description: Available credits as a decimal string.
+        dashboard:
+          type: string
+          const: /dashboard/account
+          description: Account page for manual billing management.
+        error:
+          type: string
+          enum:
+          - insufficient_credits
+          - no_credits
+          - no_subscription
+          - subscription_inactive
+        message:
+          type: string
+        next_step:
+          type: string
+          const: Ask the user to confirm a payment option before creating checkout.
+        payment_options:
+          type: object
+          additionalProperties: false
+          required:
+          - credits
+          - subscription
+          properties:
+            credits:
+              type: object
+              additionalProperties: false
+              required:
+              - create_checkout
+              properties:
+                create_checkout:
+                  type: object
+                  additionalProperties: false
+                  required:
+                  - body
+                  - creates
+                  - method
+                  - path
+                  - provider
+                  - requires_authentication
+                  - requires_user_confirmation
+                  - response_url_field
+                  properties:
+                    body:
+                      type: object
+                      additionalProperties: false
+                      required:
+                      - dollars
+                      - locale
+                      properties:
+                        dollars:
+                          type: integer
+                          const: 10
+                        locale:
+                          type: string
+                          const: en
+                    creates:
+                      type: string
+                      const: checkout_url
+                    method:
+                      type: string
+                      const: POST
+                    path:
+                      type: string
+                      const: /api/v1/credits/topup
+                    provider:
+                      type: string
+                      deprecated: true
+                      const: stripe
+                    requires_authentication:
+                      type: boolean
+                      const: true
+                    requires_user_confirmation:
+                      type: boolean
+                      const: true
+                    response_url_field:
+                      type: string
+                      const: url
+            subscription:
+              type: object
+              additionalProperties: false
+              required:
+              - create_checkout
+              properties:
+                create_checkout:
+                  type: object
+                  additionalProperties: false
+                  required:
+                  - body
+                  - creates
+                  - method
+                  - path
+                  - provider
+                  - requires_authentication
+                  - requires_user_confirmation
+                  - response_url_field
+                  properties:
+                    body:
+                      type: object
+                      additionalProperties: false
+                      required:
+                      - tier
+                      properties:
+                        tier:
+                          type: string
+                          const: starter
+                    creates:
+                      type: string
+                      const: checkout_url
+                    method:
+                      type: string
+                      const: POST
+                    path:
+                      type: string
+                      const: /api/v1/subscribe
+                    provider:
+                      type: string
+                      deprecated: true
+                      const: stripe
+                    requires_authentication:
+                      type: boolean
+                      const: true
+                    requires_user_confirmation:
+                      type: boolean
+                      const: true
+                    response_url_field:
+                      type: string
+                      const: url
+        required:
+          type: string
+          pattern: ^\d+$
+          description: Credits required for the blocked request.
+        top_up_endpoint:
+          type: string
+          const: /api/v1/credits/topup
+        top_up_url:
+          type: string
+          const: POST /api/v1/credits/topup
+    XWriteActionError:
+      type: object
+      description: Canonical pre-dispatch error with safe recovery guidance.
+      additionalProperties: true
+      required:
+      - error
+      - message
+      - retryable
+      - safeToRetry
+      - charged
+      - chargedCredits
+      - success
+      - nextAction
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        retryable:
+          type: boolean
+        safeToRetry:
+          type: boolean
+        charged:
+          type: boolean
+          const: false
+        chargedCredits:
+          type: string
+          const: '0'
+        success:
+          type: boolean
+          const: false
+        writeActionId:
+          type: string
+        statusUrl:
+          type: string
+        nextAction:
+          $ref: '#/components/schemas/XWriteActionNextAction'
+        allowedFields:
+          type: array
+          items:
+            type: string
+        fieldErrors:
+          type: array
+          items:
+            type: object
+            required:
+            - code
+            - message
+            - path
+            properties:
+              code:
+                type: string
+              message:
+                type: string
+              path:
+                type: string
+    XWritePaymentRequired:
+      allOf:
+      - $ref: '#/components/schemas/XWriteAction'
+      - type: object
+        required:
+        - error
+        - message
+      description: 'Durable failed write action with the applicable payment guidance.
+
+        '
+    XWriteActionBilling:
+      type: object
+      additionalProperties: false
+      required:
+      - status
+      - charged
+      - plannedCredits
+      - chargedCredits
+      properties:
+        status:
+          type: string
+          enum:
+          - not_charged
+          - pending
+          - charged
+          - charge_failed
+          - refunded
+        charged:
+          type: boolean
+        plannedCredits:
+          type: string
+          pattern: ^\d+$
+        chargedCredits:
+          type: string
+          pattern: ^\d+$
+      description: 'plannedCredits is the approved maximum. chargedCredits comes from the settled credit ledger. Pending or failed writes are not charged.
+
+        '
+    GuestWalletTopupCheckoutAction:
+      description: Explicit direct REST action for a guest wallet top-up.
+      type: object
+      additionalProperties: false
+      required:
+      - account_required
+      - amount_bounds
+      - body
+      - creates
+      - method
+      - path
+      - provider
+      - required_headers
+      - requires_authentication
+      - requires_user_confirmation
+      - requires_user_interaction
+      - response_fields
+      - response_url_field
+      properties:
+        account_required:
+          type: boolean
+          const: false
+        amount_bounds:
+          $ref: '#/components/schemas/GuestWalletAmountBounds'
+        body:
+          $ref: '#/components/schemas/GuestWalletPurchaseRequest'
+        creates:
+          type: string
+          const: checkout_url
+        method:
+          type: string
+          const: POST
+        path:
+          type: string
+          const: /api/v1/guest-wallets/topups
+        provider:
+          type: string
+          deprecated: true
+          const: stripe
+        required_headers:
+          type: object
+          additionalProperties: false
+          required:
+          - Idempotency-Key
+          properties:
+            Idempotency-Key:
+              type: string
+              const: <cryptographically random UUID v4>
+        requires_authentication:
+          type: boolean
+          const: true
+        requires_user_confirmation:
+          type: boolean
+          const: true
+        requires_user_interaction:
+          type: boolean
+          const: true
+        response_fields:
+          type: array
+          minItems: 2
+          maxItems: 2
+          prefixItems:
+          - type: string
+            const: checkout_url
+          - type: string
+            const: status_url
+          items:
+            type: string
+            enum:
+            - checkout_url
+            - status_url
+        response_url_field:
+          type: string
+          const: checkout_url
+    GuestPaymentRequired:
+      description: 'Credit error for a paid-read guest key with only its accountless guest top-up action.
+
+        '
+      type: object
+      additionalProperties: false
+      required:
+      - balance
+      - error
+      - message
+      - next_step
+      - payment_options
+      - required
+      - top_up_endpoint
+      - top_up_url
+      properties:
+        balance:
+          type: string
+          pattern: ^\d+$
+        error:
+          type: string
+          enum:
+          - insufficient_credits
+          - no_credits
+          - no_subscription
+          - subscription_inactive
+        message:
+          type: string
+        next_step:
+          type: string
+          const: Ask the user to confirm a USD amount before creating checkout.
+        payment_options:
+          type: object
+          additionalProperties: false
+          required:
+          - credits
+          properties:
+            credits:
+              type: object
+              additionalProperties: false
+              required:
+              - create_checkout
+              properties:
+                create_checkout:
+                  $ref: '#/components/schemas/GuestWalletTopupCheckoutAction'
+        required:
+          type: string
+          pattern: ^\d+$
+        top_up_endpoint:
+          type: string
+          const: /api/v1/guest-wallets/topups
+        top_up_url:
+          type: string
+          const: POST /api/v1/guest-wallets/topups
+    MppPaymentRequired:
+      description: Anonymous payment requirement for a direct MPP operation. The response includes an MPP challenge and an accountless checkout action.
+      type: object
+      required:
+      - account_required
+      - detail
+      - next_step
+      - payment_options
+      - status
+      - title
+      - type
+      properties:
+        account_required:
+          type: boolean
+          const: false
+        challengeId:
+          type: string
+          description: Opaque identifier for the MPP payment challenge.
+        detail:
+          type: string
+        hint:
+          type: string
+          description: Instructions for selecting and paying an MPP offer.
+        next_step:
+          type: string
+          const: Ask the user to confirm a USD amount before creating checkout.
+        payment_options:
+          type: object
+          additionalProperties: false
+          required:
+          - guest_wallet
+          properties:
+            guest_wallet:
+              type: object
+              additionalProperties: false
+              required:
+              - create_checkout
+              properties:
+                create_checkout:
+                  $ref: '#/components/schemas/GuestWalletCreateCheckoutAction'
+        status:
+          type: integer
+          const: 402
+        title:
+          type: string
+          const: Payment Required
+        type:
+          type: string
+          format: uri
+          const: https://paymentauth.org/problems/payment-required
+    XWriteActionNextAction:
+      type:
+      - object
+      - 'null'
+      description: Exact follow-up an API client or agent should perform.
+      additionalProperties: false
+      required:
+      - type
+      properties:
+        type:
+          type: string
+          enum:
+          - poll
+          - retry
+          - verify_result
+          - fix_request
+        url:
+          type: string
+        afterMs:
+          type: integer
+          minimum: 0
+        requiresNewIdempotencyKey:
+          type: boolean
   parameters:
+    ResourceId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Resource ID returned by the matching create or list endpoint.
     WriteIdempotencyKey:
       name: Idempotency-Key
       in: header
@@ -2752,13 +2759,6 @@ components:
         minLength: 1
         maxLength: 255
         pattern: ^[!-~]{1,255}$
-    ResourceId:
-      name: id
-      in: path
-      required: true
-      schema:
-        type: string
-      description: Resource ID returned by the matching create or list endpoint.
   securitySchemes:
     apiKey:
       type: apiKey

@@ -157,104 +157,6 @@ paths:
           $ref: '#/components/responses/UnexpectedError'
       description: Get event.
 components:
-  parameters:
-    ResourceId:
-      name: id
-      in: path
-      required: true
-      schema:
-        type: string
-      description: Resource ID returned by the matching create or list endpoint.
-    Limit:
-      name: limit
-      in: query
-      description: 'Maximum number of items to return (1-100, default 50). For paid per-result endpoints, the returned count may be lower when remaining credits cannot cover the requested page. If zero paid results are affordable, the endpoint returns 402 insufficient_credits.
-
-        '
-      schema:
-        type: integer
-        minimum: 1
-        maximum: 100
-        default: 50
-    After:
-      name: cursor
-      in: query
-      schema:
-        type: string
-      description: Previous nextCursor.
-  responses:
-    InvalidInput:
-      description: Invalid input
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: invalid_input
-            message: Invalid input. Check the request body.
-    Unauthenticated:
-      description: Unauthenticated
-      headers:
-        Cache-Control:
-          description: Prevents storage of authentication responses.
-          schema:
-            type: string
-            const: no-store
-        WWW-Authenticate:
-          description: Bearer authentication challenge.
-          schema:
-            type: string
-            const: Bearer realm="xquik"
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: unauthenticated
-            message: Authentication required. Provide a valid API key or bearer token.
-    NotFound:
-      description: Not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: not_found
-            message: Resource not found.
-    RateLimitExceeded:
-      description: 'Xquik tier rate limit exceeded. The response includes a `Retry-After` header with the number of seconds to wait before retrying.
-
-        '
-      content:
-        application/json:
-          schema:
-            allOf:
-            - $ref: '#/components/schemas/Error'
-            - type: object
-              properties:
-                retryAfter:
-                  type: integer
-                  example: 60
-          example:
-            error: rate_limit_exceeded
-            message: Too many requests. Try again later.
-            retryAfter: 60
-      headers:
-        Retry-After:
-          description: Seconds until the next permitted request.
-          schema:
-            example: 60
-            minimum: 1
-            type: integer
-    UnexpectedError:
-      content:
-        application/json:
-          example:
-            error: internal_error
-            message: Unexpected error. Try again.
-          schema:
-            $ref: '#/components/schemas/Error'
-      description: Unexpected error.
   schemas:
     Error:
       description: 'Error response. Default v1 returns a legacy string error code. Send `xquik-api-contract: 2026-04-29` to receive the structured best-practice error object.
@@ -535,6 +437,31 @@ components:
           type: integer
           minimum: 1
           description: Required wait in milliseconds.
+    EventType:
+      description: Type of monitor event fired when account activity occurs.
+      type: string
+      enum:
+      - tweet.new
+      - tweet.reply
+      - tweet.retweet
+      - tweet.quote
+      - tweet.media
+      - tweet.link
+      - tweet.poll
+      - tweet.mention
+      - tweet.hashtag
+      - tweet.longform
+      - profile.avatar.changed
+      - profile.banner.changed
+      - profile.name.changed
+      - profile.username.changed
+      - profile.bio.changed
+      - profile.location.changed
+      - profile.url.changed
+      - profile.verified.changed
+      - profile.protected.changed
+      - profile.pinned_tweet.changed
+      - profile.unavailable.changed
     EventDetail:
       description: Full monitor event including payload data and optional X event ID.
       type: object
@@ -579,31 +506,6 @@ components:
           x-stainless-terraform-type: string
         xEventId:
           type: string
-    EventType:
-      description: Type of monitor event fired when account activity occurs.
-      type: string
-      enum:
-      - tweet.new
-      - tweet.reply
-      - tweet.retweet
-      - tweet.quote
-      - tweet.media
-      - tweet.link
-      - tweet.poll
-      - tweet.mention
-      - tweet.hashtag
-      - tweet.longform
-      - profile.avatar.changed
-      - profile.banner.changed
-      - profile.name.changed
-      - profile.username.changed
-      - profile.bio.changed
-      - profile.location.changed
-      - profile.url.changed
-      - profile.verified.changed
-      - profile.protected.changed
-      - profile.pinned_tweet.changed
-      - profile.unavailable.changed
     Event:
       description: Monitor event summary with source metadata and occurrence time.
       type: object
@@ -643,6 +545,104 @@ components:
         data:
           type: object
           additionalProperties: true
+  responses:
+    Unauthenticated:
+      description: Unauthenticated
+      headers:
+        Cache-Control:
+          description: Prevents storage of authentication responses.
+          schema:
+            type: string
+            const: no-store
+        WWW-Authenticate:
+          description: Bearer authentication challenge.
+          schema:
+            type: string
+            const: Bearer realm="xquik"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: unauthenticated
+            message: Authentication required. Provide a valid API key or bearer token.
+    InvalidInput:
+      description: Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: invalid_input
+            message: Invalid input. Check the request body.
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: not_found
+            message: Resource not found.
+    UnexpectedError:
+      content:
+        application/json:
+          example:
+            error: internal_error
+            message: Unexpected error. Try again.
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Unexpected error.
+    RateLimitExceeded:
+      description: 'Xquik tier rate limit exceeded. The response includes a `Retry-After` header with the number of seconds to wait before retrying.
+
+        '
+      content:
+        application/json:
+          schema:
+            allOf:
+            - $ref: '#/components/schemas/Error'
+            - type: object
+              properties:
+                retryAfter:
+                  type: integer
+                  example: 60
+          example:
+            error: rate_limit_exceeded
+            message: Too many requests. Try again later.
+            retryAfter: 60
+      headers:
+        Retry-After:
+          description: Seconds until the next permitted request.
+          schema:
+            example: 60
+            minimum: 1
+            type: integer
+  parameters:
+    ResourceId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Resource ID returned by the matching create or list endpoint.
+    Limit:
+      name: limit
+      in: query
+      description: 'Maximum number of items to return (1-100, default 50). For paid per-result endpoints, the returned count may be lower when remaining credits cannot cover the requested page. If zero paid results are affordable, the endpoint returns 402 insufficient_credits.
+
+        '
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 50
+    After:
+      name: cursor
+      in: query
+      schema:
+        type: string
+      description: Previous nextCursor.
   securitySchemes:
     apiKey:
       type: apiKey

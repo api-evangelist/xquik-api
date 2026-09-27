@@ -45,6 +45,7 @@ tags:
 - Webhook
 - MCP
 - Developer API
+- A2A
 tags_raw:
 - social media data
 - X / Twitter
@@ -54,6 +55,7 @@ tags_raw:
 - webhooks
 - MCP
 - developer API
+- A2A
 apis:
 - name: Xquik API MCP Server
   description: Hosted MCP server for the Xquik API with OAuth 2.1 and API-key access.
@@ -157,6 +159,8 @@ apis:
   humanURL: https://docs.xquik.com/api-reference/overview
   baseURL: https://xquik.com/api/v1
   tags:
+  - Community
+  tags_raw:
   - Communities
   properties:
   - type: OpenAPI
@@ -632,3 +636,10 @@ x-enrichment:
   status: enriched
   artifacts_added: 28
   pass: local-v1
+x-a2a:
+  verified: true
+  probed: '2026-09-26'
+  url: "https://xquik.com/.well-known/agent-card.json"
+  grade: "flavored"
+  protocol_version: "1.0"
+  control: 404

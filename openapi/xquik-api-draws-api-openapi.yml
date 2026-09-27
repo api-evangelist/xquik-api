@@ -357,116 +357,6 @@ paths:
           $ref: '#/components/responses/UnexpectedError'
       description: Export draw data.
 components:
-  responses:
-    InvalidInput:
-      description: Invalid input
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: invalid_input
-            message: Invalid input. Check the request body.
-    NotFound:
-      description: Not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: not_found
-            message: Resource not found.
-    XApiError:
-      description: 'Dependency unavailable, unauthorized, or rate limited. Default v1 returns 502. The best-practice response contract returns 424 for transparent dependency failures.
-
-        '
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: x_api_unavailable
-            message: X data source temporarily unavailable. Try again later.
-    Unauthenticated:
-      description: Unauthenticated
-      headers:
-        Cache-Control:
-          description: Prevents storage of authentication responses.
-          schema:
-            type: string
-            const: no-store
-        WWW-Authenticate:
-          description: Bearer authentication challenge.
-          schema:
-            type: string
-            const: Bearer realm="xquik"
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: unauthenticated
-            message: Authentication required. Provide a valid API key or bearer token.
-    RateLimitExceeded:
-      description: 'Xquik tier rate limit exceeded. The response includes a `Retry-After` header with the number of seconds to wait before retrying.
-
-        '
-      content:
-        application/json:
-          schema:
-            allOf:
-            - $ref: '#/components/schemas/Error'
-            - type: object
-              properties:
-                retryAfter:
-                  type: integer
-                  example: 60
-          example:
-            error: rate_limit_exceeded
-            message: Too many requests. Try again later.
-            retryAfter: 60
-      headers:
-        Retry-After:
-          description: Seconds until the next permitted request.
-          schema:
-            example: 60
-            minimum: 1
-            type: integer
-    UnexpectedError:
-      content:
-        application/json:
-          example:
-            error: internal_error
-            message: Unexpected error. Try again.
-          schema:
-            $ref: '#/components/schemas/Error'
-      description: Unexpected error.
-  parameters:
-    DrawId:
-      name: id
-      in: path
-      required: true
-      schema:
-        type: string
-        example: f4bd00a2-7b4e-4e59-8e1b-72e2c9f12345
-      description: Draw public ID returned by create and list draw responses.
-    Limit:
-      name: limit
-      in: query
-      description: 'Maximum number of items to return (1-100, default 50). For paid per-result endpoints, the returned count may be lower when remaining credits cannot cover the requested page. If zero paid results are affordable, the endpoint returns 402 insufficient_credits.
-
-        '
-      schema:
-        type: integer
-        minimum: 1
-        maximum: 100
-        default: 50
-    After:
-      name: cursor
-      in: query
-      schema:
-        type: string
-      description: Previous nextCursor.
   schemas:
     Error:
       description: 'Error response. Default v1 returns a legacy string error code. Send `xquik-api-contract: 2026-04-29` to receive the structured best-practice error object.
@@ -797,23 +687,6 @@ components:
         drawnAt:
           type: string
           format: date-time
-    Winner:
-      description: Giveaway draw winner with position and backup flag.
-      type: object
-      required:
-      - authorUsername
-      - tweetId
-      - position
-      - isBackup
-      properties:
-        authorUsername:
-          type: string
-        tweetId:
-          type: string
-        position:
-          type: integer
-        isBackup:
-          type: boolean
     DrawListItem:
       description: Giveaway draw summary with entry counts and status.
       type: object
@@ -843,6 +716,133 @@ components:
         drawnAt:
           type: string
           format: date-time
+    Winner:
+      description: Giveaway draw winner with position and backup flag.
+      type: object
+      required:
+      - authorUsername
+      - tweetId
+      - position
+      - isBackup
+      properties:
+        authorUsername:
+          type: string
+        tweetId:
+          type: string
+        position:
+          type: integer
+        isBackup:
+          type: boolean
+  responses:
+    XApiError:
+      description: 'Dependency unavailable, unauthorized, or rate limited. Default v1 returns 502. The best-practice response contract returns 424 for transparent dependency failures.
+
+        '
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: x_api_unavailable
+            message: X data source temporarily unavailable. Try again later.
+    Unauthenticated:
+      description: Unauthenticated
+      headers:
+        Cache-Control:
+          description: Prevents storage of authentication responses.
+          schema:
+            type: string
+            const: no-store
+        WWW-Authenticate:
+          description: Bearer authentication challenge.
+          schema:
+            type: string
+            const: Bearer realm="xquik"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: unauthenticated
+            message: Authentication required. Provide a valid API key or bearer token.
+    InvalidInput:
+      description: Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: invalid_input
+            message: Invalid input. Check the request body.
+    UnexpectedError:
+      content:
+        application/json:
+          example:
+            error: internal_error
+            message: Unexpected error. Try again.
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Unexpected error.
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: not_found
+            message: Resource not found.
+    RateLimitExceeded:
+      description: 'Xquik tier rate limit exceeded. The response includes a `Retry-After` header with the number of seconds to wait before retrying.
+
+        '
+      content:
+        application/json:
+          schema:
+            allOf:
+            - $ref: '#/components/schemas/Error'
+            - type: object
+              properties:
+                retryAfter:
+                  type: integer
+                  example: 60
+          example:
+            error: rate_limit_exceeded
+            message: Too many requests. Try again later.
+            retryAfter: 60
+      headers:
+        Retry-After:
+          description: Seconds until the next permitted request.
+          schema:
+            example: 60
+            minimum: 1
+            type: integer
+  parameters:
+    DrawId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: f4bd00a2-7b4e-4e59-8e1b-72e2c9f12345
+      description: Draw public ID returned by create and list draw responses.
+    Limit:
+      name: limit
+      in: query
+      description: 'Maximum number of items to return (1-100, default 50). For paid per-result endpoints, the returned count may be lower when remaining credits cannot cover the requested page. If zero paid results are affordable, the endpoint returns 402 insufficient_credits.
+
+        '
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 50
+    After:
+      name: cursor
+      in: query
+      schema:
+        type: string
+      description: Previous nextCursor.
   securitySchemes:
     apiKey:
       type: apiKey

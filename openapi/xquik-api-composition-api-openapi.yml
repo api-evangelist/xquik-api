@@ -771,284 +771,7 @@ paths:
           $ref: '#/components/responses/UnexpectedError'
       description: Get trending topics from curated sources.
 components:
-  responses:
-    PaymentRequired:
-      description: 'Payment required. MPP reads return a problem document and `WWW-Authenticate`. Authenticated reads return balances and checkout actions. Guest keys receive only the guest top-up action. Other endpoints may use legacy errors. A failed request never creates checkout. Require user confirmation before creating one.
-
-        '
-      headers:
-        WWW-Authenticate:
-          description: MPP payment challenge for eligible anonymous pay-per-use requests. Authenticated credit or subscription errors omit this header.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            oneOf:
-            - $ref: '#/components/schemas/XWritePaymentRequired'
-            - $ref: '#/components/schemas/AuthenticatedPaymentRequired'
-            - $ref: '#/components/schemas/GuestPaymentRequired'
-            - allOf:
-              - $ref: '#/components/schemas/Error'
-              - not:
-                  required:
-                  - payment_options
-          example:
-            balance: '0'
-            dashboard: /dashboard/account
-            error: insufficient_credits
-            message: Insufficient credits. Top up or subscribe to continue.
-            next_step: Ask the user to confirm a payment option before creating checkout.
-            payment_options:
-              credits:
-                create_checkout:
-                  body:
-                    dollars: 10
-                    locale: en
-                  creates: checkout_url
-                  method: POST
-                  path: /api/v1/credits/topup
-                  provider: stripe
-                  requires_authentication: true
-                  requires_user_confirmation: true
-                  response_url_field: url
-              subscription:
-                create_checkout:
-                  body:
-                    tier: starter
-                  creates: checkout_url
-                  method: POST
-                  path: /api/v1/subscribe
-                  provider: stripe
-                  requires_authentication: true
-                  requires_user_confirmation: true
-                  response_url_field: url
-            required: '1'
-            top_up_endpoint: /api/v1/credits/topup
-            top_up_url: POST /api/v1/credits/topup
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/MppPaymentRequired'
-          example:
-            account_required: false
-            challengeId: Opaque MPP challenge identifier
-            detail: Payment is required.
-            hint: Use a supported wallet with an offer from the WWW-Authenticate header.
-            status: 402
-            title: Payment Required
-            type: https://paymentauth.org/problems/payment-required
-            next_step: Ask the user to confirm a USD amount before creating checkout.
-            payment_options:
-              guest_wallet:
-                create_checkout:
-                  account_required: false
-                  amount_bounds:
-                    currency: usd
-                    maximum_minor: 25000
-                    minimum_minor: 1000
-                  body:
-                    amount_minor: 1000
-                    currency: usd
-                  creates: checkout_url
-                  method: POST
-                  path: /api/v1/guest-wallets
-                  provider: stripe
-                  required_headers:
-                    Idempotency-Key: <cryptographically random UUID v4>
-                  requires_authentication: false
-                  requires_user_confirmation: true
-                  requires_user_interaction: true
-                  response_fields:
-                  - checkout_url
-                  - api_key
-                  - status_url
-                  response_url_field: checkout_url
-    InvalidInput:
-      description: Invalid input
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: invalid_input
-            message: Invalid input. Check the request body.
-    UnexpectedError:
-      content:
-        application/json:
-          example:
-            error: internal_error
-            message: Unexpected error. Try again.
-          schema:
-            $ref: '#/components/schemas/Error'
-      description: Unexpected error.
-    NoContent:
-      description: Deleted
-    NotFound:
-      description: Not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: not_found
-            message: Resource not found.
-    Unauthenticated:
-      description: Unauthenticated
-      headers:
-        Cache-Control:
-          description: Prevents storage of authentication responses.
-          schema:
-            type: string
-            const: no-store
-        WWW-Authenticate:
-          description: Bearer authentication challenge.
-          schema:
-            type: string
-            const: Bearer realm="xquik"
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: unauthenticated
-            message: Authentication required. Provide a valid API key or bearer token.
-    RateLimitExceeded:
-      description: 'Xquik tier rate limit exceeded. The response includes a `Retry-After` header with the number of seconds to wait before retrying.
-
-        '
-      content:
-        application/json:
-          schema:
-            allOf:
-            - $ref: '#/components/schemas/Error'
-            - type: object
-              properties:
-                retryAfter:
-                  type: integer
-                  example: 60
-          example:
-            error: rate_limit_exceeded
-            message: Too many requests. Try again later.
-            retryAfter: 60
-      headers:
-        Retry-After:
-          description: Seconds until the next permitted request.
-          schema:
-            example: 60
-            minimum: 1
-            type: integer
   schemas:
-    XWriteActionTarget:
-      type:
-      - object
-      - 'null'
-      description: Existing X resource targeted by the write, when applicable.
-      additionalProperties: false
-      required:
-      - type
-      - id
-      properties:
-        type:
-          type: string
-          enum:
-          - tweet
-          - user
-          - community
-        id:
-          type: string
-    GuestWalletTopupCheckoutAction:
-      description: Explicit direct REST action for a guest wallet top-up.
-      type: object
-      additionalProperties: false
-      required:
-      - account_required
-      - amount_bounds
-      - body
-      - creates
-      - method
-      - path
-      - provider
-      - required_headers
-      - requires_authentication
-      - requires_user_confirmation
-      - requires_user_interaction
-      - response_fields
-      - response_url_field
-      properties:
-        account_required:
-          type: boolean
-          const: false
-        amount_bounds:
-          $ref: '#/components/schemas/GuestWalletAmountBounds'
-        body:
-          $ref: '#/components/schemas/GuestWalletPurchaseRequest'
-        creates:
-          type: string
-          const: checkout_url
-        method:
-          type: string
-          const: POST
-        path:
-          type: string
-          const: /api/v1/guest-wallets/topups
-        provider:
-          type: string
-          deprecated: true
-          const: stripe
-        required_headers:
-          type: object
-          additionalProperties: false
-          required:
-          - Idempotency-Key
-          properties:
-            Idempotency-Key:
-              type: string
-              const: <cryptographically random UUID v4>
-        requires_authentication:
-          type: boolean
-          const: true
-        requires_user_confirmation:
-          type: boolean
-          const: true
-        requires_user_interaction:
-          type: boolean
-          const: true
-        response_fields:
-          type: array
-          minItems: 2
-          maxItems: 2
-          prefixItems:
-          - type: string
-            const: checkout_url
-          - type: string
-            const: status_url
-          items:
-            type: string
-            enum:
-            - checkout_url
-            - status_url
-        response_url_field:
-          type: string
-          const: checkout_url
-    XWriteActionResult:
-      type:
-      - object
-      - 'null'
-      description: Confirmed result produced by the write, when available.
-      additionalProperties: false
-      properties:
-        type:
-          type: string
-          enum:
-          - tweet
-          - direct_message
-          - media
-          - community
-          - state_change
-        id:
-          type: string
-        state:
-          type: string
     ComposeScorerSignal:
       type: object
       required:
@@ -1066,466 +789,6 @@ components:
           type: 'null'
           description: X does not publish the production weight.
       additionalProperties: false
-    XWritePaymentRequired:
-      allOf:
-      - $ref: '#/components/schemas/XWriteAction'
-      - type: object
-        required:
-        - error
-        - message
-      description: 'Durable failed write action with the applicable payment guidance.
-
-        '
-    ComposeScoreCheck:
-      type: object
-      required:
-      - factor
-      - passed
-      properties:
-        factor:
-          type: string
-        passed:
-          type: boolean
-        suggestion:
-          type: string
-          description: Present only when the check fails.
-      additionalProperties: false
-    RadarItem:
-      description: Trending topic with score, category, source, region, language, and source-specific metadata.
-      type: object
-      required:
-      - id
-      - sourceId
-      - title
-      - score
-      - category
-      - source
-      - region
-      - language
-      - metadata
-      - publishedAt
-      - createdAt
-      properties:
-        id:
-          type: string
-          description: Radar item identifier.
-        sourceId:
-          type: string
-          description: Source-specific identifier used for deduplication.
-        title:
-          type: string
-        url:
-          type: string
-        score:
-          type: number
-        category:
-          type: string
-          enum:
-          - general
-          - tech
-          - dev
-          - science
-          - culture
-          - politics
-          - business
-          - entertainment
-        source:
-          type: string
-          enum:
-          - github
-          - google_trends
-          - hacker_news
-          - polymarket
-          - reddit
-          - trustmrr
-          - wikipedia
-        region:
-          type: string
-        language:
-          type: string
-          description: BCP-47 language code. und means the source did not identify a language.
-        metadata:
-          type: object
-          description: "Source-specific fields. Shape varies per source:\n- reddit: { author, authorId?, subreddit, subredditId?,\n  subredditSubscribers?, sourceFormat, score?, upvoteRatio?,\n  estimatedUpvotes?, estimatedDownvotes?, numberComments?,\n  numberCrossposts?, selftext?, contentUrl?, domain?, postHint?,\n  linkFlairText?, distinguished?, totalAwardsReceived?, viewCount?,\n  editedAt?, galleryImageUrls?, redditVideo?, archived?, contestMode?,\n  isCrosspostable?, isMeta?, isNsfw?, isOriginalContent?,\n  isRobotIndexable?, isSelf?, isSpoiler?, isVideo?, locked?,\n  stickied? }. `score` is Reddit's public net score. Exact public\n  upvote and downvote counts are not available. Estimated counts\n  derive from the public score and upvote ratio, which Reddit may\n  fuzz. Comment bodies are not included. Current items combine\n  public listing discovery with server-rendered post data and use\n  `sourceFormat: html`; `json` and `rss` remain for legacy rows.\n- github: { starsToday: number }\n- hacker_news: { points: number, numberComments: number }\n- google_trends: { approxTraffic: number }\n- polymarket: { volume24hr: number }\n- wikipedia: { views: number }\n- trustmrr: { mrr, growthPercent, last30Days, total, customers, activeSubscriptions, onSale, xHandle?, category?, askingPrice?, country?, foundedDate?, googleSearchImpressionsLast30Days?, growthMrrPercent?, multiple?, paymentProvider?, profitMarginLast30Days?, rank?, revenuePerVisitor?, targetAudience?, visitorsLast30Days? }\nFor the startup growth source, xHandle is the founder's X username\nwithout @. The rank field is the source's revenue rank. Result order\nrepresents reported 30-day revenue-growth rank.\n"
-          properties:
-            author:
-              type: string
-            contentUrl:
-              type: string
-              format: uri
-            estimatedDownvotes:
-              type: integer
-              minimum: 0
-            estimatedUpvotes:
-              type: integer
-              minimum: 0
-            numberComments:
-              type: integer
-              minimum: 0
-            score:
-              type: integer
-            selftext:
-              type: string
-            sourceFormat:
-              type: string
-              enum:
-              - html
-              - json
-              - rss
-              description: Current items use html. json and rss are retained for legacy rows.
-            subreddit:
-              type: string
-            upvoteRatio:
-              type: number
-              minimum: 0
-              maximum: 1
-          additionalProperties: true
-        publishedAt:
-          type: string
-          format: date-time
-        createdAt:
-          type: string
-          format: date-time
-        description:
-          type: string
-        imageUrl:
-          type: string
-          description: Source image. Startup growth items return the logo here.
-    ComposeRefineResult:
-      type: object
-      required:
-      - compositionGuidance
-      - examplePatterns
-      - intentUrl
-      - nextStep
-      properties:
-        compositionGuidance:
-          type: array
-          items:
-            type: string
-          description: Goal, tone, media, and editorial guidance.
-        examplePatterns:
-          type: array
-          minItems: 3
-          maxItems: 3
-          items:
-            $ref: '#/components/schemas/ComposeExamplePattern'
-        intentUrl:
-          type: string
-          format: uri
-          description: X post intent seeded with the topic.
-        nextStep:
-          type: string
-      additionalProperties: false
-    XWriteAction:
-      type: object
-      required:
-      - object
-      - id
-      - writeActionId
-      - action
-      - status
-      - terminal
-      - retryable
-      - safeToRetry
-      - statusUrl
-      - pollAfterMs
-      - charged
-      - chargedCredits
-      - billing
-      - request
-      - account
-      - target
-      - targetId
-      - result
-      - nextAction
-      - sendDispatched
-      - success
-      properties:
-        object:
-          type: string
-          const: x_write_action
-        id:
-          type: string
-        writeActionId:
-          type: string
-        action:
-          type: string
-          enum:
-          - create_tweet
-          - delete_tweet
-          - like
-          - unlike
-          - retweet
-          - unretweet
-          - follow
-          - unfollow
-          - remove_follower
-          - send_dm
-          - upload_media
-          - update_profile
-          - update_avatar
-          - update_banner
-          - create_community
-          - delete_community
-          - join_community
-          - leave_community
-        status:
-          type: string
-          enum:
-          - accepted
-          - dispatching
-          - pending_confirmation
-          - success
-          - failed
-          - expired
-        terminal:
-          type: boolean
-        retryable:
-          type: boolean
-          description: True only when a new attempt can reasonably succeed.
-        safeToRetry:
-          type: boolean
-          description: 'True only when no write was dispatched and a new idempotency key may be used.
-
-            '
-        statusUrl:
-          type: string
-        pollAfterMs:
-          type:
-          - integer
-          - 'null'
-          minimum: 0
-        charged:
-          type: boolean
-        chargedCredits:
-          type: string
-          pattern: ^\d+$
-        billing:
-          $ref: '#/components/schemas/XWriteActionBilling'
-        request:
-          $ref: '#/components/schemas/XWriteActionRequest'
-        account:
-          $ref: '#/components/schemas/XWriteActionAccount'
-        target:
-          $ref: '#/components/schemas/XWriteActionTarget'
-        targetId:
-          type:
-          - string
-          - 'null'
-        result:
-          $ref: '#/components/schemas/XWriteActionResult'
-        nextAction:
-          $ref: '#/components/schemas/XWriteActionNextAction'
-        requestHash:
-          type: string
-          pattern: ^[0-9a-f]{64}$
-        requestId:
-          type: string
-        idempotent:
-          type: boolean
-        error:
-          type: string
-        message:
-          type: string
-        sendDispatched:
-          type: boolean
-        sendDispatchedAt:
-          type: string
-          format: date-time
-          description: Dispatch timestamp when the write reached execution.
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-        completedAt:
-          type: string
-          format: date-time
-        expiresAt:
-          type: string
-          format: date-time
-          description: 'Deadline for resolving a non-terminal write. This is not the Idempotency-Key retention deadline.
-
-            '
-        confirmedAt:
-          type: string
-          format: date-time
-        confirmationCheckedAt:
-          type: string
-          format: date-time
-        confirmationAttempts:
-          type: integer
-          minimum: 0
-        tweetId:
-          type: string
-          description: Compatibility field for a confirmed tweet result ID.
-        messageId:
-          type: string
-          description: Compatibility field for a confirmed direct message ID.
-        mediaId:
-          type: string
-          description: Compatibility field for a confirmed media upload ID.
-        mediaUrl:
-          type: string
-          format: uri
-          description: Public media URL when the upload creates one.
-        communityId:
-          type: string
-          description: Compatibility field for a confirmed community ID.
-        communityName:
-          type: string
-          description: Confirmed community name when available.
-        resultId:
-          type: string
-          description: Compatibility result ID for other write actions.
-        media:
-          type: object
-          additionalProperties: true
-          description: Media count, kind, size, and billing details when used.
-        details:
-          type: object
-          additionalProperties: true
-          description: Structured recovery context for a failed write.
-        success:
-          type: boolean
-      description: 'Durable write lifecycle record. Poll statusUrl until terminal is true. Reusing the original Idempotency-Key returns this same record. Submit a new write only when safeToRetry is true, using a new key.
-
-        '
-    MppPaymentRequired:
-      description: Anonymous payment requirement for a direct MPP operation. The response includes an MPP challenge and an accountless checkout action.
-      type: object
-      required:
-      - account_required
-      - detail
-      - next_step
-      - payment_options
-      - status
-      - title
-      - type
-      properties:
-        account_required:
-          type: boolean
-          const: false
-        challengeId:
-          type: string
-          description: Opaque identifier for the MPP payment challenge.
-        detail:
-          type: string
-        hint:
-          type: string
-          description: Instructions for selecting and paying an MPP offer.
-        next_step:
-          type: string
-          const: Ask the user to confirm a USD amount before creating checkout.
-        payment_options:
-          type: object
-          additionalProperties: false
-          required:
-          - guest_wallet
-          properties:
-            guest_wallet:
-              type: object
-              additionalProperties: false
-              required:
-              - create_checkout
-              properties:
-                create_checkout:
-                  $ref: '#/components/schemas/GuestWalletCreateCheckoutAction'
-        status:
-          type: integer
-          const: 402
-        title:
-          type: string
-          const: Payment Required
-        type:
-          type: string
-          format: uri
-          const: https://paymentauth.org/problems/payment-required
-    ComposeScoreRequest:
-      type: object
-      required:
-      - step
-      - draft
-      properties:
-        step:
-          type: string
-          const: score
-        draft:
-          type: string
-          minLength: 1
-          description: Full post text for deterministic editorial checks.
-        hasLink:
-          type: boolean
-          description: True when a separate link card is attached.
-          default: false
-        hasMedia:
-          type: boolean
-          deprecated: true
-          x-stainless-deprecation-message: Ignored. Remove this field. Use hasLink for a separate link card.
-          description: 'Accepted for backward compatibility. Text checks ignore this field.
-
-            '
-      additionalProperties: true
-    DraftDetail:
-      description: Full tweet draft including update timestamp.
-      type: object
-      required:
-      - id
-      - text
-      - createdAt
-      - updatedAt
-      properties:
-        id:
-          type: string
-        text:
-          type: string
-        topic:
-          type: string
-        goal:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-    XWriteActionAccount:
-      type:
-      - object
-      - 'null'
-      description: Connected account selected for the write.
-      additionalProperties: false
-      required:
-      - id
-      - username
-      properties:
-        id:
-          type: string
-        username:
-          type: string
-    ComposeContentRule:
-      type: object
-      required:
-      - rule
-      properties:
-        rule:
-          type: string
-      additionalProperties: false
-    ComposeSignalLabel:
-      type: object
-      required:
-      - action
-      - multiplier
-      properties:
-        action:
-          type: string
-          description: Human-readable published signal name.
-        multiplier:
-          type: string
-          const: Production weight not published by X
-      additionalProperties: false
     ComposeSavedStyle:
       type: object
       required:
@@ -1536,173 +799,6 @@ components:
           type: integer
           minimum: 0
         username:
-          type: string
-      additionalProperties: false
-    AuthenticatedPaymentRequired:
-      description: Authenticated credit or subscription error with confirmation-gated hosted checkout actions.
-      type: object
-      additionalProperties: false
-      required:
-      - balance
-      - dashboard
-      - error
-      - message
-      - next_step
-      - payment_options
-      - required
-      - top_up_endpoint
-      - top_up_url
-      properties:
-        balance:
-          type: string
-          pattern: ^\d+$
-          description: Available credits as a decimal string.
-        dashboard:
-          type: string
-          const: /dashboard/account
-          description: Account page for manual billing management.
-        error:
-          type: string
-          enum:
-          - insufficient_credits
-          - no_credits
-          - no_subscription
-          - subscription_inactive
-        message:
-          type: string
-        next_step:
-          type: string
-          const: Ask the user to confirm a payment option before creating checkout.
-        payment_options:
-          type: object
-          additionalProperties: false
-          required:
-          - credits
-          - subscription
-          properties:
-            credits:
-              type: object
-              additionalProperties: false
-              required:
-              - create_checkout
-              properties:
-                create_checkout:
-                  type: object
-                  additionalProperties: false
-                  required:
-                  - body
-                  - creates
-                  - method
-                  - path
-                  - provider
-                  - requires_authentication
-                  - requires_user_confirmation
-                  - response_url_field
-                  properties:
-                    body:
-                      type: object
-                      additionalProperties: false
-                      required:
-                      - dollars
-                      - locale
-                      properties:
-                        dollars:
-                          type: integer
-                          const: 10
-                        locale:
-                          type: string
-                          const: en
-                    creates:
-                      type: string
-                      const: checkout_url
-                    method:
-                      type: string
-                      const: POST
-                    path:
-                      type: string
-                      const: /api/v1/credits/topup
-                    provider:
-                      type: string
-                      deprecated: true
-                      const: stripe
-                    requires_authentication:
-                      type: boolean
-                      const: true
-                    requires_user_confirmation:
-                      type: boolean
-                      const: true
-                    response_url_field:
-                      type: string
-                      const: url
-            subscription:
-              type: object
-              additionalProperties: false
-              required:
-              - create_checkout
-              properties:
-                create_checkout:
-                  type: object
-                  additionalProperties: false
-                  required:
-                  - body
-                  - creates
-                  - method
-                  - path
-                  - provider
-                  - requires_authentication
-                  - requires_user_confirmation
-                  - response_url_field
-                  properties:
-                    body:
-                      type: object
-                      additionalProperties: false
-                      required:
-                      - tier
-                      properties:
-                        tier:
-                          type: string
-                          const: starter
-                    creates:
-                      type: string
-                      const: checkout_url
-                    method:
-                      type: string
-                      const: POST
-                    path:
-                      type: string
-                      const: /api/v1/subscribe
-                    provider:
-                      type: string
-                      deprecated: true
-                      const: stripe
-                    requires_authentication:
-                      type: boolean
-                      const: true
-                    requires_user_confirmation:
-                      type: boolean
-                      const: true
-                    response_url_field:
-                      type: string
-                      const: url
-        required:
-          type: string
-          pattern: ^\d+$
-          description: Credits required for the blocked request.
-        top_up_endpoint:
-          type: string
-          const: /api/v1/credits/topup
-        top_up_url:
-          type: string
-          const: POST /api/v1/credits/topup
-    ComposeExamplePattern:
-      type: object
-      required:
-      - description
-      - pattern
-      properties:
-        description:
-          type: string
-        pattern:
           type: string
       additionalProperties: false
     StyleProfile:
@@ -1740,6 +836,57 @@ components:
                 type: string
               authorUsername:
                 type: string
+    XWriteActionRequest:
+      type: object
+      description: Stable fingerprint and sanitized payload for replay checks.
+      additionalProperties: false
+      required:
+      - hash
+      - payload
+      properties:
+        hash:
+          type:
+          - string
+          - 'null'
+          pattern: ^[0-9a-f]{64}$
+          description: Stable hash of account, action, target, and payload.
+        payload:
+          type:
+          - object
+          - 'null'
+          additionalProperties: true
+          description: Exact sanitized payload dispatched for this action.
+    GuestWalletAmountBounds:
+      description: Accepted guest wallet purchase range in USD cents.
+      type: object
+      additionalProperties: false
+      required:
+      - currency
+      - maximum_minor
+      - minimum_minor
+      properties:
+        currency:
+          type: string
+          const: usd
+        maximum_minor:
+          type: integer
+          const: 25000
+        minimum_minor:
+          type: integer
+          const: 1000
+    ComposeSignalLabel:
+      type: object
+      required:
+      - action
+      - multiplier
+      properties:
+        action:
+          type: string
+          description: Human-readable published signal name.
+        multiplier:
+          type: string
+          const: Production weight not published by X
+      additionalProperties: false
     Error:
       description: 'Error response. Default v1 returns a legacy string error code. Send `xquik-api-contract: 2026-04-29` to receive the structured best-practice error object.
 
@@ -2019,129 +1166,318 @@ components:
           type: integer
           minimum: 1
           description: Required wait in milliseconds.
-    ComposeScoreResult:
-      type: object
-      required:
-      - checklist
-      - nextStep
-      - passed
-      - passedCount
-      - topSuggestion
-      - totalChecks
-      properties:
-        checklist:
-          type: array
-          minItems: 9
-          maxItems: 9
-          items:
-            $ref: '#/components/schemas/ComposeScoreCheck'
-          description: Deterministic editorial checks. Not a reach prediction.
-        intentUrl:
-          type: string
-          format: uri
-          description: Present only when every check passes.
-        nextStep:
-          type: string
-        passed:
-          type: boolean
-        passedCount:
-          type: integer
-          minimum: 0
-          maximum: 9
-        topSuggestion:
-          type: string
-        totalChecks:
-          type: integer
-          const: 9
-      additionalProperties: false
-    GuestWalletAmountBounds:
-      description: Accepted guest wallet purchase range in USD cents.
-      type: object
-      additionalProperties: false
-      required:
-      - currency
-      - maximum_minor
-      - minimum_minor
-      properties:
-        currency:
-          type: string
-          const: usd
-        maximum_minor:
-          type: integer
-          const: 25000
-        minimum_minor:
-          type: integer
-          const: 1000
-    ComposePrepareRequest:
-      type: object
-      required:
-      - step
-      - topic
-      properties:
-        step:
-          type: string
-          const: compose
-        topic:
-          type: string
-          minLength: 1
-          description: Subject for the post.
-        goal:
-          type: string
-          enum:
-          - engagement
-          - followers
-          - authority
-          - conversation
-          default: engagement
-          description: Editorial goal used to order the rules and questions.
-        styleUsername:
-          type: string
-          minLength: 1
-          description: Username from a style analysis saved to this account.
-      additionalProperties: true
-    XWriteActionRequest:
-      type: object
-      description: Stable fingerprint and sanitized payload for replay checks.
-      additionalProperties: false
-      required:
-      - hash
-      - payload
-      properties:
-        hash:
-          type:
-          - string
-          - 'null'
-          pattern: ^[0-9a-f]{64}$
-          description: Stable hash of account, action, target, and payload.
-        payload:
-          type:
-          - object
-          - 'null'
-          additionalProperties: true
-          description: Exact sanitized payload dispatched for this action.
-    XWriteActionNextAction:
+    XWriteActionResult:
       type:
       - object
       - 'null'
-      description: Exact follow-up an API client or agent should perform.
+      description: Confirmed result produced by the write, when available.
       additionalProperties: false
-      required:
-      - type
       properties:
         type:
           type: string
           enum:
-          - poll
-          - retry
-          - verify_result
-          - fix_request
-        url:
+          - tweet
+          - direct_message
+          - media
+          - community
+          - state_change
+        id:
           type: string
-        afterMs:
+        state:
+          type: string
+    XWriteActionAccount:
+      type:
+      - object
+      - 'null'
+      description: Connected account selected for the write.
+      additionalProperties: false
+      required:
+      - id
+      - username
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+    ComposeRefineResult:
+      type: object
+      required:
+      - compositionGuidance
+      - examplePatterns
+      - intentUrl
+      - nextStep
+      properties:
+        compositionGuidance:
+          type: array
+          items:
+            type: string
+          description: Goal, tone, media, and editorial guidance.
+        examplePatterns:
+          type: array
+          minItems: 3
+          maxItems: 3
+          items:
+            $ref: '#/components/schemas/ComposeExamplePattern'
+        intentUrl:
+          type: string
+          format: uri
+          description: X post intent seeded with the topic.
+        nextStep:
+          type: string
+      additionalProperties: false
+    XWriteAction:
+      type: object
+      required:
+      - object
+      - id
+      - writeActionId
+      - action
+      - status
+      - terminal
+      - retryable
+      - safeToRetry
+      - statusUrl
+      - pollAfterMs
+      - charged
+      - chargedCredits
+      - billing
+      - request
+      - account
+      - target
+      - targetId
+      - result
+      - nextAction
+      - sendDispatched
+      - success
+      properties:
+        object:
+          type: string
+          const: x_write_action
+        id:
+          type: string
+        writeActionId:
+          type: string
+        action:
+          type: string
+          enum:
+          - create_tweet
+          - delete_tweet
+          - like
+          - unlike
+          - retweet
+          - unretweet
+          - follow
+          - unfollow
+          - remove_follower
+          - send_dm
+          - upload_media
+          - update_profile
+          - update_avatar
+          - update_banner
+          - create_community
+          - delete_community
+          - join_community
+          - leave_community
+        status:
+          type: string
+          enum:
+          - accepted
+          - dispatching
+          - pending_confirmation
+          - success
+          - failed
+          - expired
+        terminal:
+          type: boolean
+        retryable:
+          type: boolean
+          description: True only when a new attempt can reasonably succeed.
+        safeToRetry:
+          type: boolean
+          description: 'True only when no write was dispatched and a new idempotency key may be used.
+
+            '
+        statusUrl:
+          type: string
+        pollAfterMs:
+          type:
+          - integer
+          - 'null'
+          minimum: 0
+        charged:
+          type: boolean
+        chargedCredits:
+          type: string
+          pattern: ^\d+$
+        billing:
+          $ref: '#/components/schemas/XWriteActionBilling'
+        request:
+          $ref: '#/components/schemas/XWriteActionRequest'
+        account:
+          $ref: '#/components/schemas/XWriteActionAccount'
+        target:
+          $ref: '#/components/schemas/XWriteActionTarget'
+        targetId:
+          type:
+          - string
+          - 'null'
+        result:
+          $ref: '#/components/schemas/XWriteActionResult'
+        nextAction:
+          $ref: '#/components/schemas/XWriteActionNextAction'
+        requestHash:
+          type: string
+          pattern: ^[0-9a-f]{64}$
+        requestId:
+          type: string
+        idempotent:
+          type: boolean
+        error:
+          type: string
+        message:
+          type: string
+        sendDispatched:
+          type: boolean
+        sendDispatchedAt:
+          type: string
+          format: date-time
+          description: Dispatch timestamp when the write reached execution.
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+          description: 'Deadline for resolving a non-terminal write. This is not the Idempotency-Key retention deadline.
+
+            '
+        confirmedAt:
+          type: string
+          format: date-time
+        confirmationCheckedAt:
+          type: string
+          format: date-time
+        confirmationAttempts:
           type: integer
           minimum: 0
-        requiresNewIdempotencyKey:
+        tweetId:
+          type: string
+          description: Compatibility field for a confirmed tweet result ID.
+        messageId:
+          type: string
+          description: Compatibility field for a confirmed direct message ID.
+        mediaId:
+          type: string
+          description: Compatibility field for a confirmed media upload ID.
+        mediaUrl:
+          type: string
+          format: uri
+          description: Public media URL when the upload creates one.
+        communityId:
+          type: string
+          description: Compatibility field for a confirmed community ID.
+        communityName:
+          type: string
+          description: Confirmed community name when available.
+        resultId:
+          type: string
+          description: Compatibility result ID for other write actions.
+        media:
+          type: object
+          additionalProperties: true
+          description: Media count, kind, size, and billing details when used.
+        details:
+          type: object
+          additionalProperties: true
+          description: Structured recovery context for a failed write.
+        success:
           type: boolean
+      description: 'Durable write lifecycle record. Poll statusUrl until terminal is true. Reusing the original Idempotency-Key returns this same record. Submit a new write only when safeToRetry is true, using a new key.
+
+        '
+    ComposeScoreCheck:
+      type: object
+      required:
+      - factor
+      - passed
+      properties:
+        factor:
+          type: string
+        passed:
+          type: boolean
+        suggestion:
+          type: string
+          description: Present only when the check fails.
+      additionalProperties: false
+    GuestWalletPurchaseRequest:
+      description: User-confirmed guest wallet checkout request.
+      type: object
+      additionalProperties: false
+      required:
+      - amount_minor
+      - currency
+      properties:
+        amount_minor:
+          type: integer
+          minimum: 1000
+          maximum: 25000
+          description: USD cents accepted for this checkout.
+        currency:
+          type: string
+          const: usd
+    Draft:
+      description: Saved tweet draft with optional topic and goal.
+      type: object
+      required:
+      - id
+      - text
+      - createdAt
+      properties:
+        id:
+          type: string
+        text:
+          type: string
+        topic:
+          type: string
+        goal:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    ComposeRadarRecommendation:
+      type: object
+      required:
+      - endpoint
+      - guidance
+      - source
+      - useFor
+      properties:
+        endpoint:
+          type: string
+          description: Radar endpoint for this source.
+        guidance:
+          type: string
+          description: Source-specific drafting guidance.
+        source:
+          type: string
+          enum:
+          - reddit
+          - github
+          - trustmrr
+          - hacker_news
+          - google_trends
+          - wikipedia
+          - polymarket
+        useFor:
+          type: string
+          description: Current-topic research this source supports.
+      additionalProperties: false
     ComposeRefineRequest:
       type: object
       required:
@@ -2185,153 +1521,6 @@ components:
           minLength: 1
           description: Audience, constraints, sources, or other writing context.
       additionalProperties: true
-    Draft:
-      description: Saved tweet draft with optional topic and goal.
-      type: object
-      required:
-      - id
-      - text
-      - createdAt
-      properties:
-        id:
-          type: string
-        text:
-          type: string
-        topic:
-          type: string
-        goal:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-    GuestPaymentRequired:
-      description: 'Credit error for a paid-read guest key with only its accountless guest top-up action.
-
-        '
-      type: object
-      additionalProperties: false
-      required:
-      - balance
-      - error
-      - message
-      - next_step
-      - payment_options
-      - required
-      - top_up_endpoint
-      - top_up_url
-      properties:
-        balance:
-          type: string
-          pattern: ^\d+$
-        error:
-          type: string
-          enum:
-          - insufficient_credits
-          - no_credits
-          - no_subscription
-          - subscription_inactive
-        message:
-          type: string
-        next_step:
-          type: string
-          const: Ask the user to confirm a USD amount before creating checkout.
-        payment_options:
-          type: object
-          additionalProperties: false
-          required:
-          - credits
-          properties:
-            credits:
-              type: object
-              additionalProperties: false
-              required:
-              - create_checkout
-              properties:
-                create_checkout:
-                  $ref: '#/components/schemas/GuestWalletTopupCheckoutAction'
-        required:
-          type: string
-          pattern: ^\d+$
-        top_up_endpoint:
-          type: string
-          const: /api/v1/guest-wallets/topups
-        top_up_url:
-          type: string
-          const: POST /api/v1/guest-wallets/topups
-    ComposeRadarRecommendation:
-      type: object
-      required:
-      - endpoint
-      - guidance
-      - source
-      - useFor
-      properties:
-        endpoint:
-          type: string
-          description: Radar endpoint for this source.
-        guidance:
-          type: string
-          description: Source-specific drafting guidance.
-        source:
-          type: string
-          enum:
-          - reddit
-          - github
-          - trustmrr
-          - hacker_news
-          - google_trends
-          - wikipedia
-          - polymarket
-        useFor:
-          type: string
-          description: Current-topic research this source supports.
-      additionalProperties: false
-    StyleProfileSummary:
-      description: Style profile summary with tweet count and ownership flag.
-      type: object
-      required:
-      - xUsername
-      - tweetCount
-      - isOwnAccount
-      - fetchedAt
-      properties:
-        xUsername:
-          type: string
-        tweetCount:
-          type: integer
-        isOwnAccount:
-          type: boolean
-        fetchedAt:
-          type: string
-          format: date-time
-    XWriteActionBilling:
-      type: object
-      additionalProperties: false
-      required:
-      - status
-      - charged
-      - plannedCredits
-      - chargedCredits
-      properties:
-        status:
-          type: string
-          enum:
-          - not_charged
-          - pending
-          - charged
-          - charge_failed
-          - refunded
-        charged:
-          type: boolean
-        plannedCredits:
-          type: string
-          pattern: ^\d+$
-        chargedCredits:
-          type: string
-          pattern: ^\d+$
-      description: 'plannedCredits is the approved maximum. chargedCredits comes from the settled credit ledger. Pending or failed writes are not charged.
-
-        '
     GuestWalletCreateCheckoutAction:
       description: Explicit direct REST action for a new guest wallet checkout.
       type: object
@@ -2409,22 +1598,594 @@ components:
         response_url_field:
           type: string
           const: checkout_url
-    GuestWalletPurchaseRequest:
-      description: User-confirmed guest wallet checkout request.
+    XWriteActionTarget:
+      type:
+      - object
+      - 'null'
+      description: Existing X resource targeted by the write, when applicable.
+      additionalProperties: false
+      required:
+      - type
+      - id
+      properties:
+        type:
+          type: string
+          enum:
+          - tweet
+          - user
+          - community
+        id:
+          type: string
+    AuthenticatedPaymentRequired:
+      description: Authenticated credit or subscription error with confirmation-gated hosted checkout actions.
       type: object
       additionalProperties: false
       required:
-      - amount_minor
-      - currency
+      - balance
+      - dashboard
+      - error
+      - message
+      - next_step
+      - payment_options
+      - required
+      - top_up_endpoint
+      - top_up_url
       properties:
-        amount_minor:
-          type: integer
-          minimum: 1000
-          maximum: 25000
-          description: USD cents accepted for this checkout.
-        currency:
+        balance:
           type: string
-          const: usd
+          pattern: ^\d+$
+          description: Available credits as a decimal string.
+        dashboard:
+          type: string
+          const: /dashboard/account
+          description: Account page for manual billing management.
+        error:
+          type: string
+          enum:
+          - insufficient_credits
+          - no_credits
+          - no_subscription
+          - subscription_inactive
+        message:
+          type: string
+        next_step:
+          type: string
+          const: Ask the user to confirm a payment option before creating checkout.
+        payment_options:
+          type: object
+          additionalProperties: false
+          required:
+          - credits
+          - subscription
+          properties:
+            credits:
+              type: object
+              additionalProperties: false
+              required:
+              - create_checkout
+              properties:
+                create_checkout:
+                  type: object
+                  additionalProperties: false
+                  required:
+                  - body
+                  - creates
+                  - method
+                  - path
+                  - provider
+                  - requires_authentication
+                  - requires_user_confirmation
+                  - response_url_field
+                  properties:
+                    body:
+                      type: object
+                      additionalProperties: false
+                      required:
+                      - dollars
+                      - locale
+                      properties:
+                        dollars:
+                          type: integer
+                          const: 10
+                        locale:
+                          type: string
+                          const: en
+                    creates:
+                      type: string
+                      const: checkout_url
+                    method:
+                      type: string
+                      const: POST
+                    path:
+                      type: string
+                      const: /api/v1/credits/topup
+                    provider:
+                      type: string
+                      deprecated: true
+                      const: stripe
+                    requires_authentication:
+                      type: boolean
+                      const: true
+                    requires_user_confirmation:
+                      type: boolean
+                      const: true
+                    response_url_field:
+                      type: string
+                      const: url
+            subscription:
+              type: object
+              additionalProperties: false
+              required:
+              - create_checkout
+              properties:
+                create_checkout:
+                  type: object
+                  additionalProperties: false
+                  required:
+                  - body
+                  - creates
+                  - method
+                  - path
+                  - provider
+                  - requires_authentication
+                  - requires_user_confirmation
+                  - response_url_field
+                  properties:
+                    body:
+                      type: object
+                      additionalProperties: false
+                      required:
+                      - tier
+                      properties:
+                        tier:
+                          type: string
+                          const: starter
+                    creates:
+                      type: string
+                      const: checkout_url
+                    method:
+                      type: string
+                      const: POST
+                    path:
+                      type: string
+                      const: /api/v1/subscribe
+                    provider:
+                      type: string
+                      deprecated: true
+                      const: stripe
+                    requires_authentication:
+                      type: boolean
+                      const: true
+                    requires_user_confirmation:
+                      type: boolean
+                      const: true
+                    response_url_field:
+                      type: string
+                      const: url
+        required:
+          type: string
+          pattern: ^\d+$
+          description: Credits required for the blocked request.
+        top_up_endpoint:
+          type: string
+          const: /api/v1/credits/topup
+        top_up_url:
+          type: string
+          const: POST /api/v1/credits/topup
+    DraftDetail:
+      description: Full tweet draft including update timestamp.
+      type: object
+      required:
+      - id
+      - text
+      - createdAt
+      - updatedAt
+      properties:
+        id:
+          type: string
+        text:
+          type: string
+        topic:
+          type: string
+        goal:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    StyleProfileSummary:
+      description: Style profile summary with tweet count and ownership flag.
+      type: object
+      required:
+      - xUsername
+      - tweetCount
+      - isOwnAccount
+      - fetchedAt
+      properties:
+        xUsername:
+          type: string
+        tweetCount:
+          type: integer
+        isOwnAccount:
+          type: boolean
+        fetchedAt:
+          type: string
+          format: date-time
+    ComposeExamplePattern:
+      type: object
+      required:
+      - description
+      - pattern
+      properties:
+        description:
+          type: string
+        pattern:
+          type: string
+      additionalProperties: false
+    ComposeContentRule:
+      type: object
+      required:
+      - rule
+      properties:
+        rule:
+          type: string
+      additionalProperties: false
+    RadarItem:
+      description: Trending topic with score, category, source, region, language, and source-specific metadata.
+      type: object
+      required:
+      - id
+      - sourceId
+      - title
+      - score
+      - category
+      - source
+      - region
+      - language
+      - metadata
+      - publishedAt
+      - createdAt
+      properties:
+        id:
+          type: string
+          description: Radar item identifier.
+        sourceId:
+          type: string
+          description: Source-specific identifier used for deduplication.
+        title:
+          type: string
+        url:
+          type: string
+        score:
+          type: number
+        category:
+          type: string
+          enum:
+          - general
+          - tech
+          - dev
+          - science
+          - culture
+          - politics
+          - business
+          - entertainment
+        source:
+          type: string
+          enum:
+          - github
+          - google_trends
+          - hacker_news
+          - polymarket
+          - reddit
+          - trustmrr
+          - wikipedia
+        region:
+          type: string
+        language:
+          type: string
+          description: BCP-47 language code. und means the source did not identify a language.
+        metadata:
+          type: object
+          description: "Source-specific fields. Shape varies per source:\n- reddit: { author, authorId?, subreddit, subredditId?,\n  subredditSubscribers?, sourceFormat, score?, upvoteRatio?,\n  estimatedUpvotes?, estimatedDownvotes?, numberComments?,\n  numberCrossposts?, selftext?, contentUrl?, domain?, postHint?,\n  linkFlairText?, distinguished?, totalAwardsReceived?, viewCount?,\n  editedAt?, galleryImageUrls?, redditVideo?, archived?, contestMode?,\n  isCrosspostable?, isMeta?, isNsfw?, isOriginalContent?,\n  isRobotIndexable?, isSelf?, isSpoiler?, isVideo?, locked?,\n  stickied? }. `score` is Reddit's public net score. Exact public\n  upvote and downvote counts are not available. Estimated counts\n  derive from the public score and upvote ratio, which Reddit may\n  fuzz. Comment bodies are not included. Current items combine\n  public listing discovery with server-rendered post data and use\n  `sourceFormat: html`; `json` and `rss` remain for legacy rows.\n- github: { starsToday: number }\n- hacker_news: { points: number, numberComments: number }\n- google_trends: { approxTraffic: number }\n- polymarket: { volume24hr: number }\n- wikipedia: { views: number }\n- trustmrr: { mrr, growthPercent, last30Days, total, customers, activeSubscriptions, onSale, xHandle?, category?, askingPrice?, country?, foundedDate?, googleSearchImpressionsLast30Days?, growthMrrPercent?, multiple?, paymentProvider?, profitMarginLast30Days?, rank?, revenuePerVisitor?, targetAudience?, visitorsLast30Days? }\nFor the startup growth source, xHandle is the founder's X username\nwithout @. The rank field is the source's revenue rank. Result order\nrepresents reported 30-day revenue-growth rank.\n"
+          properties:
+            author:
+              type: string
+            contentUrl:
+              type: string
+              format: uri
+            estimatedDownvotes:
+              type: integer
+              minimum: 0
+            estimatedUpvotes:
+              type: integer
+              minimum: 0
+            numberComments:
+              type: integer
+              minimum: 0
+            score:
+              type: integer
+            selftext:
+              type: string
+            sourceFormat:
+              type: string
+              enum:
+              - html
+              - json
+              - rss
+              description: Current items use html. json and rss are retained for legacy rows.
+            subreddit:
+              type: string
+            upvoteRatio:
+              type: number
+              minimum: 0
+              maximum: 1
+          additionalProperties: true
+        publishedAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        description:
+          type: string
+        imageUrl:
+          type: string
+          description: Source image. Startup growth items return the logo here.
+    ComposePrepareRequest:
+      type: object
+      required:
+      - step
+      - topic
+      properties:
+        step:
+          type: string
+          const: compose
+        topic:
+          type: string
+          minLength: 1
+          description: Subject for the post.
+        goal:
+          type: string
+          enum:
+          - engagement
+          - followers
+          - authority
+          - conversation
+          default: engagement
+          description: Editorial goal used to order the rules and questions.
+        styleUsername:
+          type: string
+          minLength: 1
+          description: Username from a style analysis saved to this account.
+      additionalProperties: true
+    ComposeScoreRequest:
+      type: object
+      required:
+      - step
+      - draft
+      properties:
+        step:
+          type: string
+          const: score
+        draft:
+          type: string
+          minLength: 1
+          description: Full post text for deterministic editorial checks.
+        hasLink:
+          type: boolean
+          description: True when a separate link card is attached.
+          default: false
+        hasMedia:
+          type: boolean
+          deprecated: true
+          x-stainless-deprecation-message: Ignored. Remove this field. Use hasLink for a separate link card.
+          description: 'Accepted for backward compatibility. Text checks ignore this field.
+
+            '
+      additionalProperties: true
+    XWritePaymentRequired:
+      allOf:
+      - $ref: '#/components/schemas/XWriteAction'
+      - type: object
+        required:
+        - error
+        - message
+      description: 'Durable failed write action with the applicable payment guidance.
+
+        '
+    XWriteActionBilling:
+      type: object
+      additionalProperties: false
+      required:
+      - status
+      - charged
+      - plannedCredits
+      - chargedCredits
+      properties:
+        status:
+          type: string
+          enum:
+          - not_charged
+          - pending
+          - charged
+          - charge_failed
+          - refunded
+        charged:
+          type: boolean
+        plannedCredits:
+          type: string
+          pattern: ^\d+$
+        chargedCredits:
+          type: string
+          pattern: ^\d+$
+      description: 'plannedCredits is the approved maximum. chargedCredits comes from the settled credit ledger. Pending or failed writes are not charged.
+
+        '
+    GuestWalletTopupCheckoutAction:
+      description: Explicit direct REST action for a guest wallet top-up.
+      type: object
+      additionalProperties: false
+      required:
+      - account_required
+      - amount_bounds
+      - body
+      - creates
+      - method
+      - path
+      - provider
+      - required_headers
+      - requires_authentication
+      - requires_user_confirmation
+      - requires_user_interaction
+      - response_fields
+      - response_url_field
+      properties:
+        account_required:
+          type: boolean
+          const: false
+        amount_bounds:
+          $ref: '#/components/schemas/GuestWalletAmountBounds'
+        body:
+          $ref: '#/components/schemas/GuestWalletPurchaseRequest'
+        creates:
+          type: string
+          const: checkout_url
+        method:
+          type: string
+          const: POST
+        path:
+          type: string
+          const: /api/v1/guest-wallets/topups
+        provider:
+          type: string
+          deprecated: true
+          const: stripe
+        required_headers:
+          type: object
+          additionalProperties: false
+          required:
+          - Idempotency-Key
+          properties:
+            Idempotency-Key:
+              type: string
+              const: <cryptographically random UUID v4>
+        requires_authentication:
+          type: boolean
+          const: true
+        requires_user_confirmation:
+          type: boolean
+          const: true
+        requires_user_interaction:
+          type: boolean
+          const: true
+        response_fields:
+          type: array
+          minItems: 2
+          maxItems: 2
+          prefixItems:
+          - type: string
+            const: checkout_url
+          - type: string
+            const: status_url
+          items:
+            type: string
+            enum:
+            - checkout_url
+            - status_url
+        response_url_field:
+          type: string
+          const: checkout_url
+    GuestPaymentRequired:
+      description: 'Credit error for a paid-read guest key with only its accountless guest top-up action.
+
+        '
+      type: object
+      additionalProperties: false
+      required:
+      - balance
+      - error
+      - message
+      - next_step
+      - payment_options
+      - required
+      - top_up_endpoint
+      - top_up_url
+      properties:
+        balance:
+          type: string
+          pattern: ^\d+$
+        error:
+          type: string
+          enum:
+          - insufficient_credits
+          - no_credits
+          - no_subscription
+          - subscription_inactive
+        message:
+          type: string
+        next_step:
+          type: string
+          const: Ask the user to confirm a USD amount before creating checkout.
+        payment_options:
+          type: object
+          additionalProperties: false
+          required:
+          - credits
+          properties:
+            credits:
+              type: object
+              additionalProperties: false
+              required:
+              - create_checkout
+              properties:
+                create_checkout:
+                  $ref: '#/components/schemas/GuestWalletTopupCheckoutAction'
+        required:
+          type: string
+          pattern: ^\d+$
+        top_up_endpoint:
+          type: string
+          const: /api/v1/guest-wallets/topups
+        top_up_url:
+          type: string
+          const: POST /api/v1/guest-wallets/topups
+    ComposeScoreResult:
+      type: object
+      required:
+      - checklist
+      - nextStep
+      - passed
+      - passedCount
+      - topSuggestion
+      - totalChecks
+      properties:
+        checklist:
+          type: array
+          minItems: 9
+          maxItems: 9
+          items:
+            $ref: '#/components/schemas/ComposeScoreCheck'
+          description: Deterministic editorial checks. Not a reach prediction.
+        intentUrl:
+          type: string
+          format: uri
+          description: Present only when every check passes.
+        nextStep:
+          type: string
+        passed:
+          type: boolean
+        passedCount:
+          type: integer
+          minimum: 0
+          maximum: 9
+        topSuggestion:
+          type: string
+        totalChecks:
+          type: integer
+          const: 9
+      additionalProperties: false
     ComposePrepareResult:
       type: object
       required:
@@ -2508,6 +2269,245 @@ components:
           type: string
           description: Next action when no cached style is available.
       additionalProperties: false
+    MppPaymentRequired:
+      description: Anonymous payment requirement for a direct MPP operation. The response includes an MPP challenge and an accountless checkout action.
+      type: object
+      required:
+      - account_required
+      - detail
+      - next_step
+      - payment_options
+      - status
+      - title
+      - type
+      properties:
+        account_required:
+          type: boolean
+          const: false
+        challengeId:
+          type: string
+          description: Opaque identifier for the MPP payment challenge.
+        detail:
+          type: string
+        hint:
+          type: string
+          description: Instructions for selecting and paying an MPP offer.
+        next_step:
+          type: string
+          const: Ask the user to confirm a USD amount before creating checkout.
+        payment_options:
+          type: object
+          additionalProperties: false
+          required:
+          - guest_wallet
+          properties:
+            guest_wallet:
+              type: object
+              additionalProperties: false
+              required:
+              - create_checkout
+              properties:
+                create_checkout:
+                  $ref: '#/components/schemas/GuestWalletCreateCheckoutAction'
+        status:
+          type: integer
+          const: 402
+        title:
+          type: string
+          const: Payment Required
+        type:
+          type: string
+          format: uri
+          const: https://paymentauth.org/problems/payment-required
+    XWriteActionNextAction:
+      type:
+      - object
+      - 'null'
+      description: Exact follow-up an API client or agent should perform.
+      additionalProperties: false
+      required:
+      - type
+      properties:
+        type:
+          type: string
+          enum:
+          - poll
+          - retry
+          - verify_result
+          - fix_request
+        url:
+          type: string
+        afterMs:
+          type: integer
+          minimum: 0
+        requiresNewIdempotencyKey:
+          type: boolean
+  responses:
+    Unauthenticated:
+      description: Unauthenticated
+      headers:
+        Cache-Control:
+          description: Prevents storage of authentication responses.
+          schema:
+            type: string
+            const: no-store
+        WWW-Authenticate:
+          description: Bearer authentication challenge.
+          schema:
+            type: string
+            const: Bearer realm="xquik"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: unauthenticated
+            message: Authentication required. Provide a valid API key or bearer token.
+    PaymentRequired:
+      description: 'Payment required. MPP reads return a problem document and `WWW-Authenticate`. Authenticated reads return balances and checkout actions. Guest keys receive only the guest top-up action. Other endpoints may use legacy errors. A failed request never creates checkout. Require user confirmation before creating one.
+
+        '
+      headers:
+        WWW-Authenticate:
+          description: MPP payment challenge for eligible anonymous pay-per-use requests. Authenticated credit or subscription errors omit this header.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            oneOf:
+            - $ref: '#/components/schemas/XWritePaymentRequired'
+            - $ref: '#/components/schemas/AuthenticatedPaymentRequired'
+            - $ref: '#/components/schemas/GuestPaymentRequired'
+            - allOf:
+              - $ref: '#/components/schemas/Error'
+              - not:
+                  required:
+                  - payment_options
+          example:
+            balance: '0'
+            dashboard: /dashboard/account
+            error: insufficient_credits
+            message: Insufficient credits. Top up or subscribe to continue.
+            next_step: Ask the user to confirm a payment option before creating checkout.
+            payment_options:
+              credits:
+                create_checkout:
+                  body:
+                    dollars: 10
+                    locale: en
+                  creates: checkout_url
+                  method: POST
+                  path: /api/v1/credits/topup
+                  provider: stripe
+                  requires_authentication: true
+                  requires_user_confirmation: true
+                  response_url_field: url
+              subscription:
+                create_checkout:
+                  body:
+                    tier: starter
+                  creates: checkout_url
+                  method: POST
+                  path: /api/v1/subscribe
+                  provider: stripe
+                  requires_authentication: true
+                  requires_user_confirmation: true
+                  response_url_field: url
+            required: '1'
+            top_up_endpoint: /api/v1/credits/topup
+            top_up_url: POST /api/v1/credits/topup
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/MppPaymentRequired'
+          example:
+            account_required: false
+            challengeId: Opaque MPP challenge identifier
+            detail: Payment is required.
+            hint: Use a supported wallet with an offer from the WWW-Authenticate header.
+            status: 402
+            title: Payment Required
+            type: https://paymentauth.org/problems/payment-required
+            next_step: Ask the user to confirm a USD amount before creating checkout.
+            payment_options:
+              guest_wallet:
+                create_checkout:
+                  account_required: false
+                  amount_bounds:
+                    currency: usd
+                    maximum_minor: 25000
+                    minimum_minor: 1000
+                  body:
+                    amount_minor: 1000
+                    currency: usd
+                  creates: checkout_url
+                  method: POST
+                  path: /api/v1/guest-wallets
+                  provider: stripe
+                  required_headers:
+                    Idempotency-Key: <cryptographically random UUID v4>
+                  requires_authentication: false
+                  requires_user_confirmation: true
+                  requires_user_interaction: true
+                  response_fields:
+                  - checkout_url
+                  - api_key
+                  - status_url
+                  response_url_field: checkout_url
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: not_found
+            message: Resource not found.
+    RateLimitExceeded:
+      description: 'Xquik tier rate limit exceeded. The response includes a `Retry-After` header with the number of seconds to wait before retrying.
+
+        '
+      content:
+        application/json:
+          schema:
+            allOf:
+            - $ref: '#/components/schemas/Error'
+            - type: object
+              properties:
+                retryAfter:
+                  type: integer
+                  example: 60
+          example:
+            error: rate_limit_exceeded
+            message: Too many requests. Try again later.
+            retryAfter: 60
+      headers:
+        Retry-After:
+          description: Seconds until the next permitted request.
+          schema:
+            example: 60
+            minimum: 1
+            type: integer
+    UnexpectedError:
+      content:
+        application/json:
+          example:
+            error: internal_error
+            message: Unexpected error. Try again.
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Unexpected error.
+    InvalidInput:
+      description: Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: invalid_input
+            message: Invalid input. Check the request body.
+    NoContent:
+      description: Deleted
   parameters:
     StyleId:
       name: id

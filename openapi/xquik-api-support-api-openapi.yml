@@ -650,21 +650,6 @@ paths:
       description: Reply to a support ticket.
 components:
   schemas:
-    SupportAttachmentReceipt:
-      description: Attachment identifier and initial processing state.
-      type: object
-      required:
-      - publicId
-      - status
-      properties:
-        publicId:
-          type: string
-        status:
-          type: string
-          enum:
-          - pending
-          - ready
-          - failed
     Error:
       description: 'Error response. Default v1 returns a legacy string error code. Send `xquik-api-contract: 2026-04-29` to receive the structured best-practice error object.
 
@@ -989,25 +974,22 @@ components:
           - failed
         url:
           type: string
+    SupportAttachmentReceipt:
+      description: Attachment identifier and initial processing state.
+      type: object
+      required:
+      - publicId
+      - status
+      properties:
+        publicId:
+          type: string
+        status:
+          type: string
+          enum:
+          - pending
+          - ready
+          - failed
   responses:
-    InvalidInput:
-      description: Invalid input
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: invalid_input
-            message: Invalid input. Check the request body.
-    NotFound:
-      description: Not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: not_found
-            message: Resource not found.
     Unauthenticated:
       description: Unauthenticated
       headers:
@@ -1028,6 +1010,33 @@ components:
           example:
             error: unauthenticated
             message: Authentication required. Provide a valid API key or bearer token.
+    InvalidInput:
+      description: Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: invalid_input
+            message: Invalid input. Check the request body.
+    UnexpectedError:
+      content:
+        application/json:
+          example:
+            error: internal_error
+            message: Unexpected error. Try again.
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Unexpected error.
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: not_found
+            message: Resource not found.
     RateLimitExceeded:
       description: 'Xquik tier rate limit exceeded. The response includes a `Retry-After` header with the number of seconds to wait before retrying.
 
@@ -1053,15 +1062,6 @@ components:
             example: 60
             minimum: 1
             type: integer
-    UnexpectedError:
-      content:
-        application/json:
-          example:
-            error: internal_error
-            message: Unexpected error. Try again.
-          schema:
-            $ref: '#/components/schemas/Error'
-      description: Unexpected error.
   parameters:
     SupportIdempotencyKey:
       name: Idempotency-Key
