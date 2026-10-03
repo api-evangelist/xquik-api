@@ -493,27 +493,112 @@ paths:
         default:
           $ref: '#/components/responses/UnexpectedError'
 components:
+  parameters:
+    UserFilterMinFollowers:
+      name: minFollowers
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+      description: Minimum follower count. Filtering happens before billing.
+    UserFilterHasWebsite:
+      name: hasWebsite
+      in: query
+      schema:
+        type: boolean
+      description: Only return profiles with a website.
+    UserFilterHasLocation:
+      name: hasLocation
+      in: query
+      schema:
+        type: boolean
+      description: Only return profiles with a location.
+    UserFilterVerifiedOnly:
+      name: verifiedOnly
+      in: query
+      schema:
+        type: boolean
+      description: Only return verified profiles.
+    ResultPageSize:
+      name: pageSize
+      in: query
+      description: 'Maximum page items (1-100, default 20). Source, filters, or credits can reduce results. Continue while has_next_page is true. Deprecated limit and count aliases remain accepted.
+
+        '
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    UserFilterMaxFollowing:
+      name: maxFollowing
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+      description: Maximum following count.
+    UserFilterMaxStatuses:
+      name: maxStatuses
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+      description: Maximum post count. maxPosts is also accepted.
+    UserFilterUsernameContains:
+      name: usernameContains
+      in: query
+      schema:
+        type: string
+      description: Match a username substring, ignoring case.
+    UserFilterLocationContains:
+      name: locationContains
+      in: query
+      schema:
+        type: string
+      description: Match a location substring, ignoring case.
+    UserFilterMinFollowing:
+      name: minFollowing
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+      description: Minimum following count.
+    UserFilterVerifiedType:
+      name: verifiedType
+      in: query
+      schema:
+        type: string
+      description: Match the verification type exactly, ignoring case.
+    UserFilterMaxFollowers:
+      name: maxFollowers
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+      description: Maximum follower count. Missing counts pass this maximum.
+    UserFilterMinAccountAgeDays:
+      name: minAccountAgeDays
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+      description: Minimum account age in whole days.
+    UserFilterBioContains:
+      name: bioContains
+      in: query
+      schema:
+        type: string
+      description: 'Match any comma-separated or line-separated bio term, ignoring case.
+
+        '
+    UserFilterMinStatuses:
+      name: minStatuses
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+      description: Minimum post count. minPosts is also accepted.
   responses:
-    Unauthenticated:
-      description: Unauthenticated
-      headers:
-        Cache-Control:
-          description: Prevents storage of authentication responses.
-          schema:
-            type: string
-            const: no-store
-        WWW-Authenticate:
-          description: Bearer authentication challenge.
-          schema:
-            type: string
-            const: Bearer realm="xquik"
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: unauthenticated
-            message: Authentication required. Provide a valid API key or bearer token.
     PaymentRequired:
       description: 'Payment required. MPP reads return a problem document and `WWW-Authenticate`. Authenticated reads return balances and checkout actions. Guest keys receive only the guest top-up action. Other endpoints may use legacy errors. A failed request never creates checkout. Require user confirmation before creating one.
 
@@ -605,15 +690,6 @@ components:
                   - api_key
                   - status_url
                   response_url_field: checkout_url
-    NotFound:
-      description: Not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: not_found
-            message: Resource not found.
     RateLimitExceeded:
       description: 'Xquik tier rate limit exceeded. The response includes a `Retry-After` header with the number of seconds to wait before retrying.
 
@@ -639,6 +715,35 @@ components:
             example: 60
             minimum: 1
             type: integer
+    XApiError:
+      description: 'Dependency unavailable, unauthorized, or rate limited. Default v1 returns 502. The best-practice response contract returns 424 for transparent dependency failures.
+
+        '
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: x_api_unavailable
+            message: X data source temporarily unavailable. Try again later.
+    UnexpectedError:
+      content:
+        application/json:
+          example:
+            error: internal_error
+            message: Unexpected error. Try again.
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Unexpected error.
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: not_found
+            message: Resource not found.
     AnonymousGuestAuthenticationRequired:
       description: 'Authentication required for a non-MPP paid read. The challenge requests Bearer authentication, not payment. Missing credentials advertise guest checkout without creating it. Invalid credentials return a plain error. Require user confirmation before calling an advertised action.
 
@@ -694,15 +799,26 @@ components:
                   - api_key
                   - status_url
                   response_url_field: checkout_url
-    UnexpectedError:
+    Unauthenticated:
+      description: Unauthenticated
+      headers:
+        Cache-Control:
+          description: Prevents storage of authentication responses.
+          schema:
+            type: string
+            const: no-store
+        WWW-Authenticate:
+          description: Bearer authentication challenge.
+          schema:
+            type: string
+            const: Bearer realm="xquik"
       content:
         application/json:
-          example:
-            error: internal_error
-            message: Unexpected error. Try again.
           schema:
             $ref: '#/components/schemas/Error'
-      description: Unexpected error.
+          example:
+            error: unauthenticated
+            message: Authentication required. Provide a valid API key or bearer token.
     InvalidInput:
       description: Invalid input
       content:
@@ -712,41 +828,35 @@ components:
           example:
             error: invalid_input
             message: Invalid input. Check the request body.
-    XApiError:
-      description: 'Dependency unavailable, unauthorized, or rate limited. Default v1 returns 502. The best-practice response contract returns 424 for transparent dependency failures.
-
-        '
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: x_api_unavailable
-            message: X data source temporarily unavailable. Try again later.
   schemas:
-    TweetPlace:
-      description: Public place metadata attached to a tweet.
-      type: object
+    XWriteActionTarget:
+      type:
+      - object
+      - 'null'
+      description: Existing X resource targeted by the write, when applicable.
+      additionalProperties: false
+      required:
+      - type
+      - id
       properties:
-        boundingBox:
-          type: object
-          additionalProperties: true
-          x-stainless-any: true
-          x-stainless-terraform-type: string
-        country:
+        type:
           type: string
-        countryCode:
-          type: string
-        fullName:
-          type: string
+          enum:
+          - tweet
+          - user
+          - community
         id:
           type: string
-        name:
-          type: string
-        placeType:
-          type: string
-        url:
-          type: string
+    XWritePaymentRequired:
+      allOf:
+      - $ref: '#/components/schemas/XWriteAction'
+      - type: object
+        required:
+        - error
+        - message
+      description: 'Durable failed write action with the applicable payment guidance.
+
+        '
     XWriteActionRequest:
       type: object
       description: Stable fingerprint and sanitized payload for replay checks.
@@ -767,6 +877,174 @@ components:
           - 'null'
           additionalProperties: true
           description: Exact sanitized payload dispatched for this action.
+    XWriteActionBilling:
+      type: object
+      additionalProperties: false
+      required:
+      - status
+      - charged
+      - plannedCredits
+      - chargedCredits
+      properties:
+        status:
+          type: string
+          enum:
+          - not_charged
+          - pending
+          - charged
+          - charge_failed
+          - refunded
+        charged:
+          type: boolean
+        plannedCredits:
+          type: string
+          pattern: ^\d+$
+        chargedCredits:
+          type: string
+          pattern: ^\d+$
+      description: 'plannedCredits is the approved maximum. chargedCredits comes from the settled credit ledger. Pending or failed writes are not charged.
+
+        '
+    PaginatedUsers:
+      description: 'Paginated user profiles. No-mode follower, following, and verified follower requests merge independent views automatically. Response fields, page size, aliases, filters, and per-returned-profile billing stay unchanged. Existing unprefixed cursors retain legacy behavior. Follow next_cursor while has_next_page is true.
+
+        '
+      type: object
+      required:
+      - users
+      - has_next_page
+      - next_cursor
+      properties:
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserProfile'
+        has_next_page:
+          type: boolean
+        next_cursor:
+          type: string
+    SearchTweet:
+      description: Tweet returned from search results with inline author info. A zero metric can mean X did not report the count.
+      type: object
+      required:
+      - id
+      - text
+      - retweetCount
+      - replyCount
+      - likeCount
+      - quoteCount
+      - viewCount
+      - bookmarkCount
+      properties:
+        id:
+          type: string
+        text:
+          type: string
+        type:
+          type: string
+        createdAt:
+          type: string
+        isNoteTweet:
+          type: boolean
+          description: True for Note Tweets (long-form content, up to 25,000 characters)
+        isReply:
+          type: boolean
+          description: True when this search result is a reply
+        isQuoteStatus:
+          type: boolean
+          description: True when this search result quotes another tweet
+        isLimitedReply:
+          type: boolean
+          description: Whether the tweet has limited reply permissions
+        inReplyToId:
+          type: string
+          description: ID of the tweet this result replies to.
+        inReplyToUserId:
+          type: string
+          description: ID of the user this result replies to.
+        inReplyToUsername:
+          type: string
+          description: Username this result replies to.
+        conversationId:
+          type: string
+          description: Root tweet ID for the search result conversation
+        source:
+          type: string
+          description: Client application used to post the tweet
+        displayTextRange:
+          type: array
+          items:
+            type: integer
+          description: Rendered text's start and end offsets.
+        contentDisclosure:
+          $ref: '#/components/schemas/ContentDisclosure'
+        article:
+          $ref: '#/components/schemas/TweetArticleMetadata'
+        card:
+          $ref: '#/components/schemas/TweetCard'
+        communityNote:
+          $ref: '#/components/schemas/TweetCommunityNote'
+        edit:
+          $ref: '#/components/schemas/TweetEdit'
+        isTranslatable:
+          type: boolean
+        noteTweet:
+          $ref: '#/components/schemas/TweetNote'
+        place:
+          $ref: '#/components/schemas/TweetPlace'
+        possiblySensitive:
+          type: boolean
+        previousCounts:
+          $ref: '#/components/schemas/TweetPreviousCounts'
+        viewState:
+          type: string
+        entities:
+          type: object
+          additionalProperties: true
+          description: Parsed search-result entities including URLs, mentions, hashtags, and media markers
+        quoted_tweet:
+          $ref: '#/components/schemas/EmbeddedTweet'
+        retweeted_tweet:
+          $ref: '#/components/schemas/EmbeddedTweet'
+        media:
+          type: array
+          items:
+            $ref: '#/components/schemas/TweetMedia'
+          description: Search-result media attachments, omitted when no media is present
+        url:
+          type: string
+          description: Search result permalink.
+        lang:
+          type: string
+          description: Search result language code.
+        likeCount:
+          type: integer
+        retweetCount:
+          type: integer
+        replyCount:
+          type: integer
+        quoteCount:
+          type: integer
+        viewCount:
+          type: integer
+        bookmarkCount:
+          type: integer
+        author:
+          $ref: '#/components/schemas/UserProfile'
+    XWriteActionAccount:
+      type:
+      - object
+      - 'null'
+      description: Connected account selected for the write.
+      additionalProperties: false
+      required:
+      - id
+      - username
+      properties:
+        id:
+          type: string
+        username:
+          type: string
     GuestWalletAmountBounds:
       description: Accepted guest wallet purchase range in USD cents.
       type: object
@@ -785,14 +1063,22 @@ components:
         minimum_minor:
           type: integer
           const: 1000
-    UserHighlightsInfo:
-      description: Profile highlight availability and count metadata.
+    GuestWalletPurchaseRequest:
+      description: User-confirmed guest wallet checkout request.
       type: object
+      additionalProperties: false
+      required:
+      - amount_minor
+      - currency
       properties:
-        canHighlightTweets:
-          type: boolean
-        highlightedTweets:
+        amount_minor:
+          type: integer
+          minimum: 1000
+          maximum: 25000
+          description: USD cents accepted for this checkout.
+        currency:
           type: string
+          const: usd
     ContentDisclosure:
       description: Content disclosure metadata shown by X when a tweet is labeled as paid partnership content or AI-generated media.
       type: object
@@ -812,16 +1098,6 @@ components:
             hasAiGeneratedMedia:
               type: boolean
               description: True when X labels the tweet as containing AI-generated media.
-    TweetEdit:
-      description: Edit history metadata returned by X.
-      type: object
-      properties:
-        editTweetIds:
-          type: array
-          items:
-            type: string
-        editableUntilMsecs:
-          type: string
     Error:
       description: 'Error response. Default v1 returns a legacy string error code. Send `xquik-api-contract: 2026-04-29` to receive the structured best-practice error object.
 
@@ -1101,34 +1377,6 @@ components:
           type: integer
           minimum: 1
           description: Required wait in milliseconds.
-    TweetPreviousCounts:
-      description: Engagement counts retained from a prior tweet edit.
-      type: object
-      properties:
-        bookmarkCount:
-          type: integer
-        likeCount:
-          type: integer
-        quoteCount:
-          type: integer
-        replyCount:
-          type: integer
-        retweetCount:
-          type: integer
-    XWriteActionAccount:
-      type:
-      - object
-      - 'null'
-      description: Connected account selected for the write.
-      additionalProperties: false
-      required:
-      - id
-      - username
-      properties:
-        id:
-          type: string
-        username:
-          type: string
     XWriteActionResult:
       type:
       - object
@@ -1148,24 +1396,375 @@ components:
           type: string
         state:
           type: string
-    TweetCommunityNote:
-      description: Community Note presentation metadata returned by X.
+    UserIdentityVerification:
+      description: Identity verification metadata displayed by X.
       type: object
+      properties:
+        description:
+          type: string
+        isIdentityVerified:
+          type: boolean
+        verifiedSinceMsec:
+          type: string
+    TweetNote:
+      description: Complete Note Tweet content and rich-text metadata.
+      type: object
+      required:
+      - text
       properties:
         id:
           type: string
-        title:
+        text:
           type: string
-        shortTitle:
+        isExpandable:
+          type: boolean
+        entities:
+          type: object
+          additionalProperties: true
+          x-stainless-any: true
+          x-stainless-terraform-type: string
+        richtextTags:
+          type: array
+          items:
+            type: object
+            required:
+            - fromIndex
+            - toIndex
+            - types
+            properties:
+              fromIndex:
+                type: integer
+              toIndex:
+                type: integer
+              types:
+                type: array
+                items:
+                  type: string
+    UserProfile:
+      description: X user profile with bio, follower counts, and verification status.
+      type: object
+      required:
+      - id
+      - username
+      - name
+      properties:
+        id:
           type: string
-        subtitle:
+        username:
           type: string
-        footer:
+        name:
           type: string
-        destinationUrl:
+        description:
           type: string
-        visualStyle:
+        followers:
+          type: integer
+        following:
+          type: integer
+        verified:
+          type: boolean
+        isBlueVerified:
+          type: boolean
+          description: Whether X shows a blue verification badge
+        isVerified:
+          type: boolean
+          description: Whether X marks the profile as verified
+        profilePicture:
           type: string
+        coverPicture:
+          type: string
+        profileBannerUrl:
+          type: string
+          description: Original X profile banner field when available
+        location:
+          type: string
+        createdAt:
+          type: string
+        statusesCount:
+          type: integer
+        mediaCount:
+          type: integer
+        protected:
+          type: boolean
+          description: Whether the profile protects its posts
+        url:
+          type: string
+        favouritesCount:
+          type: integer
+        hasCustomTimelines:
+          type: boolean
+        isTranslator:
+          type: boolean
+        withheldInCountries:
+          type: array
+          items:
+            type: string
+        possiblySensitive:
+          type: boolean
+        pinnedTweetIds:
+          type: array
+          items:
+            type: string
+        isAutomated:
+          type: boolean
+        automatedBy:
+          type: string
+        unavailable:
+          type: boolean
+        unavailableReason:
+          type: string
+        verifiedType:
+          type: string
+        affiliatesHighlightedLabel:
+          $ref: '#/components/schemas/UserAffiliateLabel'
+        businessAccountAffiliatesCount:
+          type: integer
+        creatorSubscriptionsCount:
+          type: integer
+        hasGraduatedAccess:
+          type: boolean
+        hasHiddenSubscriptionsOnProfile:
+          type: boolean
+        highlightsInfo:
+          $ref: '#/components/schemas/UserHighlightsInfo'
+        identityVerification:
+          $ref: '#/components/schemas/UserIdentityVerification'
+        isProfileTranslatable:
+          type: boolean
+        parodyCommentaryFanLabel:
+          type: string
+        profileDescriptionLanguage:
+          type: string
+        profileImageShape:
+          type: string
+        profileInterstitialType:
+          type: string
+        profileSortEnabled:
+          type: boolean
+        profileTranslatorType:
+          type: string
+        superFollowEligible:
+          type: boolean
+        communityRole:
+          type: string
+          description: Community role when returned by community member reads
+        profile_bio:
+          type: object
+          additionalProperties: true
+          x-stainless-any: true
+          x-stainless-terraform-type: string
+          description: Structured profile bio with entity annotations
+    XWriteActionNextAction:
+      type:
+      - object
+      - 'null'
+      description: Exact follow-up an API client or agent should perform.
+      additionalProperties: false
+      required:
+      - type
+      properties:
+        type:
+          type: string
+          enum:
+          - poll
+          - retry
+          - verify_result
+          - fix_request
+        url:
+          type: string
+        afterMs:
+          type: integer
+          minimum: 0
+        requiresNewIdempotencyKey:
+          type: boolean
+    EmbeddedTweet:
+      description: 'Quoted or retweeted tweet context. Every object includes id, text, and engagement metrics. A zero metric can mean X did not report the count. Author, media, and conversation fields appear when available.
+
+        '
+      type: object
+      required:
+      - id
+      - text
+      - retweetCount
+      - replyCount
+      - likeCount
+      - quoteCount
+      - viewCount
+      - bookmarkCount
+      properties:
+        id:
+          type: string
+        text:
+          type: string
+        type:
+          type: string
+        createdAt:
+          type: string
+        url:
+          type: string
+        lang:
+          type: string
+        retweetCount:
+          type: integer
+        replyCount:
+          type: integer
+        likeCount:
+          type: integer
+        quoteCount:
+          type: integer
+        viewCount:
+          type: integer
+        bookmarkCount:
+          type: integer
+        isReply:
+          type: boolean
+        isLimitedReply:
+          type: boolean
+        isNoteTweet:
+          type: boolean
+        isQuoteStatus:
+          type: boolean
+        inReplyToId:
+          type: string
+        inReplyToUserId:
+          type: string
+        inReplyToUsername:
+          type: string
+        conversationId:
+          type: string
+        source:
+          type: string
+        displayTextRange:
+          type: array
+          items:
+            type: integer
+        contentDisclosure:
+          $ref: '#/components/schemas/ContentDisclosure'
+        article:
+          $ref: '#/components/schemas/TweetArticleMetadata'
+        card:
+          $ref: '#/components/schemas/TweetCard'
+        communityNote:
+          $ref: '#/components/schemas/TweetCommunityNote'
+        edit:
+          $ref: '#/components/schemas/TweetEdit'
+        isTranslatable:
+          type: boolean
+        noteTweet:
+          $ref: '#/components/schemas/TweetNote'
+        place:
+          $ref: '#/components/schemas/TweetPlace'
+        possiblySensitive:
+          type: boolean
+        previousCounts:
+          $ref: '#/components/schemas/TweetPreviousCounts'
+        viewState:
+          type: string
+        entities:
+          type: object
+          additionalProperties: true
+          x-stainless-any: true
+          x-stainless-terraform-type: string
+        quoted_tweet:
+          $ref: '#/components/schemas/EmbeddedTweet'
+        retweeted_tweet:
+          $ref: '#/components/schemas/EmbeddedTweet'
+        media:
+          type: array
+          items:
+            $ref: '#/components/schemas/TweetMedia'
+        author:
+          $ref: '#/components/schemas/UserProfile'
+    TweetPreviousCounts:
+      description: Engagement counts retained from a prior tweet edit.
+      type: object
+      properties:
+        bookmarkCount:
+          type: integer
+        likeCount:
+          type: integer
+        quoteCount:
+          type: integer
+        replyCount:
+          type: integer
+        retweetCount:
+          type: integer
+    GuestWalletCreateCheckoutAction:
+      description: Explicit direct REST action for a new guest wallet checkout.
+      type: object
+      additionalProperties: false
+      required:
+      - account_required
+      - amount_bounds
+      - body
+      - creates
+      - method
+      - path
+      - provider
+      - required_headers
+      - requires_authentication
+      - requires_user_confirmation
+      - requires_user_interaction
+      - response_fields
+      - response_url_field
+      properties:
+        account_required:
+          type: boolean
+          const: false
+        amount_bounds:
+          $ref: '#/components/schemas/GuestWalletAmountBounds'
+        body:
+          $ref: '#/components/schemas/GuestWalletPurchaseRequest'
+        creates:
+          type: string
+          const: checkout_url
+        method:
+          type: string
+          const: POST
+        path:
+          type: string
+          const: /api/v1/guest-wallets
+        provider:
+          type: string
+          deprecated: true
+          const: stripe
+        required_headers:
+          type: object
+          additionalProperties: false
+          required:
+          - Idempotency-Key
+          properties:
+            Idempotency-Key:
+              type: string
+              const: <cryptographically random UUID v4>
+        requires_authentication:
+          type: boolean
+          const: false
+        requires_user_confirmation:
+          type: boolean
+          const: true
+        requires_user_interaction:
+          type: boolean
+          const: true
+        response_fields:
+          type: array
+          minItems: 3
+          maxItems: 3
+          prefixItems:
+          - type: string
+            const: checkout_url
+          - type: string
+            const: api_key
+          - type: string
+            const: status_url
+          items:
+            type: string
+            enum:
+            - checkout_url
+            - api_key
+            - status_url
+        response_url_field:
+          type: string
+          const: checkout_url
     PaginatedTweets:
       description: 'No-mode search, user Tweet, user reply, and direct reply reads use automatic coverage. Shape, filters, aliases, and billing stay compatible. Unprefixed cursors remain legacy. Follow next_cursor while has_next_page is true. An empty filtered page can still have has_next_page true.
 
@@ -1184,6 +1783,332 @@ components:
           type: boolean
         next_cursor:
           type: string
+    UserHighlightsInfo:
+      description: Profile highlight availability and count metadata.
+      type: object
+      properties:
+        canHighlightTweets:
+          type: boolean
+        highlightedTweets:
+          type: string
+    TweetMedia:
+      description: Normalized media attached to a tweet.
+      type: object
+      required:
+      - mediaUrl
+      - type
+      - url
+      properties:
+        mediaUrl:
+          type: string
+          description: Media preview URL
+        type:
+          type: string
+          enum:
+          - photo
+          - video
+          - animated_gif
+        url:
+          type: string
+          description: X media link from the tweet
+        allowDownload:
+          type: boolean
+          description: Whether X permits direct media download.
+        altText:
+          type: string
+          description: Accessibility text supplied for the media.
+        aspectRatio:
+          type: array
+          description: Video aspect ratio as width and height.
+          items:
+            type: integer
+        availabilityStatus:
+          type: string
+          description: Media availability state reported by X.
+        displayUrl:
+          type: string
+          description: Display-friendly media URL reported by X.
+        durationMillis:
+          type: integer
+          description: Video duration in milliseconds.
+        expandedUrl:
+          type: string
+          description: Expanded X media URL.
+        faceRects:
+          type: object
+          description: Face-aware crop rectangles grouped by media size.
+          additionalProperties:
+            type: array
+            items:
+              type: object
+              required:
+              - x
+              - y
+              - w
+              - h
+              properties:
+                x:
+                  type: integer
+                y:
+                  type: integer
+                w:
+                  type: integer
+                h:
+                  type: integer
+        focusRects:
+          type: array
+          description: Suggested image crops reported by X.
+          items:
+            type: object
+            required:
+            - x
+            - y
+            - w
+            - h
+            properties:
+              x:
+                type: integer
+              y:
+                type: integer
+              w:
+                type: integer
+              h:
+                type: integer
+        height:
+          type: integer
+          description: Original media height.
+        id:
+          type: string
+          description: X media entity ID.
+        indices:
+          type: array
+          description: Media entity offsets in the tweet text.
+          items:
+            type: integer
+        mediaKey:
+          type: string
+          description: Stable X media key.
+        monetizable:
+          type: boolean
+          description: Whether X reports the media as monetizable.
+        sizes:
+          type: object
+          description: Named media renditions and resize modes.
+          additionalProperties:
+            type: object
+            required:
+            - w
+            - h
+            - resize
+            properties:
+              w:
+                type: integer
+              h:
+                type: integer
+              resize:
+                type: string
+        videoVariants:
+          type: array
+          description: Available video encodings, ordered as returned
+          items:
+            type: object
+            required:
+            - contentType
+            - url
+            properties:
+              bitrate:
+                type: integer
+              contentType:
+                type: string
+              url:
+                type: string
+        width:
+          type: integer
+          description: Original media width.
+    TweetEdit:
+      description: Edit history metadata returned by X.
+      type: object
+      properties:
+        editTweetIds:
+          type: array
+          items:
+            type: string
+        editableUntilMsecs:
+          type: string
+    TweetArticleMetadata:
+      description: Article metadata attached to a tweet.
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        previewText:
+          type: string
+        coverMediaUrl:
+          type: string
+    GuestWalletTopupCheckoutAction:
+      description: Explicit direct REST action for a guest wallet top-up.
+      type: object
+      additionalProperties: false
+      required:
+      - account_required
+      - amount_bounds
+      - body
+      - creates
+      - method
+      - path
+      - provider
+      - required_headers
+      - requires_authentication
+      - requires_user_confirmation
+      - requires_user_interaction
+      - response_fields
+      - response_url_field
+      properties:
+        account_required:
+          type: boolean
+          const: false
+        amount_bounds:
+          $ref: '#/components/schemas/GuestWalletAmountBounds'
+        body:
+          $ref: '#/components/schemas/GuestWalletPurchaseRequest'
+        creates:
+          type: string
+          const: checkout_url
+        method:
+          type: string
+          const: POST
+        path:
+          type: string
+          const: /api/v1/guest-wallets/topups
+        provider:
+          type: string
+          deprecated: true
+          const: stripe
+        required_headers:
+          type: object
+          additionalProperties: false
+          required:
+          - Idempotency-Key
+          properties:
+            Idempotency-Key:
+              type: string
+              const: <cryptographically random UUID v4>
+        requires_authentication:
+          type: boolean
+          const: true
+        requires_user_confirmation:
+          type: boolean
+          const: true
+        requires_user_interaction:
+          type: boolean
+          const: true
+        response_fields:
+          type: array
+          minItems: 2
+          maxItems: 2
+          prefixItems:
+          - type: string
+            const: checkout_url
+          - type: string
+            const: status_url
+          items:
+            type: string
+            enum:
+            - checkout_url
+            - status_url
+        response_url_field:
+          type: string
+          const: checkout_url
+    MppPaymentRequired:
+      description: Anonymous payment requirement for a direct MPP operation. The response includes an MPP challenge and an accountless checkout action.
+      type: object
+      required:
+      - account_required
+      - detail
+      - next_step
+      - payment_options
+      - status
+      - title
+      - type
+      properties:
+        account_required:
+          type: boolean
+          const: false
+        challengeId:
+          type: string
+          description: Opaque identifier for the MPP payment challenge.
+        detail:
+          type: string
+        hint:
+          type: string
+          description: Instructions for selecting and paying an MPP offer.
+        next_step:
+          type: string
+          const: Ask the user to confirm a USD amount before creating checkout.
+        payment_options:
+          type: object
+          additionalProperties: false
+          required:
+          - guest_wallet
+          properties:
+            guest_wallet:
+              type: object
+              additionalProperties: false
+              required:
+              - create_checkout
+              properties:
+                create_checkout:
+                  $ref: '#/components/schemas/GuestWalletCreateCheckoutAction'
+        status:
+          type: integer
+          const: 402
+        title:
+          type: string
+          const: Payment Required
+        type:
+          type: string
+          format: uri
+          const: https://paymentauth.org/problems/payment-required
+    AnonymousGuestAuthenticationRequired:
+      description: 'Authentication error for a non-MPP anonymous paid read. The response also offers an optional accountless checkout after confirmation.
+
+        '
+      type: object
+      additionalProperties: false
+      required:
+      - account_required
+      - error
+      - message
+      - next_step
+      - payment_options
+      properties:
+        account_required:
+          type: boolean
+          const: false
+        error:
+          type: string
+          const: unauthenticated
+        message:
+          type: string
+        next_step:
+          type: string
+          const: Ask the user to confirm a USD amount before creating checkout.
+        payment_options:
+          type: object
+          additionalProperties: false
+          required:
+          - guest_wallet
+          properties:
+            guest_wallet:
+              type: object
+              additionalProperties: false
+              required:
+              - create_checkout
+              properties:
+                create_checkout:
+                  $ref: '#/components/schemas/GuestWalletCreateCheckoutAction'
     XWriteAction:
       type: object
       required:
@@ -1360,256 +2285,6 @@ components:
       description: 'Durable write lifecycle record. Poll statusUrl until terminal is true. Reusing the original Idempotency-Key returns this same record. Submit a new write only when safeToRetry is true, using a new key.
 
         '
-    GuestWalletPurchaseRequest:
-      description: User-confirmed guest wallet checkout request.
-      type: object
-      additionalProperties: false
-      required:
-      - amount_minor
-      - currency
-      properties:
-        amount_minor:
-          type: integer
-          minimum: 1000
-          maximum: 25000
-          description: USD cents accepted for this checkout.
-        currency:
-          type: string
-          const: usd
-    SearchTweet:
-      description: Tweet returned from search results with inline author info. A zero metric can mean X did not report the count.
-      type: object
-      required:
-      - id
-      - text
-      - retweetCount
-      - replyCount
-      - likeCount
-      - quoteCount
-      - viewCount
-      - bookmarkCount
-      properties:
-        id:
-          type: string
-        text:
-          type: string
-        type:
-          type: string
-        createdAt:
-          type: string
-        isNoteTweet:
-          type: boolean
-          description: True for Note Tweets (long-form content, up to 25,000 characters)
-        isReply:
-          type: boolean
-          description: True when this search result is a reply
-        isQuoteStatus:
-          type: boolean
-          description: True when this search result quotes another tweet
-        isLimitedReply:
-          type: boolean
-          description: Whether the tweet has limited reply permissions
-        inReplyToId:
-          type: string
-          description: ID of the tweet this result replies to.
-        inReplyToUserId:
-          type: string
-          description: ID of the user this result replies to.
-        inReplyToUsername:
-          type: string
-          description: Username this result replies to.
-        conversationId:
-          type: string
-          description: Root tweet ID for the search result conversation
-        source:
-          type: string
-          description: Client application used to post the tweet
-        displayTextRange:
-          type: array
-          items:
-            type: integer
-          description: Rendered text's start and end offsets.
-        contentDisclosure:
-          $ref: '#/components/schemas/ContentDisclosure'
-        article:
-          $ref: '#/components/schemas/TweetArticleMetadata'
-        card:
-          $ref: '#/components/schemas/TweetCard'
-        communityNote:
-          $ref: '#/components/schemas/TweetCommunityNote'
-        edit:
-          $ref: '#/components/schemas/TweetEdit'
-        isTranslatable:
-          type: boolean
-        noteTweet:
-          $ref: '#/components/schemas/TweetNote'
-        place:
-          $ref: '#/components/schemas/TweetPlace'
-        possiblySensitive:
-          type: boolean
-        previousCounts:
-          $ref: '#/components/schemas/TweetPreviousCounts'
-        viewState:
-          type: string
-        entities:
-          type: object
-          additionalProperties: true
-          description: Parsed search-result entities including URLs, mentions, hashtags, and media markers
-        quoted_tweet:
-          $ref: '#/components/schemas/EmbeddedTweet'
-        retweeted_tweet:
-          $ref: '#/components/schemas/EmbeddedTweet'
-        media:
-          type: array
-          items:
-            $ref: '#/components/schemas/TweetMedia'
-          description: Search-result media attachments, omitted when no media is present
-        url:
-          type: string
-          description: Search result permalink.
-        lang:
-          type: string
-          description: Search result language code.
-        likeCount:
-          type: integer
-        retweetCount:
-          type: integer
-        replyCount:
-          type: integer
-        quoteCount:
-          type: integer
-        viewCount:
-          type: integer
-        bookmarkCount:
-          type: integer
-        author:
-          $ref: '#/components/schemas/UserProfile'
-    UserAffiliateLabel:
-      description: Organization affiliation label shown on an X profile.
-      type: object
-      properties:
-        badgeUrl:
-          type: string
-        description:
-          type: string
-        url:
-          type: string
-        urlType:
-          type: string
-        userLabelDisplayType:
-          type: string
-        userLabelType:
-          type: string
-    PaginatedUsers:
-      description: 'Paginated user profiles. No-mode follower, following, and verified follower requests merge independent views automatically. Response fields, page size, aliases, filters, and per-returned-profile billing stay unchanged. Existing unprefixed cursors retain legacy behavior. Follow next_cursor while has_next_page is true.
-
-        '
-      type: object
-      required:
-      - users
-      - has_next_page
-      - next_cursor
-      properties:
-        users:
-          type: array
-          items:
-            $ref: '#/components/schemas/UserProfile'
-        has_next_page:
-          type: boolean
-        next_cursor:
-          type: string
-    TweetCard:
-      description: Public card metadata attached to a tweet.
-      type: object
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        url:
-          type: string
-        bindingValues:
-          type: object
-          additionalProperties: true
-          x-stainless-any: true
-          x-stainless-terraform-type: string
-    GuestWalletCreateCheckoutAction:
-      description: Explicit direct REST action for a new guest wallet checkout.
-      type: object
-      additionalProperties: false
-      required:
-      - account_required
-      - amount_bounds
-      - body
-      - creates
-      - method
-      - path
-      - provider
-      - required_headers
-      - requires_authentication
-      - requires_user_confirmation
-      - requires_user_interaction
-      - response_fields
-      - response_url_field
-      properties:
-        account_required:
-          type: boolean
-          const: false
-        amount_bounds:
-          $ref: '#/components/schemas/GuestWalletAmountBounds'
-        body:
-          $ref: '#/components/schemas/GuestWalletPurchaseRequest'
-        creates:
-          type: string
-          const: checkout_url
-        method:
-          type: string
-          const: POST
-        path:
-          type: string
-          const: /api/v1/guest-wallets
-        provider:
-          type: string
-          deprecated: true
-          const: stripe
-        required_headers:
-          type: object
-          additionalProperties: false
-          required:
-          - Idempotency-Key
-          properties:
-            Idempotency-Key:
-              type: string
-              const: <cryptographically random UUID v4>
-        requires_authentication:
-          type: boolean
-          const: false
-        requires_user_confirmation:
-          type: boolean
-          const: true
-        requires_user_interaction:
-          type: boolean
-          const: true
-        response_fields:
-          type: array
-          minItems: 3
-          maxItems: 3
-          prefixItems:
-          - type: string
-            const: checkout_url
-          - type: string
-            const: api_key
-          - type: string
-            const: status_url
-          items:
-            type: string
-            enum:
-            - checkout_url
-            - api_key
-            - status_url
-        response_url_field:
-          type: string
-          const: checkout_url
     AuthenticatedPaymentRequired:
       description: Authenticated credit or subscription error with confirmation-gated hosted checkout actions.
       type: object
@@ -1766,529 +2441,63 @@ components:
         top_up_url:
           type: string
           const: POST /api/v1/credits/topup
-    XWriteActionTarget:
-      type:
-      - object
-      - 'null'
-      description: Existing X resource targeted by the write, when applicable.
-      additionalProperties: false
-      required:
-      - type
-      - id
-      properties:
-        type:
-          type: string
-          enum:
-          - tweet
-          - user
-          - community
-        id:
-          type: string
-    MppPaymentRequired:
-      description: Anonymous payment requirement for a direct MPP operation. The response includes an MPP challenge and an accountless checkout action.
+    TweetPlace:
+      description: Public place metadata attached to a tweet.
       type: object
-      required:
-      - account_required
-      - detail
-      - next_step
-      - payment_options
-      - status
-      - title
-      - type
       properties:
-        account_required:
-          type: boolean
-          const: false
-        challengeId:
-          type: string
-          description: Opaque identifier for the MPP payment challenge.
-        detail:
-          type: string
-        hint:
-          type: string
-          description: Instructions for selecting and paying an MPP offer.
-        next_step:
-          type: string
-          const: Ask the user to confirm a USD amount before creating checkout.
-        payment_options:
+        boundingBox:
           type: object
-          additionalProperties: false
-          required:
-          - guest_wallet
-          properties:
-            guest_wallet:
-              type: object
-              additionalProperties: false
-              required:
-              - create_checkout
-              properties:
-                create_checkout:
-                  $ref: '#/components/schemas/GuestWalletCreateCheckoutAction'
-        status:
-          type: integer
-          const: 402
-        title:
+          additionalProperties: true
+          x-stainless-any: true
+          x-stainless-terraform-type: string
+        country:
           type: string
-          const: Payment Required
-        type:
+        countryCode:
           type: string
-          format: uri
-          const: https://paymentauth.org/problems/payment-required
-    UserProfile:
-      description: X user profile with bio, follower counts, and verification status.
-      type: object
-      required:
-      - id
-      - username
-      - name
-      properties:
+        fullName:
+          type: string
         id:
-          type: string
-        username:
           type: string
         name:
           type: string
+        placeType:
+          type: string
+        url:
+          type: string
+    TweetCommunityNote:
+      description: Community Note presentation metadata returned by X.
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        shortTitle:
+          type: string
+        subtitle:
+          type: string
+        footer:
+          type: string
+        destinationUrl:
+          type: string
+        visualStyle:
+          type: string
+    UserAffiliateLabel:
+      description: Organization affiliation label shown on an X profile.
+      type: object
+      properties:
+        badgeUrl:
+          type: string
         description:
           type: string
-        followers:
-          type: integer
-        following:
-          type: integer
-        verified:
-          type: boolean
-        isBlueVerified:
-          type: boolean
-          description: Whether X shows a blue verification badge
-        isVerified:
-          type: boolean
-          description: Whether X marks the profile as verified
-        profilePicture:
-          type: string
-        coverPicture:
-          type: string
-        profileBannerUrl:
-          type: string
-          description: Original X profile banner field when available
-        location:
-          type: string
-        createdAt:
-          type: string
-        statusesCount:
-          type: integer
-        mediaCount:
-          type: integer
-        protected:
-          type: boolean
-          description: Whether the profile protects its posts
         url:
           type: string
-        favouritesCount:
-          type: integer
-        hasCustomTimelines:
-          type: boolean
-        isTranslator:
-          type: boolean
-        withheldInCountries:
-          type: array
-          items:
-            type: string
-        possiblySensitive:
-          type: boolean
-        pinnedTweetIds:
-          type: array
-          items:
-            type: string
-        isAutomated:
-          type: boolean
-        automatedBy:
+        urlType:
           type: string
-        unavailable:
-          type: boolean
-        unavailableReason:
+        userLabelDisplayType:
           type: string
-        verifiedType:
+        userLabelType:
           type: string
-        affiliatesHighlightedLabel:
-          $ref: '#/components/schemas/UserAffiliateLabel'
-        businessAccountAffiliatesCount:
-          type: integer
-        creatorSubscriptionsCount:
-          type: integer
-        hasGraduatedAccess:
-          type: boolean
-        hasHiddenSubscriptionsOnProfile:
-          type: boolean
-        highlightsInfo:
-          $ref: '#/components/schemas/UserHighlightsInfo'
-        identityVerification:
-          $ref: '#/components/schemas/UserIdentityVerification'
-        isProfileTranslatable:
-          type: boolean
-        parodyCommentaryFanLabel:
-          type: string
-        profileDescriptionLanguage:
-          type: string
-        profileImageShape:
-          type: string
-        profileInterstitialType:
-          type: string
-        profileSortEnabled:
-          type: boolean
-        profileTranslatorType:
-          type: string
-        superFollowEligible:
-          type: boolean
-        communityRole:
-          type: string
-          description: Community role when returned by community member reads
-        profile_bio:
-          type: object
-          additionalProperties: true
-          x-stainless-any: true
-          x-stainless-terraform-type: string
-          description: Structured profile bio with entity annotations
-    AnonymousGuestAuthenticationRequired:
-      description: 'Authentication error for a non-MPP anonymous paid read. The response also offers an optional accountless checkout after confirmation.
-
-        '
-      type: object
-      additionalProperties: false
-      required:
-      - account_required
-      - error
-      - message
-      - next_step
-      - payment_options
-      properties:
-        account_required:
-          type: boolean
-          const: false
-        error:
-          type: string
-          const: unauthenticated
-        message:
-          type: string
-        next_step:
-          type: string
-          const: Ask the user to confirm a USD amount before creating checkout.
-        payment_options:
-          type: object
-          additionalProperties: false
-          required:
-          - guest_wallet
-          properties:
-            guest_wallet:
-              type: object
-              additionalProperties: false
-              required:
-              - create_checkout
-              properties:
-                create_checkout:
-                  $ref: '#/components/schemas/GuestWalletCreateCheckoutAction'
-    TweetMedia:
-      description: Normalized media attached to a tweet.
-      type: object
-      required:
-      - mediaUrl
-      - type
-      - url
-      properties:
-        mediaUrl:
-          type: string
-          description: Media preview URL
-        type:
-          type: string
-          enum:
-          - photo
-          - video
-          - animated_gif
-        url:
-          type: string
-          description: X media link from the tweet
-        allowDownload:
-          type: boolean
-          description: Whether X permits direct media download.
-        altText:
-          type: string
-          description: Accessibility text supplied for the media.
-        aspectRatio:
-          type: array
-          description: Video aspect ratio as width and height.
-          items:
-            type: integer
-        availabilityStatus:
-          type: string
-          description: Media availability state reported by X.
-        displayUrl:
-          type: string
-          description: Display-friendly media URL reported by X.
-        durationMillis:
-          type: integer
-          description: Video duration in milliseconds.
-        expandedUrl:
-          type: string
-          description: Expanded X media URL.
-        faceRects:
-          type: object
-          description: Face-aware crop rectangles grouped by media size.
-          additionalProperties:
-            type: array
-            items:
-              type: object
-              required:
-              - x
-              - y
-              - w
-              - h
-              properties:
-                x:
-                  type: integer
-                y:
-                  type: integer
-                w:
-                  type: integer
-                h:
-                  type: integer
-        focusRects:
-          type: array
-          description: Suggested image crops reported by X.
-          items:
-            type: object
-            required:
-            - x
-            - y
-            - w
-            - h
-            properties:
-              x:
-                type: integer
-              y:
-                type: integer
-              w:
-                type: integer
-              h:
-                type: integer
-        height:
-          type: integer
-          description: Original media height.
-        id:
-          type: string
-          description: X media entity ID.
-        indices:
-          type: array
-          description: Media entity offsets in the tweet text.
-          items:
-            type: integer
-        mediaKey:
-          type: string
-          description: Stable X media key.
-        monetizable:
-          type: boolean
-          description: Whether X reports the media as monetizable.
-        sizes:
-          type: object
-          description: Named media renditions and resize modes.
-          additionalProperties:
-            type: object
-            required:
-            - w
-            - h
-            - resize
-            properties:
-              w:
-                type: integer
-              h:
-                type: integer
-              resize:
-                type: string
-        videoVariants:
-          type: array
-          description: Available video encodings, ordered as returned
-          items:
-            type: object
-            required:
-            - contentType
-            - url
-            properties:
-              bitrate:
-                type: integer
-              contentType:
-                type: string
-              url:
-                type: string
-        width:
-          type: integer
-          description: Original media width.
-    XWritePaymentRequired:
-      allOf:
-      - $ref: '#/components/schemas/XWriteAction'
-      - type: object
-        required:
-        - error
-        - message
-      description: 'Durable failed write action with the applicable payment guidance.
-
-        '
-    XWriteActionBilling:
-      type: object
-      additionalProperties: false
-      required:
-      - status
-      - charged
-      - plannedCredits
-      - chargedCredits
-      properties:
-        status:
-          type: string
-          enum:
-          - not_charged
-          - pending
-          - charged
-          - charge_failed
-          - refunded
-        charged:
-          type: boolean
-        plannedCredits:
-          type: string
-          pattern: ^\d+$
-        chargedCredits:
-          type: string
-          pattern: ^\d+$
-      description: 'plannedCredits is the approved maximum. chargedCredits comes from the settled credit ledger. Pending or failed writes are not charged.
-
-        '
-    TweetNote:
-      description: Complete Note Tweet content and rich-text metadata.
-      type: object
-      required:
-      - text
-      properties:
-        id:
-          type: string
-        text:
-          type: string
-        isExpandable:
-          type: boolean
-        entities:
-          type: object
-          additionalProperties: true
-          x-stainless-any: true
-          x-stainless-terraform-type: string
-        richtextTags:
-          type: array
-          items:
-            type: object
-            required:
-            - fromIndex
-            - toIndex
-            - types
-            properties:
-              fromIndex:
-                type: integer
-              toIndex:
-                type: integer
-              types:
-                type: array
-                items:
-                  type: string
-    EmbeddedTweet:
-      description: 'Quoted or retweeted tweet context. Every object includes id, text, and engagement metrics. A zero metric can mean X did not report the count. Author, media, and conversation fields appear when available.
-
-        '
-      type: object
-      required:
-      - id
-      - text
-      - retweetCount
-      - replyCount
-      - likeCount
-      - quoteCount
-      - viewCount
-      - bookmarkCount
-      properties:
-        id:
-          type: string
-        text:
-          type: string
-        type:
-          type: string
-        createdAt:
-          type: string
-        url:
-          type: string
-        lang:
-          type: string
-        retweetCount:
-          type: integer
-        replyCount:
-          type: integer
-        likeCount:
-          type: integer
-        quoteCount:
-          type: integer
-        viewCount:
-          type: integer
-        bookmarkCount:
-          type: integer
-        isReply:
-          type: boolean
-        isLimitedReply:
-          type: boolean
-        isNoteTweet:
-          type: boolean
-        isQuoteStatus:
-          type: boolean
-        inReplyToId:
-          type: string
-        inReplyToUserId:
-          type: string
-        inReplyToUsername:
-          type: string
-        conversationId:
-          type: string
-        source:
-          type: string
-        displayTextRange:
-          type: array
-          items:
-            type: integer
-        contentDisclosure:
-          $ref: '#/components/schemas/ContentDisclosure'
-        article:
-          $ref: '#/components/schemas/TweetArticleMetadata'
-        card:
-          $ref: '#/components/schemas/TweetCard'
-        communityNote:
-          $ref: '#/components/schemas/TweetCommunityNote'
-        edit:
-          $ref: '#/components/schemas/TweetEdit'
-        isTranslatable:
-          type: boolean
-        noteTweet:
-          $ref: '#/components/schemas/TweetNote'
-        place:
-          $ref: '#/components/schemas/TweetPlace'
-        possiblySensitive:
-          type: boolean
-        previousCounts:
-          $ref: '#/components/schemas/TweetPreviousCounts'
-        viewState:
-          type: string
-        entities:
-          type: object
-          additionalProperties: true
-          x-stainless-any: true
-          x-stainless-terraform-type: string
-        quoted_tweet:
-          $ref: '#/components/schemas/EmbeddedTweet'
-        retweeted_tweet:
-          $ref: '#/components/schemas/EmbeddedTweet'
-        media:
-          type: array
-          items:
-            $ref: '#/components/schemas/TweetMedia'
-        author:
-          $ref: '#/components/schemas/UserProfile'
     GuestPaymentRequired:
       description: 'Credit error for a paid-read guest key with only its accountless guest top-up action.
 
@@ -2343,230 +2552,21 @@ components:
         top_up_url:
           type: string
           const: POST /api/v1/guest-wallets/topups
-    GuestWalletTopupCheckoutAction:
-      description: Explicit direct REST action for a guest wallet top-up.
-      type: object
-      additionalProperties: false
-      required:
-      - account_required
-      - amount_bounds
-      - body
-      - creates
-      - method
-      - path
-      - provider
-      - required_headers
-      - requires_authentication
-      - requires_user_confirmation
-      - requires_user_interaction
-      - response_fields
-      - response_url_field
-      properties:
-        account_required:
-          type: boolean
-          const: false
-        amount_bounds:
-          $ref: '#/components/schemas/GuestWalletAmountBounds'
-        body:
-          $ref: '#/components/schemas/GuestWalletPurchaseRequest'
-        creates:
-          type: string
-          const: checkout_url
-        method:
-          type: string
-          const: POST
-        path:
-          type: string
-          const: /api/v1/guest-wallets/topups
-        provider:
-          type: string
-          deprecated: true
-          const: stripe
-        required_headers:
-          type: object
-          additionalProperties: false
-          required:
-          - Idempotency-Key
-          properties:
-            Idempotency-Key:
-              type: string
-              const: <cryptographically random UUID v4>
-        requires_authentication:
-          type: boolean
-          const: true
-        requires_user_confirmation:
-          type: boolean
-          const: true
-        requires_user_interaction:
-          type: boolean
-          const: true
-        response_fields:
-          type: array
-          minItems: 2
-          maxItems: 2
-          prefixItems:
-          - type: string
-            const: checkout_url
-          - type: string
-            const: status_url
-          items:
-            type: string
-            enum:
-            - checkout_url
-            - status_url
-        response_url_field:
-          type: string
-          const: checkout_url
-    TweetArticleMetadata:
-      description: Article metadata attached to a tweet.
+    TweetCard:
+      description: Public card metadata attached to a tweet.
       type: object
       properties:
         id:
           type: string
-        title:
+        name:
           type: string
-        previewText:
-          type: string
-        coverMediaUrl:
-          type: string
-    XWriteActionNextAction:
-      type:
-      - object
-      - 'null'
-      description: Exact follow-up an API client or agent should perform.
-      additionalProperties: false
-      required:
-      - type
-      properties:
-        type:
-          type: string
-          enum:
-          - poll
-          - retry
-          - verify_result
-          - fix_request
         url:
           type: string
-        afterMs:
-          type: integer
-          minimum: 0
-        requiresNewIdempotencyKey:
-          type: boolean
-    UserIdentityVerification:
-      description: Identity verification metadata displayed by X.
-      type: object
-      properties:
-        description:
-          type: string
-        isIdentityVerified:
-          type: boolean
-        verifiedSinceMsec:
-          type: string
-  parameters:
-    UserFilterMaxFollowers:
-      name: maxFollowers
-      in: query
-      schema:
-        type: integer
-        minimum: 0
-      description: Maximum follower count. Missing counts pass this maximum.
-    UserFilterMinFollowers:
-      name: minFollowers
-      in: query
-      schema:
-        type: integer
-        minimum: 0
-      description: Minimum follower count. Filtering happens before billing.
-    UserFilterMinStatuses:
-      name: minStatuses
-      in: query
-      schema:
-        type: integer
-        minimum: 0
-      description: Minimum post count. minPosts is also accepted.
-    UserFilterLocationContains:
-      name: locationContains
-      in: query
-      schema:
-        type: string
-      description: Match a location substring, ignoring case.
-    UserFilterMaxStatuses:
-      name: maxStatuses
-      in: query
-      schema:
-        type: integer
-        minimum: 0
-      description: Maximum post count. maxPosts is also accepted.
-    UserFilterMinFollowing:
-      name: minFollowing
-      in: query
-      schema:
-        type: integer
-        minimum: 0
-      description: Minimum following count.
-    ResultPageSize:
-      name: pageSize
-      in: query
-      description: 'Maximum page items (1-100, default 20). Source, filters, or credits can reduce results. Continue while has_next_page is true. Deprecated limit and count aliases remain accepted.
-
-        '
-      schema:
-        type: integer
-        minimum: 1
-        maximum: 100
-        default: 20
-    UserFilterBioContains:
-      name: bioContains
-      in: query
-      schema:
-        type: string
-      description: 'Match any comma-separated or line-separated bio term, ignoring case.
-
-        '
-    UserFilterHasLocation:
-      name: hasLocation
-      in: query
-      schema:
-        type: boolean
-      description: Only return profiles with a location.
-    UserFilterVerifiedType:
-      name: verifiedType
-      in: query
-      schema:
-        type: string
-      description: Match the verification type exactly, ignoring case.
-    UserFilterMaxFollowing:
-      name: maxFollowing
-      in: query
-      schema:
-        type: integer
-        minimum: 0
-      description: Maximum following count.
-    UserFilterVerifiedOnly:
-      name: verifiedOnly
-      in: query
-      schema:
-        type: boolean
-      description: Only return verified profiles.
-    UserFilterHasWebsite:
-      name: hasWebsite
-      in: query
-      schema:
-        type: boolean
-      description: Only return profiles with a website.
-    UserFilterMinAccountAgeDays:
-      name: minAccountAgeDays
-      in: query
-      schema:
-        type: integer
-        minimum: 0
-      description: Minimum account age in whole days.
-    UserFilterUsernameContains:
-      name: usernameContains
-      in: query
-      schema:
-        type: string
-      description: Match a username substring, ignoring case.
+        bindingValues:
+          type: object
+          additionalProperties: true
+          x-stainless-any: true
+          x-stainless-terraform-type: string
   securitySchemes:
     apiKey:
       type: apiKey

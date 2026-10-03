@@ -650,6 +650,66 @@ paths:
       description: Reply to a support ticket.
 components:
   schemas:
+    SupportAttachment:
+      description: Downloadable image or video attached to a support message.
+      type: object
+      required:
+      - publicId
+      - filename
+      - contentType
+      - kind
+      - sizeBytes
+      - status
+      - url
+      properties:
+        publicId:
+          type: string
+        filename:
+          type: string
+        contentType:
+          type: string
+          description: Validated media type.
+          enum:
+          - image/jpeg
+          - image/png
+          - image/gif
+          - image/webp
+          - video/mp4
+          - video/quicktime
+          - video/webm
+        kind:
+          type: string
+          description: Attachment media class.
+          enum:
+          - image
+          - video
+        sizeBytes:
+          type: integer
+          format: int64
+        status:
+          type: string
+          description: Storage processing state.
+          enum:
+          - pending
+          - ready
+          - failed
+        url:
+          type: string
+    SupportAttachmentReceipt:
+      description: Attachment identifier and initial processing state.
+      type: object
+      required:
+      - publicId
+      - status
+      properties:
+        publicId:
+          type: string
+        status:
+          type: string
+          enum:
+          - pending
+          - ready
+          - failed
     Error:
       description: 'Error response. Default v1 returns a legacy string error code. Send `xquik-api-contract: 2026-04-29` to receive the structured best-practice error object.
 
@@ -929,66 +989,19 @@ components:
           type: integer
           minimum: 1
           description: Required wait in milliseconds.
-    SupportAttachment:
-      description: Downloadable image or video attached to a support message.
-      type: object
-      required:
-      - publicId
-      - filename
-      - contentType
-      - kind
-      - sizeBytes
-      - status
-      - url
-      properties:
-        publicId:
-          type: string
-        filename:
-          type: string
-        contentType:
-          type: string
-          description: Validated media type.
-          enum:
-          - image/jpeg
-          - image/png
-          - image/gif
-          - image/webp
-          - video/mp4
-          - video/quicktime
-          - video/webm
-        kind:
-          type: string
-          description: Attachment media class.
-          enum:
-          - image
-          - video
-        sizeBytes:
-          type: integer
-          format: int64
-        status:
-          type: string
-          description: Storage processing state.
-          enum:
-          - pending
-          - ready
-          - failed
-        url:
-          type: string
-    SupportAttachmentReceipt:
-      description: Attachment identifier and initial processing state.
-      type: object
-      required:
-      - publicId
-      - status
-      properties:
-        publicId:
-          type: string
-        status:
-          type: string
-          enum:
-          - pending
-          - ready
-          - failed
+  parameters:
+    SupportIdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      description: 'Generate one random value per ticket or reply. Reuse it only when retrying identical text and attachments. Never log this value.
+
+        '
+      schema:
+        type: string
+        minLength: 8
+        maxLength: 128
+        pattern: ^[A-Za-z0-9._:-]{8,128}$
   responses:
     Unauthenticated:
       description: Unauthenticated
@@ -1010,33 +1023,6 @@ components:
           example:
             error: unauthenticated
             message: Authentication required. Provide a valid API key or bearer token.
-    InvalidInput:
-      description: Invalid input
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: invalid_input
-            message: Invalid input. Check the request body.
-    UnexpectedError:
-      content:
-        application/json:
-          example:
-            error: internal_error
-            message: Unexpected error. Try again.
-          schema:
-            $ref: '#/components/schemas/Error'
-      description: Unexpected error.
-    NotFound:
-      description: Not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: not_found
-            message: Resource not found.
     RateLimitExceeded:
       description: 'Xquik tier rate limit exceeded. The response includes a `Retry-After` header with the number of seconds to wait before retrying.
 
@@ -1062,19 +1048,33 @@ components:
             example: 60
             minimum: 1
             type: integer
-  parameters:
-    SupportIdempotencyKey:
-      name: Idempotency-Key
-      in: header
-      required: false
-      description: 'Generate one random value per ticket or reply. Reuse it only when retrying identical text and attachments. Never log this value.
-
-        '
-      schema:
-        type: string
-        minLength: 8
-        maxLength: 128
-        pattern: ^[A-Za-z0-9._:-]{8,128}$
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: not_found
+            message: Resource not found.
+    InvalidInput:
+      description: Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: invalid_input
+            message: Invalid input. Check the request body.
+    UnexpectedError:
+      content:
+        application/json:
+          example:
+            error: internal_error
+            message: Unexpected error. Try again.
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Unexpected error.
   securitySchemes:
     apiKey:
       type: apiKey

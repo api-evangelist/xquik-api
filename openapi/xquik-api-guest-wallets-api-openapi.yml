@@ -342,6 +342,61 @@ paths:
           $ref: '#/components/responses/UnexpectedError'
 components:
   schemas:
+    GuestWalletPurchaseRequest:
+      description: User-confirmed guest wallet checkout request.
+      type: object
+      additionalProperties: false
+      required:
+      - amount_minor
+      - currency
+      properties:
+        amount_minor:
+          type: integer
+          minimum: 1000
+          maximum: 25000
+          description: USD cents accepted for this checkout.
+        currency:
+          type: string
+          const: usd
+    GuestWalletPurchaseStatus:
+      description: Latest guest wallet purchase fulfillment state.
+      type: object
+      additionalProperties: false
+      required:
+      - amount
+      - checkout_url
+      - credits
+      - expires_at
+      - purchase_id
+      - status
+      properties:
+        amount:
+          $ref: '#/components/schemas/GuestWalletAmount'
+        checkout_url:
+          anyOf:
+          - type: string
+            format: uri
+          - type: 'null'
+          description: Present only while the purchase is pending.
+        credits:
+          type: string
+          pattern: ^\d+$
+        expires_at:
+          type: string
+          format: date-time
+        purchase_id:
+          type: string
+          pattern: ^gp_[A-Za-z0-9_-]+$
+        status:
+          type: string
+          enum:
+          - creating
+          - pending
+          - paid
+          - expired
+          - failed
+          - refunded
+          - disputed
     Error:
       description: 'Error response. Default v1 returns a legacy string error code. Send `xquik-api-contract: 2026-04-29` to receive the structured best-practice error object.
 
@@ -621,96 +676,6 @@ components:
           type: integer
           minimum: 1
           description: Required wait in milliseconds.
-    GuestWalletAmount:
-      description: Confirmed USD amount for a guest wallet purchase.
-      type: object
-      additionalProperties: false
-      required:
-      - amount_minor
-      - currency
-      properties:
-        amount_minor:
-          type: integer
-          minimum: 1000
-          maximum: 25000
-          description: USD amount in cents. Accepted range is $10-$250.
-        currency:
-          type: string
-          const: usd
-    GuestWalletStatusResponse:
-      description: Current balance, usability, and latest guest purchase state.
-      type: object
-      additionalProperties: false
-      required:
-      - balance
-      - latest_purchase
-      - poll_after_seconds
-      - scope
-      - status
-      - top_up
-      - usable
-      - wallet_id
-      properties:
-        balance:
-          type: string
-          pattern: ^\d+$
-        latest_purchase:
-          description: Latest purchase state. This does not determine usability.
-          anyOf:
-          - $ref: '#/components/schemas/GuestWalletPurchaseStatus'
-          - type: 'null'
-        poll_after_seconds:
-          description: Polling delay while payment is pending. Null means stop.
-          anyOf:
-          - type: integer
-            const: 2
-          - type: 'null'
-        scope:
-          type: string
-          const: paid_reads
-        status:
-          type: string
-          description: 'Combined wallet and pending-checkout state. A pending top-up can coexist with usable true. Terminal expired or failed states require a new guest wallet.
-
-            '
-          enum:
-          - active
-          - pending
-          - expired
-          - failed
-          - frozen
-          - closed
-        top_up:
-          description: Top-up action when usable and no checkout is pending.
-          anyOf:
-          - type: object
-            additionalProperties: false
-            required:
-            - method
-            - path
-            properties:
-              method:
-                type: string
-                const: POST
-              path:
-                type: string
-                const: /api/v1/guest-wallets/topups
-          - type: 'null'
-        usable:
-          type: boolean
-          description: Authoritative paid-read readiness. Use instead of status.
-        wallet_id:
-          type: string
-          pattern: ^gw_[A-Za-z0-9_-]+$
-    GuestWalletCreateResponse:
-      description: Initial guest wallet response containing the one-time key.
-      allOf:
-      - $ref: '#/components/schemas/GuestWalletCheckoutResponse'
-      - type: object
-        required:
-        - api_key
-        - authorization
-        - credential_notice
     GuestWalletCheckoutResponse:
       description: Pending hosted checkout and guest wallet purchase details.
       type: object
@@ -818,8 +783,82 @@ components:
                 type: object
             required:
             - authorization
-    GuestWalletPurchaseRequest:
-      description: User-confirmed guest wallet checkout request.
+    GuestWalletStatusResponse:
+      description: Current balance, usability, and latest guest purchase state.
+      type: object
+      additionalProperties: false
+      required:
+      - balance
+      - latest_purchase
+      - poll_after_seconds
+      - scope
+      - status
+      - top_up
+      - usable
+      - wallet_id
+      properties:
+        balance:
+          type: string
+          pattern: ^\d+$
+        latest_purchase:
+          description: Latest purchase state. This does not determine usability.
+          anyOf:
+          - $ref: '#/components/schemas/GuestWalletPurchaseStatus'
+          - type: 'null'
+        poll_after_seconds:
+          description: Polling delay while payment is pending. Null means stop.
+          anyOf:
+          - type: integer
+            const: 2
+          - type: 'null'
+        scope:
+          type: string
+          const: paid_reads
+        status:
+          type: string
+          description: 'Combined wallet and pending-checkout state. A pending top-up can coexist with usable true. Terminal expired or failed states require a new guest wallet.
+
+            '
+          enum:
+          - active
+          - pending
+          - expired
+          - failed
+          - frozen
+          - closed
+        top_up:
+          description: Top-up action when usable and no checkout is pending.
+          anyOf:
+          - type: object
+            additionalProperties: false
+            required:
+            - method
+            - path
+            properties:
+              method:
+                type: string
+                const: POST
+              path:
+                type: string
+                const: /api/v1/guest-wallets/topups
+          - type: 'null'
+        usable:
+          type: boolean
+          description: Authoritative paid-read readiness. Use instead of status.
+        wallet_id:
+          type: string
+          pattern: ^gw_[A-Za-z0-9_-]+$
+    GuestWalletCreateResponse:
+      description: Initial guest wallet response containing the one-time key.
+      allOf:
+      - $ref: '#/components/schemas/GuestWalletCheckoutResponse'
+      - type: object
+        required:
+        - api_key
+        - authorization
+        - credential_notice
+    GuestWalletAmount:
+      description: Confirmed USD amount for a guest wallet purchase.
       type: object
       additionalProperties: false
       required:
@@ -830,49 +869,10 @@ components:
           type: integer
           minimum: 1000
           maximum: 25000
-          description: USD cents accepted for this checkout.
+          description: USD amount in cents. Accepted range is $10-$250.
         currency:
           type: string
           const: usd
-    GuestWalletPurchaseStatus:
-      description: Latest guest wallet purchase fulfillment state.
-      type: object
-      additionalProperties: false
-      required:
-      - amount
-      - checkout_url
-      - credits
-      - expires_at
-      - purchase_id
-      - status
-      properties:
-        amount:
-          $ref: '#/components/schemas/GuestWalletAmount'
-        checkout_url:
-          anyOf:
-          - type: string
-            format: uri
-          - type: 'null'
-          description: Present only while the purchase is pending.
-        credits:
-          type: string
-          pattern: ^\d+$
-        expires_at:
-          type: string
-          format: date-time
-        purchase_id:
-          type: string
-          pattern: ^gp_[A-Za-z0-9_-]+$
-        status:
-          type: string
-          enum:
-          - creating
-          - pending
-          - paid
-          - expired
-          - failed
-          - refunded
-          - disputed
   responses:
     Unauthenticated:
       description: Unauthenticated
@@ -910,15 +910,6 @@ components:
           example:
             error: rate_limited
             message: Try again later.
-    UnexpectedError:
-      content:
-        application/json:
-          example:
-            error: internal_error
-            message: Unexpected error. Try again.
-          schema:
-            $ref: '#/components/schemas/Error'
-      description: Unexpected error.
     InvalidInput:
       description: Invalid input
       content:
@@ -928,6 +919,15 @@ components:
           example:
             error: invalid_input
             message: Invalid input. Check the request body.
+    UnexpectedError:
+      content:
+        application/json:
+          example:
+            error: internal_error
+            message: Unexpected error. Try again.
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Unexpected error.
   parameters:
     GuestIdempotencyKey:
       name: Idempotency-Key

@@ -158,6 +158,75 @@ paths:
       description: Get event.
 components:
   schemas:
+    EventType:
+      description: Type of monitor event fired when account activity occurs.
+      type: string
+      enum:
+      - tweet.new
+      - tweet.reply
+      - tweet.retweet
+      - tweet.quote
+      - tweet.media
+      - tweet.link
+      - tweet.poll
+      - tweet.mention
+      - tweet.hashtag
+      - tweet.longform
+      - profile.avatar.changed
+      - profile.banner.changed
+      - profile.name.changed
+      - profile.username.changed
+      - profile.bio.changed
+      - profile.location.changed
+      - profile.url.changed
+      - profile.verified.changed
+      - profile.protected.changed
+      - profile.pinned_tweet.changed
+      - profile.unavailable.changed
+    EventDetail:
+      description: Full monitor event including payload data and optional X event ID.
+      type: object
+      required:
+      - id
+      - type
+      - monitorId
+      - monitorType
+      - occurredAt
+      - data
+      properties:
+        id:
+          type: string
+        type:
+          $ref: '#/components/schemas/EventType'
+        username:
+          type: string
+          description: Account username for this detailed monitor event.
+        query:
+          type: string
+          description: Keyword query for this detailed monitor event.
+        monitorId:
+          type: string
+          description: Monitor ID associated with this detailed event payload.
+        monitorType:
+          type: string
+          enum:
+          - account
+          - keyword
+          description: Source monitor type for this detailed event.
+        keywordMonitorId:
+          type: string
+          description: Keyword monitor ID included on detailed keyword events.
+        occurredAt:
+          type: string
+          format: date-time
+        data:
+          type: object
+          additionalProperties: true
+          x-stainless-any: true
+          description: Event payload - shape varies by event type (JSON)
+          x-stainless-terraform-type: string
+        xEventId:
+          type: string
     Error:
       description: 'Error response. Default v1 returns a legacy string error code. Send `xquik-api-contract: 2026-04-29` to receive the structured best-practice error object.
 
@@ -437,75 +506,6 @@ components:
           type: integer
           minimum: 1
           description: Required wait in milliseconds.
-    EventType:
-      description: Type of monitor event fired when account activity occurs.
-      type: string
-      enum:
-      - tweet.new
-      - tweet.reply
-      - tweet.retweet
-      - tweet.quote
-      - tweet.media
-      - tweet.link
-      - tweet.poll
-      - tweet.mention
-      - tweet.hashtag
-      - tweet.longform
-      - profile.avatar.changed
-      - profile.banner.changed
-      - profile.name.changed
-      - profile.username.changed
-      - profile.bio.changed
-      - profile.location.changed
-      - profile.url.changed
-      - profile.verified.changed
-      - profile.protected.changed
-      - profile.pinned_tweet.changed
-      - profile.unavailable.changed
-    EventDetail:
-      description: Full monitor event including payload data and optional X event ID.
-      type: object
-      required:
-      - id
-      - type
-      - monitorId
-      - monitorType
-      - occurredAt
-      - data
-      properties:
-        id:
-          type: string
-        type:
-          $ref: '#/components/schemas/EventType'
-        username:
-          type: string
-          description: Account username for this detailed monitor event.
-        query:
-          type: string
-          description: Keyword query for this detailed monitor event.
-        monitorId:
-          type: string
-          description: Monitor ID associated with this detailed event payload.
-        monitorType:
-          type: string
-          enum:
-          - account
-          - keyword
-          description: Source monitor type for this detailed event.
-        keywordMonitorId:
-          type: string
-          description: Keyword monitor ID included on detailed keyword events.
-        occurredAt:
-          type: string
-          format: date-time
-        data:
-          type: object
-          additionalProperties: true
-          x-stainless-any: true
-          description: Event payload - shape varies by event type (JSON)
-          x-stainless-terraform-type: string
-        xEventId:
-          type: string
     Event:
       description: Monitor event summary with source metadata and occurrence time.
       type: object
@@ -545,54 +545,32 @@ components:
         data:
           type: object
           additionalProperties: true
+  parameters:
+    After:
+      name: cursor
+      in: query
+      schema:
+        type: string
+      description: Previous nextCursor.
+    Limit:
+      name: limit
+      in: query
+      description: 'Maximum number of items to return (1-100, default 50). For paid per-result endpoints, the returned count may be lower when remaining credits cannot cover the requested page. If zero paid results are affordable, the endpoint returns 402 insufficient_credits.
+
+        '
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 50
+    ResourceId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Resource ID returned by the matching create or list endpoint.
   responses:
-    Unauthenticated:
-      description: Unauthenticated
-      headers:
-        Cache-Control:
-          description: Prevents storage of authentication responses.
-          schema:
-            type: string
-            const: no-store
-        WWW-Authenticate:
-          description: Bearer authentication challenge.
-          schema:
-            type: string
-            const: Bearer realm="xquik"
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: unauthenticated
-            message: Authentication required. Provide a valid API key or bearer token.
-    InvalidInput:
-      description: Invalid input
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: invalid_input
-            message: Invalid input. Check the request body.
-    NotFound:
-      description: Not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: not_found
-            message: Resource not found.
-    UnexpectedError:
-      content:
-        application/json:
-          example:
-            error: internal_error
-            message: Unexpected error. Try again.
-          schema:
-            $ref: '#/components/schemas/Error'
-      description: Unexpected error.
     RateLimitExceeded:
       description: 'Xquik tier rate limit exceeded. The response includes a `Retry-After` header with the number of seconds to wait before retrying.
 
@@ -618,31 +596,53 @@ components:
             example: 60
             minimum: 1
             type: integer
-  parameters:
-    ResourceId:
-      name: id
-      in: path
-      required: true
-      schema:
-        type: string
-      description: Resource ID returned by the matching create or list endpoint.
-    Limit:
-      name: limit
-      in: query
-      description: 'Maximum number of items to return (1-100, default 50). For paid per-result endpoints, the returned count may be lower when remaining credits cannot cover the requested page. If zero paid results are affordable, the endpoint returns 402 insufficient_credits.
-
-        '
-      schema:
-        type: integer
-        minimum: 1
-        maximum: 100
-        default: 50
-    After:
-      name: cursor
-      in: query
-      schema:
-        type: string
-      description: Previous nextCursor.
+    Unauthenticated:
+      description: Unauthenticated
+      headers:
+        Cache-Control:
+          description: Prevents storage of authentication responses.
+          schema:
+            type: string
+            const: no-store
+        WWW-Authenticate:
+          description: Bearer authentication challenge.
+          schema:
+            type: string
+            const: Bearer realm="xquik"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: unauthenticated
+            message: Authentication required. Provide a valid API key or bearer token.
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: not_found
+            message: Resource not found.
+    InvalidInput:
+      description: Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: invalid_input
+            message: Invalid input. Check the request body.
+    UnexpectedError:
+      content:
+        application/json:
+          example:
+            error: internal_error
+            message: Unexpected error. Try again.
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Unexpected error.
   securitySchemes:
     apiKey:
       type: apiKey
