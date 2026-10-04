@@ -555,223 +555,7 @@ paths:
           $ref: '#/components/responses/UnexpectedError'
       description: Delete monitor.
 components:
-  responses:
-    PaymentRequired:
-      description: 'Payment required. MPP reads return a problem document and `WWW-Authenticate`. Authenticated reads return balances and checkout actions. Guest keys receive only the guest top-up action. Other endpoints may use legacy errors. A failed request never creates checkout. Require user confirmation before creating one.
-
-        '
-      headers:
-        WWW-Authenticate:
-          description: MPP payment challenge for eligible anonymous pay-per-use requests. Authenticated credit or subscription errors omit this header.
-          schema:
-            type: string
-      content:
-        application/json:
-          schema:
-            oneOf:
-            - $ref: '#/components/schemas/XWritePaymentRequired'
-            - $ref: '#/components/schemas/AuthenticatedPaymentRequired'
-            - $ref: '#/components/schemas/GuestPaymentRequired'
-            - allOf:
-              - $ref: '#/components/schemas/Error'
-              - not:
-                  required:
-                  - payment_options
-          example:
-            balance: '0'
-            dashboard: /dashboard/account
-            error: insufficient_credits
-            message: Insufficient credits. Top up or subscribe to continue.
-            next_step: Ask the user to confirm a payment option before creating checkout.
-            payment_options:
-              credits:
-                create_checkout:
-                  body:
-                    dollars: 10
-                    locale: en
-                  creates: checkout_url
-                  method: POST
-                  path: /api/v1/credits/topup
-                  provider: stripe
-                  requires_authentication: true
-                  requires_user_confirmation: true
-                  response_url_field: url
-              subscription:
-                create_checkout:
-                  body:
-                    tier: starter
-                  creates: checkout_url
-                  method: POST
-                  path: /api/v1/subscribe
-                  provider: stripe
-                  requires_authentication: true
-                  requires_user_confirmation: true
-                  response_url_field: url
-            required: '1'
-            top_up_endpoint: /api/v1/credits/topup
-            top_up_url: POST /api/v1/credits/topup
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/MppPaymentRequired'
-          example:
-            account_required: false
-            challengeId: Opaque MPP challenge identifier
-            detail: Payment is required.
-            hint: Use a supported wallet with an offer from the WWW-Authenticate header.
-            status: 402
-            title: Payment Required
-            type: https://paymentauth.org/problems/payment-required
-            next_step: Ask the user to confirm a USD amount before creating checkout.
-            payment_options:
-              guest_wallet:
-                create_checkout:
-                  account_required: false
-                  amount_bounds:
-                    currency: usd
-                    maximum_minor: 25000
-                    minimum_minor: 1000
-                  body:
-                    amount_minor: 1000
-                    currency: usd
-                  creates: checkout_url
-                  method: POST
-                  path: /api/v1/guest-wallets
-                  provider: stripe
-                  required_headers:
-                    Idempotency-Key: <cryptographically random UUID v4>
-                  requires_authentication: false
-                  requires_user_confirmation: true
-                  requires_user_interaction: true
-                  response_fields:
-                  - checkout_url
-                  - api_key
-                  - status_url
-                  response_url_field: checkout_url
-    RateLimitExceeded:
-      description: 'Xquik tier rate limit exceeded. The response includes a `Retry-After` header with the number of seconds to wait before retrying.
-
-        '
-      content:
-        application/json:
-          schema:
-            allOf:
-            - $ref: '#/components/schemas/Error'
-            - type: object
-              properties:
-                retryAfter:
-                  type: integer
-                  example: 60
-          example:
-            error: rate_limit_exceeded
-            message: Too many requests. Try again later.
-            retryAfter: 60
-      headers:
-        Retry-After:
-          description: Seconds until the next permitted request.
-          schema:
-            example: 60
-            minimum: 1
-            type: integer
-    Success:
-      description: Success
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-            - success
-            properties:
-              success:
-                type: boolean
-                const: true
-                example: true
-          example:
-            success: true
-    UnexpectedError:
-      content:
-        application/json:
-          example:
-            error: internal_error
-            message: Unexpected error. Try again.
-          schema:
-            $ref: '#/components/schemas/Error'
-      description: Unexpected error.
-    NotFound:
-      description: Not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: not_found
-            message: Resource not found.
-    Unauthenticated:
-      description: Unauthenticated
-      headers:
-        Cache-Control:
-          description: Prevents storage of authentication responses.
-          schema:
-            type: string
-            const: no-store
-        WWW-Authenticate:
-          description: Bearer authentication challenge.
-          schema:
-            type: string
-            const: Bearer realm="xquik"
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: unauthenticated
-            message: Authentication required. Provide a valid API key or bearer token.
-    UserNotFound:
-      description: X user not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: user_not_found
-            message: X user not found. Check the username.
-    InvalidInput:
-      description: Invalid input
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: invalid_input
-            message: Invalid input. Check the request body.
   schemas:
-    XWriteActionTarget:
-      type:
-      - object
-      - 'null'
-      description: Existing X resource targeted by the write, when applicable.
-      additionalProperties: false
-      required:
-      - type
-      - id
-      properties:
-        type:
-          type: string
-          enum:
-          - tweet
-          - user
-          - community
-        id:
-          type: string
-    XWritePaymentRequired:
-      allOf:
-      - $ref: '#/components/schemas/XWriteAction'
-      - type: object
-        required:
-        - error
-        - message
-      description: 'Durable failed write action with the applicable payment guidance.
-
-        '
     XWriteActionRequest:
       type: object
       description: Stable fingerprint and sanitized payload for replay checks.
@@ -792,66 +576,135 @@ components:
           - 'null'
           additionalProperties: true
           description: Exact sanitized payload dispatched for this action.
-    XWriteActionBilling:
-      type: object
-      additionalProperties: false
-      required:
-      - status
-      - charged
-      - plannedCredits
-      - chargedCredits
-      properties:
-        status:
-          type: string
-          enum:
-          - not_charged
-          - pending
-          - charged
-          - charge_failed
-          - refunded
-        charged:
-          type: boolean
-        plannedCredits:
-          type: string
-          pattern: ^\d+$
-        chargedCredits:
-          type: string
-          pattern: ^\d+$
-      description: 'plannedCredits is the approved maximum. chargedCredits comes from the settled credit ledger. Pending or failed writes are not charged.
-
-        '
-    XWriteActionAccount:
+    XWriteActionResult:
       type:
       - object
       - 'null'
-      description: Connected account selected for the write.
+      description: Confirmed result produced by the write, when available.
       additionalProperties: false
-      required:
-      - id
-      - username
       properties:
+        type:
+          type: string
+          enum:
+          - tweet
+          - direct_message
+          - media
+          - community
+          - state_change
         id:
           type: string
-        username:
+        state:
           type: string
-    GuestWalletAmountBounds:
-      description: Accepted guest wallet purchase range in USD cents.
+    XWritePaymentRequired:
+      allOf:
+      - $ref: '#/components/schemas/XWriteAction'
+      - type: object
+        required:
+        - error
+        - message
+      description: 'Durable failed write action with the applicable payment guidance.
+
+        '
+    GuestWalletTopupCheckoutAction:
+      description: Explicit direct REST action for a guest wallet top-up.
       type: object
       additionalProperties: false
       required:
-      - currency
-      - maximum_minor
-      - minimum_minor
+      - account_required
+      - amount_bounds
+      - body
+      - creates
+      - method
+      - path
+      - provider
+      - required_headers
+      - requires_authentication
+      - requires_user_confirmation
+      - requires_user_interaction
+      - response_fields
+      - response_url_field
       properties:
-        currency:
+        account_required:
+          type: boolean
+          const: false
+        amount_bounds:
+          $ref: '#/components/schemas/GuestWalletAmountBounds'
+        body:
+          $ref: '#/components/schemas/GuestWalletPurchaseRequest'
+        creates:
           type: string
-          const: usd
-        maximum_minor:
-          type: integer
-          const: 25000
-        minimum_minor:
-          type: integer
-          const: 1000
+          const: checkout_url
+        method:
+          type: string
+          const: POST
+        path:
+          type: string
+          const: /api/v1/guest-wallets/topups
+        provider:
+          type: string
+          deprecated: true
+          const: stripe
+        required_headers:
+          type: object
+          additionalProperties: false
+          required:
+          - Idempotency-Key
+          properties:
+            Idempotency-Key:
+              type: string
+              const: <cryptographically random UUID v4>
+        requires_authentication:
+          type: boolean
+          const: true
+        requires_user_confirmation:
+          type: boolean
+          const: true
+        requires_user_interaction:
+          type: boolean
+          const: true
+        response_fields:
+          type: array
+          minItems: 2
+          maxItems: 2
+          prefixItems:
+          - type: string
+            const: checkout_url
+          - type: string
+            const: status_url
+          items:
+            type: string
+            enum:
+            - checkout_url
+            - status_url
+        response_url_field:
+          type: string
+          const: checkout_url
+    KeywordMonitor:
+      description: Keyword monitor that tracks matching public X activity.
+      type: object
+      required:
+      - id
+      - query
+      - eventTypes
+      - isActive
+      - createdAt
+      - nextBillingAt
+      properties:
+        id:
+          type: string
+        query:
+          type: string
+        eventTypes:
+          $ref: '#/components/schemas/EventTypeArray'
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        nextBillingAt:
+          type: string
+          format: date-time
+          description: Next hourly credit charge time for this keyword query monitor.
     GuestWalletPurchaseRequest:
       description: User-confirmed guest wallet checkout request.
       type: object
@@ -1185,48 +1038,6 @@ components:
           type: integer
           minimum: 1
           description: Required wait in milliseconds.
-    XWriteActionResult:
-      type:
-      - object
-      - 'null'
-      description: Confirmed result produced by the write, when available.
-      additionalProperties: false
-      properties:
-        type:
-          type: string
-          enum:
-          - tweet
-          - direct_message
-          - media
-          - community
-          - state_change
-        id:
-          type: string
-        state:
-          type: string
-    XWriteActionNextAction:
-      type:
-      - object
-      - 'null'
-      description: Exact follow-up an API client or agent should perform.
-      additionalProperties: false
-      required:
-      - type
-      properties:
-        type:
-          type: string
-          enum:
-          - poll
-          - retry
-          - verify_result
-          - fix_request
-        url:
-          type: string
-        afterMs:
-          type: integer
-          minimum: 0
-        requiresNewIdempotencyKey:
-          type: boolean
     GuestWalletCreateCheckoutAction:
       description: Explicit direct REST action for a new guest wallet checkout.
       type: object
@@ -1304,106 +1115,6 @@ components:
         response_url_field:
           type: string
           const: checkout_url
-    GuestWalletTopupCheckoutAction:
-      description: Explicit direct REST action for a guest wallet top-up.
-      type: object
-      additionalProperties: false
-      required:
-      - account_required
-      - amount_bounds
-      - body
-      - creates
-      - method
-      - path
-      - provider
-      - required_headers
-      - requires_authentication
-      - requires_user_confirmation
-      - requires_user_interaction
-      - response_fields
-      - response_url_field
-      properties:
-        account_required:
-          type: boolean
-          const: false
-        amount_bounds:
-          $ref: '#/components/schemas/GuestWalletAmountBounds'
-        body:
-          $ref: '#/components/schemas/GuestWalletPurchaseRequest'
-        creates:
-          type: string
-          const: checkout_url
-        method:
-          type: string
-          const: POST
-        path:
-          type: string
-          const: /api/v1/guest-wallets/topups
-        provider:
-          type: string
-          deprecated: true
-          const: stripe
-        required_headers:
-          type: object
-          additionalProperties: false
-          required:
-          - Idempotency-Key
-          properties:
-            Idempotency-Key:
-              type: string
-              const: <cryptographically random UUID v4>
-        requires_authentication:
-          type: boolean
-          const: true
-        requires_user_confirmation:
-          type: boolean
-          const: true
-        requires_user_interaction:
-          type: boolean
-          const: true
-        response_fields:
-          type: array
-          minItems: 2
-          maxItems: 2
-          prefixItems:
-          - type: string
-            const: checkout_url
-          - type: string
-            const: status_url
-          items:
-            type: string
-            enum:
-            - checkout_url
-            - status_url
-        response_url_field:
-          type: string
-          const: checkout_url
-    KeywordMonitor:
-      description: Keyword monitor that tracks matching public X activity.
-      type: object
-      required:
-      - id
-      - query
-      - eventTypes
-      - isActive
-      - createdAt
-      - nextBillingAt
-      properties:
-        id:
-          type: string
-        query:
-          type: string
-        eventTypes:
-          $ref: '#/components/schemas/EventTypeArray'
-        isActive:
-          type: boolean
-        createdAt:
-          type: string
-          format: date-time
-        nextBillingAt:
-          type: string
-          format: date-time
-          description: Next hourly credit charge time for this keyword query monitor.
     MppPaymentRequired:
       description: Anonymous payment requirement for a direct MPP operation. The response includes an MPP challenge and an accountless checkout action.
       type: object
@@ -1454,6 +1165,30 @@ components:
           type: string
           format: uri
           const: https://paymentauth.org/problems/payment-required
+    XWriteActionTarget:
+      type:
+      - object
+      - 'null'
+      description: Existing X resource targeted by the write, when applicable.
+      additionalProperties: false
+      required:
+      - type
+      - id
+      properties:
+        type:
+          type: string
+          enum:
+          - tweet
+          - user
+          - community
+        id:
+          type: string
+    EventTypeArray:
+      description: Array of event types to subscribe to.
+      type: array
+      items:
+        $ref: '#/components/schemas/EventType'
+      minItems: 1
     EventType:
       description: Type of monitor event fired when account activity occurs.
       type: string
@@ -1479,6 +1214,262 @@ components:
       - profile.protected.changed
       - profile.pinned_tweet.changed
       - profile.unavailable.changed
+    GuestWalletAmountBounds:
+      description: Accepted guest wallet purchase range in USD cents.
+      type: object
+      additionalProperties: false
+      required:
+      - currency
+      - maximum_minor
+      - minimum_minor
+      properties:
+        currency:
+          type: string
+          const: usd
+        maximum_minor:
+          type: integer
+          const: 25000
+        minimum_minor:
+          type: integer
+          const: 1000
+    XWriteActionBilling:
+      type: object
+      additionalProperties: false
+      required:
+      - status
+      - charged
+      - plannedCredits
+      - chargedCredits
+      properties:
+        status:
+          type: string
+          enum:
+          - not_charged
+          - pending
+          - charged
+          - charge_failed
+          - refunded
+        charged:
+          type: boolean
+        plannedCredits:
+          type: string
+          pattern: ^\d+$
+        chargedCredits:
+          type: string
+          pattern: ^\d+$
+      description: 'plannedCredits is the approved maximum. chargedCredits comes from the settled credit ledger. Pending or failed writes are not charged.
+
+        '
+    GuestPaymentRequired:
+      description: 'Credit error for a paid-read guest key with only its accountless guest top-up action.
+
+        '
+      type: object
+      additionalProperties: false
+      required:
+      - balance
+      - error
+      - message
+      - next_step
+      - payment_options
+      - required
+      - top_up_endpoint
+      - top_up_url
+      properties:
+        balance:
+          type: string
+          pattern: ^\d+$
+        error:
+          type: string
+          enum:
+          - insufficient_credits
+          - no_credits
+          - no_subscription
+          - subscription_inactive
+        message:
+          type: string
+        next_step:
+          type: string
+          const: Ask the user to confirm a USD amount before creating checkout.
+        payment_options:
+          type: object
+          additionalProperties: false
+          required:
+          - credits
+          properties:
+            credits:
+              type: object
+              additionalProperties: false
+              required:
+              - create_checkout
+              properties:
+                create_checkout:
+                  $ref: '#/components/schemas/GuestWalletTopupCheckoutAction'
+        required:
+          type: string
+          pattern: ^\d+$
+        top_up_endpoint:
+          type: string
+          const: /api/v1/guest-wallets/topups
+        top_up_url:
+          type: string
+          const: POST /api/v1/guest-wallets/topups
+    AuthenticatedPaymentRequired:
+      description: Authenticated credit or subscription error with confirmation-gated hosted checkout actions.
+      type: object
+      additionalProperties: false
+      required:
+      - balance
+      - dashboard
+      - error
+      - message
+      - next_step
+      - payment_options
+      - required
+      - top_up_endpoint
+      - top_up_url
+      properties:
+        balance:
+          type: string
+          pattern: ^\d+$
+          description: Available credits as a decimal string.
+        dashboard:
+          type: string
+          const: /dashboard/account
+          description: Account page for manual billing management.
+        error:
+          type: string
+          enum:
+          - insufficient_credits
+          - no_credits
+          - no_subscription
+          - subscription_inactive
+        message:
+          type: string
+        next_step:
+          type: string
+          const: Ask the user to confirm a payment option before creating checkout.
+        payment_options:
+          type: object
+          additionalProperties: false
+          required:
+          - credits
+          - subscription
+          properties:
+            credits:
+              type: object
+              additionalProperties: false
+              required:
+              - create_checkout
+              properties:
+                create_checkout:
+                  type: object
+                  additionalProperties: false
+                  required:
+                  - body
+                  - creates
+                  - method
+                  - path
+                  - provider
+                  - requires_authentication
+                  - requires_user_confirmation
+                  - response_url_field
+                  properties:
+                    body:
+                      type: object
+                      additionalProperties: false
+                      required:
+                      - dollars
+                      - locale
+                      properties:
+                        dollars:
+                          type: integer
+                          const: 10
+                        locale:
+                          type: string
+                          const: en
+                    creates:
+                      type: string
+                      const: checkout_url
+                    method:
+                      type: string
+                      const: POST
+                    path:
+                      type: string
+                      const: /api/v1/credits/topup
+                    provider:
+                      type: string
+                      deprecated: true
+                      const: stripe
+                    requires_authentication:
+                      type: boolean
+                      const: true
+                    requires_user_confirmation:
+                      type: boolean
+                      const: true
+                    response_url_field:
+                      type: string
+                      const: url
+            subscription:
+              type: object
+              additionalProperties: false
+              required:
+              - create_checkout
+              properties:
+                create_checkout:
+                  type: object
+                  additionalProperties: false
+                  required:
+                  - body
+                  - creates
+                  - method
+                  - path
+                  - provider
+                  - requires_authentication
+                  - requires_user_confirmation
+                  - response_url_field
+                  properties:
+                    body:
+                      type: object
+                      additionalProperties: false
+                      required:
+                      - tier
+                      properties:
+                        tier:
+                          type: string
+                          const: starter
+                    creates:
+                      type: string
+                      const: checkout_url
+                    method:
+                      type: string
+                      const: POST
+                    path:
+                      type: string
+                      const: /api/v1/subscribe
+                    provider:
+                      type: string
+                      deprecated: true
+                      const: stripe
+                    requires_authentication:
+                      type: boolean
+                      const: true
+                    requires_user_confirmation:
+                      type: boolean
+                      const: true
+                    response_url_field:
+                      type: string
+                      const: url
+        required:
+          type: string
+          pattern: ^\d+$
+          description: Credits required for the blocked request.
+        top_up_endpoint:
+          type: string
+          const: /api/v1/credits/topup
+        top_up_url:
+          type: string
+          const: POST /api/v1/credits/topup
     XWriteAction:
       type: object
       required:
@@ -1655,222 +1646,231 @@ components:
       description: 'Durable write lifecycle record. Poll statusUrl until terminal is true. Reusing the original Idempotency-Key returns this same record. Submit a new write only when safeToRetry is true, using a new key.
 
         '
-    AuthenticatedPaymentRequired:
-      description: Authenticated credit or subscription error with confirmation-gated hosted checkout actions.
-      type: object
+    XWriteActionAccount:
+      type:
+      - object
+      - 'null'
+      description: Connected account selected for the write.
       additionalProperties: false
       required:
-      - balance
-      - dashboard
-      - error
-      - message
-      - next_step
-      - payment_options
-      - required
-      - top_up_endpoint
-      - top_up_url
+      - id
+      - username
       properties:
-        balance:
+        id:
           type: string
-          pattern: ^\d+$
-          description: Available credits as a decimal string.
-        dashboard:
+        username:
           type: string
-          const: /dashboard/account
-          description: Account page for manual billing management.
-        error:
+    XWriteActionNextAction:
+      type:
+      - object
+      - 'null'
+      description: Exact follow-up an API client or agent should perform.
+      additionalProperties: false
+      required:
+      - type
+      properties:
+        type:
           type: string
           enum:
-          - insufficient_credits
-          - no_credits
-          - no_subscription
-          - subscription_inactive
-        message:
+          - poll
+          - retry
+          - verify_result
+          - fix_request
+        url:
           type: string
-        next_step:
-          type: string
-          const: Ask the user to confirm a payment option before creating checkout.
-        payment_options:
-          type: object
-          additionalProperties: false
-          required:
-          - credits
-          - subscription
-          properties:
-            credits:
-              type: object
-              additionalProperties: false
-              required:
-              - create_checkout
-              properties:
-                create_checkout:
-                  type: object
-                  additionalProperties: false
-                  required:
-                  - body
-                  - creates
-                  - method
-                  - path
-                  - provider
-                  - requires_authentication
-                  - requires_user_confirmation
-                  - response_url_field
-                  properties:
-                    body:
-                      type: object
-                      additionalProperties: false
-                      required:
-                      - dollars
-                      - locale
-                      properties:
-                        dollars:
-                          type: integer
-                          const: 10
-                        locale:
-                          type: string
-                          const: en
-                    creates:
-                      type: string
-                      const: checkout_url
-                    method:
-                      type: string
-                      const: POST
-                    path:
-                      type: string
-                      const: /api/v1/credits/topup
-                    provider:
-                      type: string
-                      deprecated: true
-                      const: stripe
-                    requires_authentication:
-                      type: boolean
-                      const: true
-                    requires_user_confirmation:
-                      type: boolean
-                      const: true
-                    response_url_field:
-                      type: string
-                      const: url
-            subscription:
-              type: object
-              additionalProperties: false
-              required:
-              - create_checkout
-              properties:
-                create_checkout:
-                  type: object
-                  additionalProperties: false
-                  required:
-                  - body
-                  - creates
-                  - method
-                  - path
-                  - provider
-                  - requires_authentication
-                  - requires_user_confirmation
-                  - response_url_field
-                  properties:
-                    body:
-                      type: object
-                      additionalProperties: false
-                      required:
-                      - tier
-                      properties:
-                        tier:
-                          type: string
-                          const: starter
-                    creates:
-                      type: string
-                      const: checkout_url
-                    method:
-                      type: string
-                      const: POST
-                    path:
-                      type: string
-                      const: /api/v1/subscribe
-                    provider:
-                      type: string
-                      deprecated: true
-                      const: stripe
-                    requires_authentication:
-                      type: boolean
-                      const: true
-                    requires_user_confirmation:
-                      type: boolean
-                      const: true
-                    response_url_field:
-                      type: string
-                      const: url
-        required:
-          type: string
-          pattern: ^\d+$
-          description: Credits required for the blocked request.
-        top_up_endpoint:
-          type: string
-          const: /api/v1/credits/topup
-        top_up_url:
-          type: string
-          const: POST /api/v1/credits/topup
-    EventTypeArray:
-      description: Array of event types to subscribe to.
-      type: array
-      items:
-        $ref: '#/components/schemas/EventType'
-      minItems: 1
-    GuestPaymentRequired:
-      description: 'Credit error for a paid-read guest key with only its accountless guest top-up action.
+        afterMs:
+          type: integer
+          minimum: 0
+        requiresNewIdempotencyKey:
+          type: boolean
+  responses:
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: not_found
+            message: Resource not found.
+    PaymentRequired:
+      description: 'Payment required. MPP reads return a problem document and `WWW-Authenticate`. Authenticated reads return balances and checkout actions. Guest keys receive only the guest top-up action. Other endpoints may use legacy errors. A failed request never creates checkout. Require user confirmation before creating one.
 
         '
-      type: object
-      additionalProperties: false
-      required:
-      - balance
-      - error
-      - message
-      - next_step
-      - payment_options
-      - required
-      - top_up_endpoint
-      - top_up_url
-      properties:
-        balance:
-          type: string
-          pattern: ^\d+$
-        error:
-          type: string
-          enum:
-          - insufficient_credits
-          - no_credits
-          - no_subscription
-          - subscription_inactive
-        message:
-          type: string
-        next_step:
-          type: string
-          const: Ask the user to confirm a USD amount before creating checkout.
-        payment_options:
-          type: object
-          additionalProperties: false
-          required:
-          - credits
-          properties:
-            credits:
-              type: object
-              additionalProperties: false
-              required:
-              - create_checkout
-              properties:
+      headers:
+        WWW-Authenticate:
+          description: MPP payment challenge for eligible anonymous pay-per-use requests. Authenticated credit or subscription errors omit this header.
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            oneOf:
+            - $ref: '#/components/schemas/XWritePaymentRequired'
+            - $ref: '#/components/schemas/AuthenticatedPaymentRequired'
+            - $ref: '#/components/schemas/GuestPaymentRequired'
+            - allOf:
+              - $ref: '#/components/schemas/Error'
+              - not:
+                  required:
+                  - payment_options
+          example:
+            balance: '0'
+            dashboard: /dashboard/account
+            error: insufficient_credits
+            message: Insufficient credits. Top up or subscribe to continue.
+            next_step: Ask the user to confirm a payment option before creating checkout.
+            payment_options:
+              credits:
                 create_checkout:
-                  $ref: '#/components/schemas/GuestWalletTopupCheckoutAction'
-        required:
-          type: string
-          pattern: ^\d+$
-        top_up_endpoint:
-          type: string
-          const: /api/v1/guest-wallets/topups
-        top_up_url:
-          type: string
-          const: POST /api/v1/guest-wallets/topups
+                  body:
+                    dollars: 10
+                    locale: en
+                  creates: checkout_url
+                  method: POST
+                  path: /api/v1/credits/topup
+                  provider: stripe
+                  requires_authentication: true
+                  requires_user_confirmation: true
+                  response_url_field: url
+              subscription:
+                create_checkout:
+                  body:
+                    tier: starter
+                  creates: checkout_url
+                  method: POST
+                  path: /api/v1/subscribe
+                  provider: stripe
+                  requires_authentication: true
+                  requires_user_confirmation: true
+                  response_url_field: url
+            required: '1'
+            top_up_endpoint: /api/v1/credits/topup
+            top_up_url: POST /api/v1/credits/topup
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/MppPaymentRequired'
+          example:
+            account_required: false
+            challengeId: Opaque MPP challenge identifier
+            detail: Payment is required.
+            hint: Use a supported wallet with an offer from the WWW-Authenticate header.
+            status: 402
+            title: Payment Required
+            type: https://paymentauth.org/problems/payment-required
+            next_step: Ask the user to confirm a USD amount before creating checkout.
+            payment_options:
+              guest_wallet:
+                create_checkout:
+                  account_required: false
+                  amount_bounds:
+                    currency: usd
+                    maximum_minor: 25000
+                    minimum_minor: 1000
+                  body:
+                    amount_minor: 1000
+                    currency: usd
+                  creates: checkout_url
+                  method: POST
+                  path: /api/v1/guest-wallets
+                  provider: stripe
+                  required_headers:
+                    Idempotency-Key: <cryptographically random UUID v4>
+                  requires_authentication: false
+                  requires_user_confirmation: true
+                  requires_user_interaction: true
+                  response_fields:
+                  - checkout_url
+                  - api_key
+                  - status_url
+                  response_url_field: checkout_url
+    Unauthenticated:
+      description: Unauthenticated
+      headers:
+        Cache-Control:
+          description: Prevents storage of authentication responses.
+          schema:
+            type: string
+            const: no-store
+        WWW-Authenticate:
+          description: Bearer authentication challenge.
+          schema:
+            type: string
+            const: Bearer realm="xquik"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: unauthenticated
+            message: Authentication required. Provide a valid API key or bearer token.
+    RateLimitExceeded:
+      description: 'Xquik tier rate limit exceeded. The response includes a `Retry-After` header with the number of seconds to wait before retrying.
+
+        '
+      content:
+        application/json:
+          schema:
+            allOf:
+            - $ref: '#/components/schemas/Error'
+            - type: object
+              properties:
+                retryAfter:
+                  type: integer
+                  example: 60
+          example:
+            error: rate_limit_exceeded
+            message: Too many requests. Try again later.
+            retryAfter: 60
+      headers:
+        Retry-After:
+          description: Seconds until the next permitted request.
+          schema:
+            example: 60
+            minimum: 1
+            type: integer
+    UnexpectedError:
+      content:
+        application/json:
+          example:
+            error: internal_error
+            message: Unexpected error. Try again.
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Unexpected error.
+    InvalidInput:
+      description: Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: invalid_input
+            message: Invalid input. Check the request body.
+    UserNotFound:
+      description: X user not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: user_not_found
+            message: X user not found. Check the username.
+    Success:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+            - success
+            properties:
+              success:
+                type: boolean
+                const: true
+                example: true
+          example:
+            success: true
   parameters:
     ResourceId:
       name: id

@@ -480,23 +480,194 @@ paths:
         default:
           $ref: '#/components/responses/UnexpectedError'
 components:
-  parameters:
-    ConnectionAttemptId:
-      name: id
-      in: path
-      required: true
-      description: Connection attempt ID returned by `POST /x/accounts`.
-      schema:
-        type: string
-        pattern: ^xatt_[0-9a-f]{32}$
-        example: xatt_0123456789abcdef0123456789abcdef
-    ResourceId:
-      name: id
-      in: path
-      required: true
-      schema:
-        type: string
-      description: Resource ID returned by the matching create or list endpoint.
+  responses:
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: not_found
+            message: Resource not found.
+    Unauthenticated:
+      description: Unauthenticated
+      headers:
+        Cache-Control:
+          description: Prevents storage of authentication responses.
+          schema:
+            type: string
+            const: no-store
+        WWW-Authenticate:
+          description: Bearer authentication challenge.
+          schema:
+            type: string
+            const: Bearer realm="xquik"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: unauthenticated
+            message: Authentication required. Provide a valid API key or bearer token.
+    ConnectServiceUnavailable:
+      description: 'The X connection service is temporarily unavailable. Retry after a short delay. Returns error code `service_unavailable`.
+
+        '
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: service_unavailable
+            message: Service temporarily unavailable. Try again later.
+    RateLimitExceeded:
+      description: 'Xquik tier rate limit exceeded. The response includes a `Retry-After` header with the number of seconds to wait before retrying.
+
+        '
+      content:
+        application/json:
+          schema:
+            allOf:
+            - $ref: '#/components/schemas/Error'
+            - type: object
+              properties:
+                retryAfter:
+                  type: integer
+                  example: 60
+          example:
+            error: rate_limit_exceeded
+            message: Too many requests. Try again later.
+            retryAfter: 60
+      headers:
+        Retry-After:
+          description: Seconds until the next permitted request.
+          schema:
+            example: 60
+            minimum: 1
+            type: integer
+    ConnectUserLookupFailed:
+      description: 'The X username could not be resolved. Verify the handle is correct and the account exists. Default v1 returns 502. The best-practice response contract returns 424. Error code: `x_user_lookup_failed`.
+
+        '
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: x_user_lookup_failed
+            message: X username lookup failed. Try again later.
+    ConnectLoginFailed:
+      description: 'Login requires new credentials or account verification. Cooldowns include `retryAfterMs` and `Retry-After`. Codes are `login_failed` or `passkey_required`.
+
+        '
+      headers:
+        Retry-After:
+          description: Cooldown duration in seconds, when retrying must wait.
+          schema:
+            type: integer
+            minimum: 1
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: login_failed
+            message: Login failed. Check credentials and try again.
+            retryAfterMs: 300000
+    UnexpectedError:
+      content:
+        application/json:
+          example:
+            error: internal_error
+            message: Unexpected error. Try again.
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Unexpected error.
+    InvalidInput:
+      description: Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: invalid_input
+            message: Invalid input. Check the request body.
+    ReauthAccountNotFound:
+      description: 'No X account with this ID belongs to the authenticated user. Returns error code `account_not_found`.
+
+        '
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: account_not_found
+            message: X account not found.
+    ConnectAlreadyConnected:
+      description: 'The specified X account is already connected to this Xquik account. Returns error code `account_already_connected`.
+
+        '
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: account_already_connected
+            message: This X account is already connected.
+    Success:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+            - success
+            properties:
+              success:
+                type: boolean
+                const: true
+                example: true
+          example:
+            success: true
+    ConnectRateLimitExceeded:
+      description: 'Too many requests. `rate_limit_exceeded` includes `retryAfter` and `Retry-After`. `login_cooldown` also includes `reason` and `retryAfterMs`.
+
+        '
+      headers:
+        Retry-After:
+          description: Required wait in seconds.
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: rate_limit_exceeded
+            message: Too many requests. Retry later.
+    ConnectLoginCooldown:
+      description: 'A prior login attempt triggered a cooldown. Response includes `reason`, `retryAfterMs`, and a `Retry-After` header in seconds. Returns error code `login_cooldown`.
+
+        '
+      headers:
+        Retry-After:
+          description: Cooldown duration in seconds.
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: login_cooldown
+            message: Login is temporarily paused
+            reason: temporary_issue
+            retryAfterMs: 60000
   schemas:
     XAccountConnectionChallenge:
       description: Resumable account connection challenge. Submit the email code to finish the same connection attempt.
@@ -524,15 +695,14 @@ components:
           type: string
         username:
           type: string
-    XAccountConnectionAttemptPending:
-      description: The connection is still in progress.
+    XAccountConnectionAttemptSuccess:
+      description: The account connected successfully.
       type: object
       additionalProperties: false
       required:
       - object
       - id
       - status
-      - pollAfterMs
       properties:
         object:
           type: string
@@ -541,35 +711,44 @@ components:
           type: string
         status:
           type: string
-          const: pending
-        pollAfterMs:
-          type: integer
-          minimum: 0
-    XAccountConnectionAttemptFailed:
-      description: The connection reached a final failure.
+          const: success
+    XAccountDetail:
+      description: Connected X account details with health and timestamp metadata.
       type: object
-      additionalProperties: false
       required:
-      - object
       - id
+      - xUserId
+      - xUsername
       - status
-      - error
-      - retryable
+      - health
+      - createdAt
       properties:
-        object:
-          type: string
-          const: x_account_connection_attempt
         id:
+          type: string
+        xUserId:
+          type: string
+        xUsername:
           type: string
         status:
           type: string
-          const: failed
-        error:
+        health:
           type: string
-        reason:
+          enum:
+          - healthy
+          - locked
+          - needsReauth
+          - recovering
+          - suspended
+          - temporaryIssue
+        createdAt:
           type: string
-        retryable:
-          type: boolean
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        cookiesObtainedAt:
+          type: string
+          format: date-time
     Error:
       description: 'Error response. Default v1 returns a legacy string error code. Send `xquik-api-contract: 2026-04-29` to receive the structured best-practice error object.
 
@@ -849,6 +1028,27 @@ components:
           type: integer
           minimum: 1
           description: Required wait in milliseconds.
+    XAccountConnectionAttemptPending:
+      description: The connection is still in progress.
+      type: object
+      additionalProperties: false
+      required:
+      - object
+      - id
+      - status
+      - pollAfterMs
+      properties:
+        object:
+          type: string
+          const: x_account_connection_attempt
+        id:
+          type: string
+        status:
+          type: string
+          const: pending
+        pollAfterMs:
+          type: integer
+          minimum: 0
     SanitizedXAccount:
       description: Sanitized X account summary returned by connect and reauth.
       type: object
@@ -922,6 +1122,31 @@ components:
         cookiesObtainedAt:
           type: string
           format: date-time
+    XAccountConnectionAttemptFailed:
+      description: The connection reached a final failure.
+      type: object
+      additionalProperties: false
+      required:
+      - object
+      - id
+      - status
+      - error
+      - retryable
+      properties:
+        object:
+          type: string
+          const: x_account_connection_attempt
+        id:
+          type: string
+        status:
+          type: string
+          const: failed
+        error:
+          type: string
+        reason:
+          type: string
+        retryable:
+          type: boolean
     XAccountConnectionContinuation:
       description: The connection is still running or needs an email code.
       oneOf:
@@ -932,248 +1157,23 @@ components:
         mapping:
           pending: '#/components/schemas/XAccountConnectionAttemptPending'
           requires_email_code: '#/components/schemas/XAccountConnectionChallenge'
-    XAccountConnectionAttemptSuccess:
-      description: The account connected successfully.
-      type: object
-      additionalProperties: false
-      required:
-      - object
-      - id
-      - status
-      properties:
-        object:
-          type: string
-          const: x_account_connection_attempt
-        id:
-          type: string
-        status:
-          type: string
-          const: success
-    XAccountDetail:
-      description: Connected X account details with health and timestamp metadata.
-      type: object
-      required:
-      - id
-      - xUserId
-      - xUsername
-      - status
-      - health
-      - createdAt
-      properties:
-        id:
-          type: string
-        xUserId:
-          type: string
-        xUsername:
-          type: string
-        status:
-          type: string
-        health:
-          type: string
-          enum:
-          - healthy
-          - locked
-          - needsReauth
-          - recovering
-          - suspended
-          - temporaryIssue
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-        cookiesObtainedAt:
-          type: string
-          format: date-time
-  responses:
-    RateLimitExceeded:
-      description: 'Xquik tier rate limit exceeded. The response includes a `Retry-After` header with the number of seconds to wait before retrying.
-
-        '
-      content:
-        application/json:
-          schema:
-            allOf:
-            - $ref: '#/components/schemas/Error'
-            - type: object
-              properties:
-                retryAfter:
-                  type: integer
-                  example: 60
-          example:
-            error: rate_limit_exceeded
-            message: Too many requests. Try again later.
-            retryAfter: 60
-      headers:
-        Retry-After:
-          description: Seconds until the next permitted request.
-          schema:
-            example: 60
-            minimum: 1
-            type: integer
-    ConnectLoginFailed:
-      description: 'Login requires new credentials or account verification. Cooldowns include `retryAfterMs` and `Retry-After`. Codes are `login_failed` or `passkey_required`.
-
-        '
-      headers:
-        Retry-After:
-          description: Cooldown duration in seconds, when retrying must wait.
-          schema:
-            type: integer
-            minimum: 1
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: login_failed
-            message: Login failed. Check credentials and try again.
-            retryAfterMs: 300000
-    ConnectAlreadyConnected:
-      description: 'The specified X account is already connected to this Xquik account. Returns error code `account_already_connected`.
-
-        '
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: account_already_connected
-            message: This X account is already connected.
-    ConnectRateLimitExceeded:
-      description: 'Too many requests. `rate_limit_exceeded` includes `retryAfter` and `Retry-After`. `login_cooldown` also includes `reason` and `retryAfterMs`.
-
-        '
-      headers:
-        Retry-After:
-          description: Required wait in seconds.
-          required: true
-          schema:
-            type: integer
-            minimum: 1
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: rate_limit_exceeded
-            message: Too many requests. Retry later.
-    Success:
-      description: Success
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-            - success
-            properties:
-              success:
-                type: boolean
-                const: true
-                example: true
-          example:
-            success: true
-    UnexpectedError:
-      content:
-        application/json:
-          example:
-            error: internal_error
-            message: Unexpected error. Try again.
-          schema:
-            $ref: '#/components/schemas/Error'
-      description: Unexpected error.
-    NotFound:
-      description: Not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: not_found
-            message: Resource not found.
-    ConnectUserLookupFailed:
-      description: 'The X username could not be resolved. Verify the handle is correct and the account exists. Default v1 returns 502. The best-practice response contract returns 424. Error code: `x_user_lookup_failed`.
-
-        '
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: x_user_lookup_failed
-            message: X username lookup failed. Try again later.
-    ConnectServiceUnavailable:
-      description: 'The X connection service is temporarily unavailable. Retry after a short delay. Returns error code `service_unavailable`.
-
-        '
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: service_unavailable
-            message: Service temporarily unavailable. Try again later.
-    ReauthAccountNotFound:
-      description: 'No X account with this ID belongs to the authenticated user. Returns error code `account_not_found`.
-
-        '
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: account_not_found
-            message: X account not found.
-    ConnectLoginCooldown:
-      description: 'A prior login attempt triggered a cooldown. Response includes `reason`, `retryAfterMs`, and a `Retry-After` header in seconds. Returns error code `login_cooldown`.
-
-        '
-      headers:
-        Retry-After:
-          description: Cooldown duration in seconds.
-          required: true
-          schema:
-            type: integer
-            minimum: 1
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: login_cooldown
-            message: Login is temporarily paused
-            reason: temporary_issue
-            retryAfterMs: 60000
-    Unauthenticated:
-      description: Unauthenticated
-      headers:
-        Cache-Control:
-          description: Prevents storage of authentication responses.
-          schema:
-            type: string
-            const: no-store
-        WWW-Authenticate:
-          description: Bearer authentication challenge.
-          schema:
-            type: string
-            const: Bearer realm="xquik"
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: unauthenticated
-            message: Authentication required. Provide a valid API key or bearer token.
-    InvalidInput:
-      description: Invalid input
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: invalid_input
-            message: Invalid input. Check the request body.
+  parameters:
+    ResourceId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Resource ID returned by the matching create or list endpoint.
+    ConnectionAttemptId:
+      name: id
+      in: path
+      required: true
+      description: Connection attempt ID returned by `POST /x/accounts`.
+      schema:
+        type: string
+        pattern: ^xatt_[0-9a-f]{32}$
+        example: xatt_0123456789abcdef0123456789abcdef
   securitySchemes:
     apiKey:
       type: apiKey

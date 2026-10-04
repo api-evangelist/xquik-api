@@ -462,7 +462,123 @@ webhooks:
       tags:
       - Webhooks
 components:
+  responses:
+    Success:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+            - success
+            properties:
+              success:
+                type: boolean
+                const: true
+                example: true
+          example:
+            success: true
+    InvalidInput:
+      description: Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: invalid_input
+            message: Invalid input. Check the request body.
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: not_found
+            message: Resource not found.
+    Unauthenticated:
+      description: Unauthenticated
+      headers:
+        Cache-Control:
+          description: Prevents storage of authentication responses.
+          schema:
+            type: string
+            const: no-store
+        WWW-Authenticate:
+          description: Bearer authentication challenge.
+          schema:
+            type: string
+            const: Bearer realm="xquik"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: unauthenticated
+            message: Authentication required. Provide a valid API key or bearer token.
+    RateLimitExceeded:
+      description: 'Xquik tier rate limit exceeded. The response includes a `Retry-After` header with the number of seconds to wait before retrying.
+
+        '
+      content:
+        application/json:
+          schema:
+            allOf:
+            - $ref: '#/components/schemas/Error'
+            - type: object
+              properties:
+                retryAfter:
+                  type: integer
+                  example: 60
+          example:
+            error: rate_limit_exceeded
+            message: Too many requests. Try again later.
+            retryAfter: 60
+      headers:
+        Retry-After:
+          description: Seconds until the next permitted request.
+          schema:
+            example: 60
+            minimum: 1
+            type: integer
+    UnexpectedError:
+      content:
+        application/json:
+          example:
+            error: internal_error
+            message: Unexpected error. Try again.
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Unexpected error.
   schemas:
+    Delivery:
+      description: Webhook delivery attempt record with status and retry count.
+      type: object
+      required:
+      - id
+      - streamEventId
+      - status
+      - attempts
+      - createdAt
+      properties:
+        id:
+          type: string
+        streamEventId:
+          type: string
+        status:
+          type: string
+        attempts:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        deliveredAt:
+          type: string
+          format: date-time
+        lastStatusCode:
+          type: integer
+        lastError:
+          type: string
     EventType:
       description: Type of monitor event fired when account activity occurs.
       type: string
@@ -488,6 +604,44 @@ components:
       - profile.protected.changed
       - profile.pinned_tweet.changed
       - profile.unavailable.changed
+    Webhook:
+      description: Webhook endpoint registered to receive event deliveries.
+      type: object
+      required:
+      - id
+      - url
+      - eventTypes
+      - isActive
+      - consecutiveFailures
+      - deliveryStatus
+      - failureHardCap
+      - createdAt
+      properties:
+        id:
+          type: string
+        url:
+          type: string
+          format: uri
+        eventTypes:
+          $ref: '#/components/schemas/EventTypeArray'
+        isActive:
+          type: boolean
+        consecutiveFailures:
+          type: integer
+          description: Consecutive failed delivery attempts since the last success.
+        deliveryStatus:
+          type: string
+          enum:
+          - active
+          - paused
+          - needs_attention
+          description: Endpoint delivery state. needs_attention means delivery stopped after repeated failures.
+        failureHardCap:
+          type: integer
+          description: Consecutive delivery failures that pause the endpoint.
+        createdAt:
+          type: string
+          format: date-time
     Error:
       description: 'Error response. Default v1 returns a legacy string error code. Send `xquik-api-contract: 2026-04-29` to receive the structured best-practice error object.
 
@@ -767,166 +921,12 @@ components:
           type: integer
           minimum: 1
           description: Required wait in milliseconds.
-    Delivery:
-      description: Webhook delivery attempt record with status and retry count.
-      type: object
-      required:
-      - id
-      - streamEventId
-      - status
-      - attempts
-      - createdAt
-      properties:
-        id:
-          type: string
-        streamEventId:
-          type: string
-        status:
-          type: string
-        attempts:
-          type: integer
-        createdAt:
-          type: string
-          format: date-time
-        deliveredAt:
-          type: string
-          format: date-time
-        lastStatusCode:
-          type: integer
-        lastError:
-          type: string
-    Webhook:
-      description: Webhook endpoint registered to receive event deliveries.
-      type: object
-      required:
-      - id
-      - url
-      - eventTypes
-      - isActive
-      - consecutiveFailures
-      - deliveryStatus
-      - failureHardCap
-      - createdAt
-      properties:
-        id:
-          type: string
-        url:
-          type: string
-          format: uri
-        eventTypes:
-          $ref: '#/components/schemas/EventTypeArray'
-        isActive:
-          type: boolean
-        consecutiveFailures:
-          type: integer
-          description: Consecutive failed delivery attempts since the last success.
-        deliveryStatus:
-          type: string
-          enum:
-          - active
-          - paused
-          - needs_attention
-          description: Endpoint delivery state. needs_attention means delivery stopped after repeated failures.
-        failureHardCap:
-          type: integer
-          description: Consecutive delivery failures that pause the endpoint.
-        createdAt:
-          type: string
-          format: date-time
     EventTypeArray:
       description: Array of event types to subscribe to.
       type: array
       items:
         $ref: '#/components/schemas/EventType'
       minItems: 1
-  responses:
-    RateLimitExceeded:
-      description: 'Xquik tier rate limit exceeded. The response includes a `Retry-After` header with the number of seconds to wait before retrying.
-
-        '
-      content:
-        application/json:
-          schema:
-            allOf:
-            - $ref: '#/components/schemas/Error'
-            - type: object
-              properties:
-                retryAfter:
-                  type: integer
-                  example: 60
-          example:
-            error: rate_limit_exceeded
-            message: Too many requests. Try again later.
-            retryAfter: 60
-      headers:
-        Retry-After:
-          description: Seconds until the next permitted request.
-          schema:
-            example: 60
-            minimum: 1
-            type: integer
-    Unauthenticated:
-      description: Unauthenticated
-      headers:
-        Cache-Control:
-          description: Prevents storage of authentication responses.
-          schema:
-            type: string
-            const: no-store
-        WWW-Authenticate:
-          description: Bearer authentication challenge.
-          schema:
-            type: string
-            const: Bearer realm="xquik"
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: unauthenticated
-            message: Authentication required. Provide a valid API key or bearer token.
-    NotFound:
-      description: Not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: not_found
-            message: Resource not found.
-    Success:
-      description: Success
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-            - success
-            properties:
-              success:
-                type: boolean
-                const: true
-                example: true
-          example:
-            success: true
-    InvalidInput:
-      description: Invalid input
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: invalid_input
-            message: Invalid input. Check the request body.
-    UnexpectedError:
-      content:
-        application/json:
-          example:
-            error: internal_error
-            message: Unexpected error. Try again.
-          schema:
-            $ref: '#/components/schemas/Error'
-      description: Unexpected error.
   parameters:
     ResourceId:
       name: id
