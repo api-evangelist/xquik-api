@@ -1,0 +1,70 @@
+slug: xquik-api
+provider: Xquik
+generated_by: planning/capability-mapping/scripts/classify_capabilities.py
+model: claude-opus-5
+frame:
+- Software & Technology
+min_confidence: 0.7
+capability_model:
+  source: https://github.com/vincentmakes/turbo-ea-capabilities
+  license: CC-BY-4.0
+  attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
+    CC BY 4.0
+  notice: NOTICE
+edge_count: 5
+edges:
+- tag: Support
+  spec_file: xquik-api-support-api-openapi.yml
+  capability_id: BC-430.10
+  capability_id_l1: BC-430
+  capability_name: Customer Inquiry Management
+  confidence: 0.88
+  evidence: POST /api/v1/support/tickets  createTicket  Create a support ticket; POST /api/v1/support/tickets/{id}/messages  addTicketMessage  Reply
+    to a support ticket
+  reason: Full support-ticket lifecycle with messages, status updates and attachments — inbound customer
+    inquiry capture, routing and resolution.
+- tag: API Keys
+  spec_file: xquik-api-api-keys-api-openapi.yml
+  capability_id: BC-4270.40
+  capability_id_l1: BC-4270
+  capability_name: Developer Identity & Credential Management
+  confidence: 0.85
+  evidence: POST /api/v1/api-keys createApiKey Create API key; DELETE /api/v1/api-keys/{id} revokeApiKey
+    Revoke API key; schema ApiKey
+  reason: Issuance, listing and revocation of API credentials for developers consuming this third-party
+    platform, matching Developer Identity & Credential Management. Slight reservation that credential
+    CRUD could also be read as generic IAM, but the vendor context (OAuth 2.1, API keys, SDKs for external
+    developers) favours the developer-platform reading.
+- tag: Webhooks
+  spec_file: xquik-api-webhooks-api-openapi.yml
+  capability_id: BC-4270.80
+  capability_id_l1: BC-4270
+  capability_name: Webhook & Event Subscription Management
+  confidence: 0.8
+  evidence: 'POST /api/v1/webhooks createWebhook Create webhook; GET /api/v1/webhooks/{id}/deliveries
+    listWebhookDeliveries List webhook deliveries; schemas: EventType, Delivery, Webhook'
+  reason: Operations are the full lifecycle of outbound webhook subscriptions (create/update/deactivate),
+    event types, delivery inspection and endpoint test/resume — exactly the webhook & event subscription
+    sub-capability of a developer/API platform, not a business-domain function.
+- tag: Subscribe
+  spec_file: xquik-api-subscribe-api-openapi.yml
+  capability_id: BC-4250.40
+  capability_id_l1: BC-4250
+  capability_name: Payment Collection & Dunning
+  confidence: 0.72
+  evidence: POST /api/v1/subscribe  subscribe  Create subscription checkout; POST /api/v1/credits/quick-topup  quickTopUpCredits  Charge
+    saved card for credits
+  reason: Subscription checkout, credit balance and card-charging top-ups are recurring-revenue payment
+    collection for the SaaS offering; L2 payment collection fits the charging operations, though some
+    surface also touches subscription provisioning.
+- tag: Guest Wallets
+  spec_file: xquik-api-guest-wallets-api-openapi.yml
+  capability_id: BC-4250.40
+  capability_id_l1: BC-4250
+  capability_name: Payment Collection & Dunning
+  confidence: 0.7
+  evidence: POST /api/v1/guest-wallets  createGuestWallet  Create an accountless prepaid wallet checkout;
+    GET /api/v1/guest-wallets/status  Get guest wallet and payment status
+  reason: Prepaid wallet checkout and top-up with payment status tracking is payment-method and payment-collection
+    handling for the SaaS commercial model; sub-capability is payment collection rather than invoicing
+    or metering.

@@ -472,6 +472,9 @@ apis:
   - type: Authentication
     url: https://docs.xquik.com/api-reference/authentication
 common:
+- type: CapabilityMap
+  url: capabilities/xquik-api-capability-edges.yml
+  name: Xquik Business Capability Map
 - type: VulnerabilityDisclosure
   url: security/xquik-api-vulnerability-disclosure.yml
 - type: DomainSecurity
