@@ -91,3 +91,44 @@ plans:
         unit: 1670000
         price: '199.00'
         userMultiplied: false
+x-canonical:
+  generated: '2026-10-08'
+  vocabulary: all/0-working/economics/plans-canonical.yml
+  models:
+  - metered
+  - subscription
+  units:
+  - credit
+  plans:
+  - name: Pay As You Go
+    access: other
+    model: metered
+    model_how: stated
+    units:
+    - credit
+    periods:
+    - per-use
+  - name: Starter
+    access: other
+    model: subscription
+    model_how: stated
+    units:
+    - credit
+    periods:
+    - month
+  - name: Pro
+    access: other
+    model: subscription
+    model_how: stated
+    units:
+    - credit
+    periods:
+    - month
+  - name: Business
+    access: other
+    model: subscription
+    model_how: stated
+    units:
+    - credit
+    periods:
+    - month
