@@ -357,103 +357,91 @@ paths:
           $ref: '#/components/responses/UnexpectedError'
       description: Export draw data.
 components:
+  responses:
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: not_found
+            message: Resource not found.
+    UnexpectedError:
+      content:
+        application/json:
+          example:
+            error: internal_error
+            message: Unexpected error. Try again.
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Unexpected error.
+    InvalidInput:
+      description: Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: invalid_input
+            message: Invalid input. Check the request body.
+    RateLimitExceeded:
+      description: 'Xquik tier rate limit exceeded. The response includes a `Retry-After` header with the number of seconds to wait before retrying.
+
+        '
+      content:
+        application/json:
+          schema:
+            allOf:
+            - $ref: '#/components/schemas/Error'
+            - type: object
+              properties:
+                retryAfter:
+                  type: integer
+                  example: 60
+          example:
+            error: rate_limit_exceeded
+            message: Too many requests. Try again later.
+            retryAfter: 60
+      headers:
+        Retry-After:
+          description: Seconds until the next permitted request.
+          schema:
+            example: 60
+            minimum: 1
+            type: integer
+    Unauthenticated:
+      description: Unauthenticated
+      headers:
+        Cache-Control:
+          description: Prevents storage of authentication responses.
+          schema:
+            type: string
+            const: no-store
+        WWW-Authenticate:
+          description: Bearer authentication challenge.
+          schema:
+            type: string
+            const: Bearer realm="xquik"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: unauthenticated
+            message: Authentication required. Provide a valid API key or bearer token.
+    XApiError:
+      description: 'Dependency unavailable, unauthorized, or rate limited. Default v1 returns 502. The best-practice response contract returns 424 for transparent dependency failures.
+
+        '
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: x_api_unavailable
+            message: X data source temporarily unavailable. Try again later.
   schemas:
-    DrawDetail:
-      description: Full giveaway draw with tweet metrics, entries, and timing.
-      type: object
-      required:
-      - id
-      - tweetUrl
-      - tweetId
-      - tweetText
-      - tweetAuthorUsername
-      - status
-      - totalEntries
-      - validEntries
-      - tweetLikeCount
-      - tweetRetweetCount
-      - tweetReplyCount
-      - tweetQuoteCount
-      - createdAt
-      properties:
-        id:
-          type: string
-          description: Draw public ID.
-        tweetUrl:
-          type: string
-          format: uri
-        tweetId:
-          type: string
-        tweetText:
-          type: string
-        tweetAuthorUsername:
-          type: string
-        status:
-          type: string
-        totalEntries:
-          type: integer
-        validEntries:
-          type: integer
-        tweetLikeCount:
-          type: integer
-        tweetRetweetCount:
-          type: integer
-        tweetReplyCount:
-          type: integer
-        tweetQuoteCount:
-          type: integer
-        createdAt:
-          type: string
-          format: date-time
-        drawnAt:
-          type: string
-          format: date-time
-    Winner:
-      description: Giveaway draw winner with position and backup flag.
-      type: object
-      required:
-      - authorUsername
-      - tweetId
-      - position
-      - isBackup
-      properties:
-        authorUsername:
-          type: string
-        tweetId:
-          type: string
-        position:
-          type: integer
-        isBackup:
-          type: boolean
-    DrawListItem:
-      description: Giveaway draw summary with entry counts and status.
-      type: object
-      required:
-      - id
-      - tweetUrl
-      - status
-      - totalEntries
-      - validEntries
-      - createdAt
-      properties:
-        id:
-          type: string
-          description: Draw public ID for detail responses.
-        tweetUrl:
-          type: string
-          format: uri
-        status:
-          type: string
-        totalEntries:
-          type: integer
-        validEntries:
-          type: integer
-        createdAt:
-          type: string
-          format: date-time
-        drawnAt:
-          type: string
-          format: date-time
     Error:
       description: 'Error response. Default v1 returns a legacy string error code. Send `xquik-api-contract: 2026-04-29` to receive the structured best-practice error object.
 
@@ -733,15 +721,103 @@ components:
           type: integer
           minimum: 1
           description: Required wait in milliseconds.
+    DrawListItem:
+      description: Giveaway draw summary with entry counts and status.
+      type: object
+      required:
+      - id
+      - tweetUrl
+      - status
+      - totalEntries
+      - validEntries
+      - createdAt
+      properties:
+        id:
+          type: string
+          description: Draw public ID for detail responses.
+        tweetUrl:
+          type: string
+          format: uri
+        status:
+          type: string
+        totalEntries:
+          type: integer
+        validEntries:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        drawnAt:
+          type: string
+          format: date-time
+    DrawDetail:
+      description: Full giveaway draw with tweet metrics, entries, and timing.
+      type: object
+      required:
+      - id
+      - tweetUrl
+      - tweetId
+      - tweetText
+      - tweetAuthorUsername
+      - status
+      - totalEntries
+      - validEntries
+      - tweetLikeCount
+      - tweetRetweetCount
+      - tweetReplyCount
+      - tweetQuoteCount
+      - createdAt
+      properties:
+        id:
+          type: string
+          description: Draw public ID.
+        tweetUrl:
+          type: string
+          format: uri
+        tweetId:
+          type: string
+        tweetText:
+          type: string
+        tweetAuthorUsername:
+          type: string
+        status:
+          type: string
+        totalEntries:
+          type: integer
+        validEntries:
+          type: integer
+        tweetLikeCount:
+          type: integer
+        tweetRetweetCount:
+          type: integer
+        tweetReplyCount:
+          type: integer
+        tweetQuoteCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        drawnAt:
+          type: string
+          format: date-time
+    Winner:
+      description: Giveaway draw winner with position and backup flag.
+      type: object
+      required:
+      - authorUsername
+      - tweetId
+      - position
+      - isBackup
+      properties:
+        authorUsername:
+          type: string
+        tweetId:
+          type: string
+        position:
+          type: integer
+        isBackup:
+          type: boolean
   parameters:
-    DrawId:
-      name: id
-      in: path
-      required: true
-      schema:
-        type: string
-        example: f4bd00a2-7b4e-4e59-8e1b-72e2c9f12345
-      description: Draw public ID returned by create and list draw responses.
     After:
       name: cursor
       in: query
@@ -759,90 +835,14 @@ components:
         minimum: 1
         maximum: 100
         default: 50
-  responses:
-    InvalidInput:
-      description: Invalid input
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: invalid_input
-            message: Invalid input. Check the request body.
-    NotFound:
-      description: Not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: not_found
-            message: Resource not found.
-    Unauthenticated:
-      description: Unauthenticated
-      headers:
-        Cache-Control:
-          description: Prevents storage of authentication responses.
-          schema:
-            type: string
-            const: no-store
-        WWW-Authenticate:
-          description: Bearer authentication challenge.
-          schema:
-            type: string
-            const: Bearer realm="xquik"
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: unauthenticated
-            message: Authentication required. Provide a valid API key or bearer token.
-    UnexpectedError:
-      content:
-        application/json:
-          example:
-            error: internal_error
-            message: Unexpected error. Try again.
-          schema:
-            $ref: '#/components/schemas/Error'
-      description: Unexpected error.
-    RateLimitExceeded:
-      description: 'Xquik tier rate limit exceeded. The response includes a `Retry-After` header with the number of seconds to wait before retrying.
-
-        '
-      content:
-        application/json:
-          schema:
-            allOf:
-            - $ref: '#/components/schemas/Error'
-            - type: object
-              properties:
-                retryAfter:
-                  type: integer
-                  example: 60
-          example:
-            error: rate_limit_exceeded
-            message: Too many requests. Try again later.
-            retryAfter: 60
-      headers:
-        Retry-After:
-          description: Seconds until the next permitted request.
-          schema:
-            example: 60
-            minimum: 1
-            type: integer
-    XApiError:
-      description: 'Dependency unavailable, unauthorized, or rate limited. Default v1 returns 502. The best-practice response contract returns 424 for transparent dependency failures.
-
-        '
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-          example:
-            error: x_api_unavailable
-            message: X data source temporarily unavailable. Try again later.
+    DrawId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        example: f4bd00a2-7b4e-4e59-8e1b-72e2c9f12345
+      description: Draw public ID returned by create and list draw responses.
   securitySchemes:
     apiKey:
       type: apiKey
