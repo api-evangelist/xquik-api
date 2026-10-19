@@ -97,3 +97,82 @@
     builder: Pipedream repo (component)
   status: not-a-workflow
   arazzo: null
+- slug: xquik-api-go-module-proxy
+  label: Go module proxy
+  partner_name: Go module proxy
+  category: official SDK (Go)
+  type: register
+  channel: package-registry
+  evidence: https://pkg.go.dev/github.com/Xquik-dev/x-twitter-scraper-cli
+  source: edge
+  relationship: distribution-channel
+  contract_reference:
+    register: Go module proxy (public registry JSON)
+    spec_file: null
+    language: Go
+    packages:
+    - name: github.com/Xquik-dev/x-twitter-scraper-cli
+      version: v0.13.6
+      released: '2026-10-14'
+      released_field: Time
+      lapsed: false
+      page: https://pkg.go.dev/github.com/Xquik-dev/x-twitter-scraper-cli
+      repo_leg: github-org:xquik-dev
+      publisher_leg: org:xquik-dev
+      matched_by: github-org
+    - name: github.com/Xquik-dev/x-twitter-scraper-go
+      version: v0.20.0
+      released: '2026-10-15'
+      released_field: Time
+      lapsed: false
+      page: https://pkg.go.dev/github.com/Xquik-dev/x-twitter-scraper-go
+      repo_leg: github-org:xquik-dev
+      publisher_leg: org:xquik-dev
+      matched_by: github-org
+    current: true
+    signal_note: 'an official package on the registry: distribution, not an integration; lapsed = no release in
+      24 months'
+    detected_by: sweep-official-sdks.py
+    detected: '2026-10-18'
+  status: not-a-workflow
+  arazzo: null
+- slug: xquik-api-npm-registry
+  label: npm registry
+  partner: npm
+  partner_name: npm registry
+  category: official SDK (JavaScript/TypeScript)
+  type: register
+  channel: package-registry
+  evidence: https://www.npmjs.com/package/@xquik/tweetclaw
+  source: edge
+  relationship: distribution-channel
+  contract_reference:
+    register: npm registry (public registry JSON)
+    spec_file: null
+    language: JavaScript/TypeScript
+    packages:
+    - name: '@xquik/tweetclaw'
+      version: 1.7.1
+      released: '2026-10-14'
+      released_field: modified
+      lapsed: false
+      page: https://www.npmjs.com/package/@xquik/tweetclaw
+      repo_leg: github-org:xquik-dev
+      publisher_leg: email:xquik.com
+      matched_by: domain
+    - name: x-twitter-scraper
+      version: 0.16.0
+      released: '2026-10-15'
+      released_field: modified
+      lapsed: false
+      page: https://www.npmjs.com/package/x-twitter-scraper
+      repo_leg: domain:xquik.com
+      publisher_leg: email:xquik.com
+      matched_by: domain
+    current: true
+    signal_note: 'an official package on the registry: distribution, not an integration; lapsed = no release in
+      24 months'
+    detected_by: sweep-official-sdks.py
+    detected: '2026-10-18'
+  status: not-a-workflow
+  arazzo: null
