@@ -272,6 +272,86 @@ edges:
     detected: '2026-10-20'
   detected_by: sweep-agent-skills.py
   first_seen: '2026-10-20'
+- partner_name: OpenSSF Best Practices Badge
+  partner: null
+  partner_match: register
+  type: register
+  channel: standard-directory
+  relationship: standard-participant
+  direction: partner-built
+  evidence: https://www.bestpractices.dev/en/projects/13725
+  category: OpenSSF Best Practices badge (open-source project security conformance)
+  contract_reference:
+    register: OpenSSF Best Practices badge projects (bestpractices.dev/en/projects.json, paged)
+    standard: OpenSSF Best Practices Badge criteria (formerly CII Best Practices; bestpractices.dev)
+    spec_file: null
+    role: badge-holder
+    registered_name: hermes-tweet
+    matched_by: github-org
+    matched_on: xquik-dev
+    certified_products:
+    - product: open-source project
+      product_type: open-source project
+      standard: OpenSSF Best Practices Badge criteria (formerly CII Best Practices; bestpractices.dev)
+      lapsed: false
+      partner_tier: passing
+      projects:
+      - name: hermes-tweet
+        id: 13725
+        url: https://www.bestpractices.dev/en/projects/13725
+        badge_level: passing
+      - name: n8n-nodes-xquik
+        id: 13726
+        url: https://www.bestpractices.dev/en/projects/13726
+        badge_level: passing
+      - name: paperclip-plugin-xquik
+        id: 13727
+        url: https://www.bestpractices.dev/en/projects/13727
+        badge_level: passing
+      - name: prefect-xquik
+        id: 13728
+        url: https://www.bestpractices.dev/en/projects/13728
+        badge_level: passing
+      - name: terraform-provider-x-twitter-scraper
+        id: 13729
+        url: https://www.bestpractices.dev/en/projects/13729
+        badge_level: passing
+      - name: tweetclaw
+        id: 13730
+        url: https://www.bestpractices.dev/en/projects/13730
+        badge_level: passing
+      - name: x-twitter-scraper
+        id: 13731
+        url: https://www.bestpractices.dev/en/projects/13731
+        badge_level: passing
+      - name: x-twitter-scraper-cli
+        id: 13732
+        url: https://www.bestpractices.dev/en/projects/13732
+        badge_level: passing
+      - name: x-twitter-scraper-csharp
+        id: 13733
+        url: https://www.bestpractices.dev/en/projects/13733
+        badge_level: passing
+      - name: x-twitter-scraper-go
+        id: 13734
+        url: https://www.bestpractices.dev/en/projects/13734
+        badge_level: passing
+      - name: x-twitter-scraper-java
+        id: 13735
+        url: https://www.bestpractices.dev/en/projects/13735
+        badge_level: passing
+      - name: x-twitter-scraper-kotlin
+        id: 13736
+        url: https://www.bestpractices.dev/en/projects/13736
+        badge_level: passing
+    signal_note: 'certified_products = ONE entry (product type: open-source project) with the highest CURRENT badge
+      level in partner_tier; a provider whose projects only lost the badge is lapsed: true; project names are context,
+      never counted; in_progress entries are not conformance'
+    detected_by: sweep-openssf-best-practices-badges.py
+    detected: '2026-10-22'
+    identity_source: apis.yml GitHubOrganization pointer (provider's own declaration)
+  detected_by: sweep-openssf-best-practices-badges.py
+  first_seen: '2026-10-22'
 generated: '2026-10-14'
 method: searched
 checked:
@@ -294,5 +374,6 @@ checked:
 - https://officialskills.sh/sitemap.xml
 - https://skillsmp.com/sitemap.xml
 - https://www.skills.sh/sitemap.xml
+- https://www.bestpractices.dev/en/projects.json
 source:
 - https://a2aregistry.org/api/agents
