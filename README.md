@@ -1,4 +1,4 @@
-# xquik-api
+# Xquik
 
 <!-- API-EVANGELIST-PROVENANCE:BEGIN -->
 > ### About this repository
@@ -64,4 +64,226 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Independent, third-party X (Twitter) data and automation platform offering 40+ tools for search, extraction, write actions, monitoring, webhooks, and trends. Provides a REST API with OpenAPI 3.1 contract, hosted MCP servers, llms.txt, and published agent skills. Not affiliated with X Corp.
+Xquik is an independent third-party X data and automation platform. It provides public data reads, connected-account write actions, monitoring, signed webhooks, exports, hosted MCP servers, OAuth 2.1, API keys, 8 SDKs, a CLI, Agent Skills, and an OpenAPI 3.1 contract. Not affiliated with X Corp.
+
+**Areas:** social-media-data · X / Twitter · Social Listening · Data Extraction · Automation · Webhook · MCP · Developer API · A2A
+
+## Xquik on APIs.io
+
+Everything profiled for Xquik is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/xquik-api/](https://apis.io/providers/xquik-api/)** — or go straight to one of the APIs or properties below.
+
+### APIs (22)
+
+- [Xquik API MCP Server](https://apis.io/apis/xquik-api/xquik-api-mcp-server/) — Hosted MCP server for the Xquik API with OAuth 2.1 and API-key access.
+- [Xquik Docs MCP Server](https://apis.io/apis/xquik-api/xquik-docs-mcp-server/) — Read-only hosted MCP server for searching Xquik documentation.
+- [Xquik Account API](https://apis.io/apis/xquik-api/xquik-api-account-api/) — Account info and settings
+- [Xquik API Keys API](https://apis.io/apis/xquik-api/xquik-api-api-keys-api/) — API key management (session auth only)
+- [Xquik Articles API](https://apis.io/apis/xquik-api/xquik-api-articles-api/) — Long-form X Article extraction
+- [Xquik Communities API](https://apis.io/apis/xquik-api/xquik-api-communities-api/) — X Community info, members, and tweets
+- [Xquik Composition API](https://apis.io/apis/xquik-api/xquik-api-composition-api/) — AI tweet composition, drafts, writing styles, and radar
+- [Xquik Draws API](https://apis.io/apis/xquik-api/xquik-api-draws-api/) — Giveaway draws from tweet replies
+- [Xquik Events API](https://apis.io/apis/xquik-api/xquik-api-events-api/) — Activity events from monitored accounts
+- [Xquik Extractions API](https://apis.io/apis/xquik-api/xquik-api-extractions-api/) — Bulk data extraction (23 tool types)
+- [Xquik Guest Wallets API](https://apis.io/apis/xquik-api/xquik-api-guest-wallets-api/) — Accountless prepaid access for paid read endpoints
+- [Xquik Lists API](https://apis.io/apis/xquik-api/xquik-api-lists-api/) — X List followers, members, and tweets
+- [Xquik Media API](https://apis.io/apis/xquik-api/xquik-api-media-api/) — Media upload and download
+- [Xquik Monitors API](https://apis.io/apis/xquik-api/xquik-api-monitors-api/) — X account monitoring with 1-second checks
+- [Xquik Subscribe API](https://apis.io/apis/xquik-api/xquik-api-subscribe-api/) — Subscription, billing, and credits
+- [Xquik Support API](https://apis.io/apis/xquik-api/xquik-api-support-api/) — Support ticket management
+- [Xquik Trends API](https://apis.io/apis/xquik-api/xquik-api-trends-api/) — Trending topics and hashtags by region
+- [Xquik Tweets API](https://apis.io/apis/xquik-api/xquik-api-tweets-api/) — Look up, search, and analyze individual tweets
+- [Xquik Users API](https://apis.io/apis/xquik-api/xquik-api-users-api/) — Look up, search, and explore user profiles and relationships
+- [Xquik Webhooks API](https://apis.io/apis/xquik-api/xquik-api-webhooks-api/) — Webhook endpoint management and delivery
+- [Xquik X Accounts API](https://apis.io/apis/xquik-api/xquik-api-x-accounts-api/) — Connected X account management
+- [Xquik X Write API](https://apis.io/apis/xquik-api/xquik-api-x-write-api/) — X write actions (tweets, likes, follows, DMs)
+
+### Published properties
+
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
+
+#### AsyncAPI (2)
+
+Event-driven and webhook contracts.
+
+- [Xquik Monitor Webhooks](https://apis.io/asyncapis/xquik-api/xquik-asyncapi/)
+- [Xquik Asyncapi Provenance](https://apis.io/asyncapis/xquik-api/xquik-asyncapi-provenance/)
+
+#### Event channels (2)
+
+Individual events and webhooks the provider emits.
+
+- [{callbackPath}](https://apis.io/channels/xquik-api/callbackpath/)
+- [{callbackPath}](https://apis.io/channels/xquik-api/xquik-monitor-webhooks-callbackpath/)
+
+#### MCP servers (2)
+
+Model Context Protocol servers that expose the API to agents.
+
+- [Xquik MCP Server](https://apis.io/servers/xquik-api/com-xquik-mcp/)
+- [mcp](https://apis.io/servers/xquik-api/mcp/)
+
+#### Agentic access (1)
+
+Which operations an agent can call, which act, and which need a human in the loop.
+
+- [Xquik Agentic Access](https://apis.io/agentic-access/xquik-api/xquik-agentic-access/)
+
+#### JSON Schema (2)
+
+The data models the API reads and writes.
+
+- [Xquik Webhook Endpoint](https://apis.io/schemas/xquik-api/xquik-webhook-endpoint.schema/)
+- [Xquik Webhook Event](https://apis.io/schemas/xquik-api/xquik-webhook-event.schema/)
+
+#### JSON-LD (1)
+
+Linked-data contexts for the provider's vocabulary.
+
+- [Xquik Context](https://apis.io/jsonld/xquik-api/xquik-context/)
+
+#### Vocabulary (1)
+
+The provider's domain terms, defined.
+
+- [Xquik API Vocabulary](https://apis.io/vocabularies/xquik-api/xquik-vocabulary/)
+
+#### Collections (1)
+
+Postman and Open Collection request collections.
+
+- [Xquik API](https://apis.io/collections/xquik-api/open-xquik-rest-api/)
+
+#### Overlays (21)
+
+OpenAPI overlays, including conversational phrasing for each operation.
+
+- [Xquik Api Account Api Phrasing Overlay](https://apis.io/overlays/xquik-api/xquik-api-account-api-phrasing-overlay/)
+- [Xquik Api Api Keys Api Phrasing Overlay](https://apis.io/overlays/xquik-api/xquik-api-api-keys-api-phrasing-overlay/)
+- [Xquik Api Articles Api Phrasing Overlay](https://apis.io/overlays/xquik-api/xquik-api-articles-api-phrasing-overlay/)
+- [Xquik Api Communities Api Phrasing Overlay](https://apis.io/overlays/xquik-api/xquik-api-communities-api-phrasing-overlay/)
+- [Xquik Api Composition Api Phrasing Overlay](https://apis.io/overlays/xquik-api/xquik-api-composition-api-phrasing-overlay/)
+- [Xquik Api Draws Api Phrasing Overlay](https://apis.io/overlays/xquik-api/xquik-api-draws-api-phrasing-overlay/)
+- [Xquik Api Events Api Phrasing Overlay](https://apis.io/overlays/xquik-api/xquik-api-events-api-phrasing-overlay/)
+- [Xquik Api Extractions Api Phrasing Overlay](https://apis.io/overlays/xquik-api/xquik-api-extractions-api-phrasing-overlay/)
+- [Xquik Api Guest Wallets Api Phrasing Overlay](https://apis.io/overlays/xquik-api/xquik-api-guest-wallets-api-phrasing-overlay/)
+- [Xquik Api Lists Api Phrasing Overlay](https://apis.io/overlays/xquik-api/xquik-api-lists-api-phrasing-overlay/)
+- [Xquik Api Media Api Phrasing Overlay](https://apis.io/overlays/xquik-api/xquik-api-media-api-phrasing-overlay/)
+- [Xquik Api Monitors Api Phrasing Overlay](https://apis.io/overlays/xquik-api/xquik-api-monitors-api-phrasing-overlay/)
+- [Xquik Api Subscribe Api Phrasing Overlay](https://apis.io/overlays/xquik-api/xquik-api-subscribe-api-phrasing-overlay/)
+- [Xquik Api Support Api Phrasing Overlay](https://apis.io/overlays/xquik-api/xquik-api-support-api-phrasing-overlay/)
+- [Xquik Api Trends Api Phrasing Overlay](https://apis.io/overlays/xquik-api/xquik-api-trends-api-phrasing-overlay/)
+- [Xquik Api Tweets Api Phrasing Overlay](https://apis.io/overlays/xquik-api/xquik-api-tweets-api-phrasing-overlay/)
+- [Xquik Api Users Api Phrasing Overlay](https://apis.io/overlays/xquik-api/xquik-api-users-api-phrasing-overlay/)
+- [Xquik Api Webhooks Api Phrasing Overlay](https://apis.io/overlays/xquik-api/xquik-api-webhooks-api-phrasing-overlay/)
+- [Xquik Api X Accounts Api Phrasing Overlay](https://apis.io/overlays/xquik-api/xquik-api-x-accounts-api-phrasing-overlay/)
+- [Xquik Api X Write Api Phrasing Overlay](https://apis.io/overlays/xquik-api/xquik-api-x-write-api-phrasing-overlay/)
+- [Xquik Overlay](https://apis.io/overlays/xquik-api/xquik-overlay/)
+
+#### Governance rules (1)
+
+Spectral rulesets for the provider's contracts.
+
+- [Xquik — xquik rules](https://apis.io/rules/xquik-api/xquik-rules/)
+
+#### Security (3)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Xquik Api Authentication](https://apis.io/security/xquik-api/xquik-api-authentication/)
+- [Xquik Api Domain Security](https://apis.io/security/xquik-api/xquik-api-domain-security/)
+- [Xquik Api Vulnerability Disclosure](https://apis.io/security/xquik-api/xquik-api-vulnerability-disclosure/)
+
+#### OAuth scopes (1)
+
+The permissions the API asks for.
+
+- [Xquik Scopes](https://apis.io/scopes/xquik-api/xquik-scopes/)
+
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [Xquik Plans](https://apis.io/plans/xquik-api/xquik-plans/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Xquik Rate Limits](https://apis.io/rate-limits/xquik-api/xquik-rate-limits/)
+
+#### FinOps (1)
+
+What the API costs to run, by operation.
+
+- [Xquik Finops](https://apis.io/finops/xquik-api/xquik-finops/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://xquik.com/en)
+- [Documentation](https://docs.xquik.com)
+- [Getting started](https://docs.xquik.com/x-api-quickstart)
+- [API reference](https://docs.xquik.com/api-reference/overview)
+- [Pricing](https://xquik.com/en#pricing)
+- [Sign up](https://dashboard.xquik.com/en/signup)
+- [Changelog](https://docs.xquik.com/changelog)
+- [Security](https://docs.xquik.com/security)
+- [Terms of service](https://xquik.com/en/terms)
+- [Privacy policy](https://xquik.com/en/privacy)
+- [GitHub](https://github.com/Xquik-dev)
+
+## API Evangelist rating
+
+**Kin Score 82.9** — exemplar · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 91.7 |
+| Contract quality | 66.7 |
+| Contract governance | 45.5 |
+| Operational transparency | 81.6 |
+| Developer ergonomics | 94.0 |
+| Access clarity | 92.1 |
+
+**Agent readiness 91.8** — agent-native
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | yes |
+| Reversibility Documented | — |
+| MCP Server | verified |
+| Auth Clarity | served (partial credit) |
+| Idempotency | verified |
+| Error Semantics | verified |
+| OpenAPI Examples | verified |
+| Rate Limit Signal | verified |
+| Event Surface Described | yes |
+| Agent Skills | yes |
+| Well Known Catalog | yes |
+| Consent Identity | yes |
+| Agent Card | conformant |
+| Dry Run Mode | yes |
+| Delegated Identity | served (partial credit) |
+| Protected Resource Metadata | verified |
+| Dynamic Client Registration | yes |
+| Agentic Commerce | — |
+| Pagination Ratio | paginated |
+| Operation Distinctiveness | distinct |
+
+**Regulatory alignment 45.1** — Horizontal (data, software, accessibility, platform)
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/xquik-api/](https://apis.io/providers/xquik-api/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for Xquik: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/xquik-api/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
