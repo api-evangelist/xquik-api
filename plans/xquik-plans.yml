@@ -1,0 +1,137 @@
+# Pricing transcribed from the provider's own page — see provenance. Numbers are quoted, not derived.
+generated: '2026-10-28'
+method: searched
+source: https://xquik.com/en#pricing
+sources:
+- https://xquik.com/en#pricing
+provenance:
+  tool: engine/economics/harvest_pricing.py
+  run: 20261028T120612
+  grounding: every price_text was found verbatim in the fetched page text
+audience: developer-api
+pricing_basis: per-call
+delivery:
+  delivery: managed
+  method: page
+  read: '2026-10-28'
+  managed_tier: Starter
+published: true
+note: Credit-based subscriptions plus one-time top-ups; page also cites unit rates like "$0.0036/hour",
+  "from $0.0012 per action", "from $0.00012 per tweet". Subscribe & save up to 20%; unused credits roll
+  over.
+plan_count: 7
+currency: USD
+plans:
+- name: Starter
+  price_text: $20 /mo
+  price: 20
+  currency: USD
+  period: month
+  unit: credits
+  included_quota: 140,000 credits/month
+  overage: add extra credits from $10
+- name: Pro
+  price_text: $99 /mo
+  price: 99
+  currency: USD
+  period: month
+  unit: credits
+  included_quota: 770,000 credits/month
+  overage: add extra credits from $10
+- name: Business
+  price_text: $199 /mo
+  price: 199
+  currency: USD
+  period: month
+  unit: credits
+  included_quota: 1,670,000 credits/month
+  overage: add extra credits from $10
+- name: Top up
+  price_text: $10 +66,666 credits
+  currency: USD
+  period: one-time
+  unit: credits
+  included_quota: 66,666 credits
+- name: Top up
+  price_text: $25 +166,666 credits
+  currency: USD
+  period: one-time
+  unit: credits
+  included_quota: 166,666 credits
+- name: Top up
+  price_text: $50 +333,333 credits
+  currency: USD
+  period: one-time
+  unit: credits
+  included_quota: 333,333 credits
+- name: Top up
+  price_text: $100 +666,666 credits
+  currency: USD
+  period: one-time
+  unit: credits
+  included_quota: 666,666 credits
+x-canonical:
+  generated: '2026-11-01'
+  vocabulary: engine/economics/plans-canonical.yml
+  models:
+  - hybrid
+  - metered
+  units:
+  - credit
+  plans:
+  - name: Starter
+    access: other
+    model: hybrid
+    model_how: derived
+    units:
+    - credit
+    periods:
+    - month
+  - name: Pro
+    access: other
+    model: hybrid
+    model_how: derived
+    units:
+    - credit
+    periods:
+    - month
+  - name: Business
+    access: other
+    model: hybrid
+    model_how: derived
+    units:
+    - credit
+    periods:
+    - month
+  - name: Top up
+    access: other
+    model: metered
+    model_how: derived
+    units:
+    - credit
+    periods:
+    - one-time
+  - name: Top up
+    access: other
+    model: metered
+    model_how: derived
+    units:
+    - credit
+    periods:
+    - one-time
+  - name: Top up
+    access: other
+    model: metered
+    model_how: derived
+    units:
+    - credit
+    periods:
+    - one-time
+  - name: Top up
+    access: other
+    model: metered
+    model_how: derived
+    units:
+    - credit
+    periods:
+    - one-time
